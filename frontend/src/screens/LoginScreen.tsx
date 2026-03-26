@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity,
-  SafeAreaView, Image, StyleSheet, Dimensions, Platform } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router } from 'expo-router';
-import EyeIcon from '../components/EyeIcon';
-import FieldError from '../components/FieldError';
-import { fonts } from '../theme/typography';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ValidationError } from 'yup';
-import { loginValidation } from '../validations/authValidation';
+import FieldError from '../components/FieldError';
+import EyeIcon from '../components/icons/EyeIcon';
+import { useAuth } from '../context/AuthContext';
 import { colors } from '../theme/color';
+import { fonts } from '../theme/typography';
+import { loginValidation } from '../validations/authValidation';
 
 export default function LoginScreen() {
   const { login, loading } = useAuth()
@@ -52,7 +52,7 @@ export default function LoginScreen() {
 
         <View style={styles.logoArea}>
           <Image
-            source={require('../assets/logo.png')}
+            source={require('../assets/images/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 24, fontFamily: fonts.bold, marginBottom: 32 },
+  title: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 32 },
   inputGroup: { marginBottom: 24 },
   label: { color: colors.gray, marginBottom: 4, fontSize: 14, fontFamily: fonts.regular },
   input: {
@@ -182,8 +182,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15, fontFamily: fonts.bold },
+  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
   registerWrapper: { alignItems: 'center' },
   registerText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
-  registerBold: { fontFamily: fonts.bold },
+  registerBold: { fontWeight: 'bold', },
 })

@@ -55,7 +55,7 @@ export default function ForgotPasswordScreen() {
 
         <View style={styles.logoArea}>
           <Image
-            source={require('../assets/logo.png')}
+            source={require('../assets/images/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 22, fontFamily: fonts.bold, marginBottom: 6 },
+  title: { color: colors.primary, fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
   subtitle: { color: colors.gray, fontSize: 13, fontFamily: fonts.regular, marginBottom: 32 },
   successText: {
     color: colors.primary,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15, fontFamily: fonts.bold },
+  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
   backWrapper: { alignItems: 'center' },
   backText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
 })

@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity,
-  SafeAreaView, Image, StyleSheet, Platform } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { router, useLocalSearchParams } from 'expo-router';
-import EyeIcon from '../components/EyeIcon';
-import FieldError from '../components/FieldError';
-import { fonts } from '../theme/typography';
+import React, { useState } from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet, 
+  Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ValidationError } from 'yup';
-import { resetPasswordValidation } from '../validations/authValidation';
+import FieldError from '../components/FieldError';
+import EyeIcon from '../components/icons/EyeIcon';
 import { authService } from '../services/authService';
 import { colors } from '../theme/color';
+import { fonts } from '../theme/typography';
+import { resetPasswordValidation } from '../validations/authValidation';
 
 export default function ResetPasswordScreen() {
   const { token } = useLocalSearchParams<{ token: string }>()
@@ -58,7 +58,7 @@ export default function ResetPasswordScreen() {
 
         <View style={styles.logoArea}>
           <Image
-            source={require('../assets/logo.png')}
+            source={require('../assets/images/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 22, fontFamily: fonts.bold, marginBottom: 6 },
+  title: { color: colors.primary, fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
   subtitle: { color: colors.gray, fontSize: 13, fontFamily: fonts.regular, marginBottom: 32 },
   successText: {
     color: colors.primary,
@@ -208,7 +208,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 2,
     fontSize: 15,
-    fontFamily: fonts.bold,
   },
   backWrapper: { alignItems: 'center' },
   backText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
