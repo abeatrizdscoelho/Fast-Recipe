@@ -26,6 +26,7 @@ export interface AuthResponseDTO {
     id: string
     name: string
     email: string
+    avatarUrl: string | null
   }
 }
 

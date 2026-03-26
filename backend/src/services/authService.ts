@@ -19,7 +19,7 @@ export const authService = {
     const user = await userRepository.create({ ...data, password: hashedPassword })
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
-    return { token, user: { id: user.id, name: user.name, email: user.email } }
+    return { token, user: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl ?? null } }
   },
 
   async login(data: LoginDTO): Promise<AuthResponseDTO> {
@@ -30,7 +30,7 @@ export const authService = {
     if (!validPassword) throw new Error('E-mail ou senha inválidos')
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
-    return { token, user: { id: user.id, name: user.name, email: user.email } }
+    return { token, user: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl ?? null } }
   },
 
   async forgotPassword(data: ForgotPasswordDTO): Promise<void> {

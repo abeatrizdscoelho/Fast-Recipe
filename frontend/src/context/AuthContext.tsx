@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
@@ -7,6 +8,7 @@ interface User {
   id: string
   name: string
   email: string
+  avatarUrl: string | null
 }
 
 interface AuthContextData {
@@ -17,6 +19,7 @@ interface AuthContextData {
   register: (name: string, email: string, password: string) => Promise<void>
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  updateUser: (user: User) => Promise<void>
 }
 
 // Gerenciamento de sessão
@@ -68,11 +71,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     delete api.defaults.headers.common['Authorization']
     setToken(null)
     setUser(null)
+    router.replace('/(auth)/login')
+  }
+
+  async function updateUser(updatedUser: User) {
+    await AsyncStorage.setItem('@fastrecipe:user', JSON.stringify(updatedUser))
+    setUser(updatedUser)
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, signed: !!user, register, login, logout }}>
+      value={{ user, token, loading, signed: !!user, register, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

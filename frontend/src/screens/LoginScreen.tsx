@@ -1,7 +1,9 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet,
-  Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ValidationError } from 'yup';
 import FieldError from '../components/FieldError';
@@ -12,10 +14,11 @@ import { fonts } from '../theme/typography';
 import { loginValidation } from '../validations/authValidation';
 
 export default function LoginScreen() {
-  const { login, loading } = useAuth()
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const [apiError, setApiError] = useState('')
 
@@ -24,6 +27,7 @@ export default function LoginScreen() {
       setApiError('')
       await loginValidation.validate({ email, password }, { abortEarly: false })
       setErrors({})
+      setLoading(true)
       await login(email, password)
       router.replace('/onboarding')
     } catch (err) {
@@ -37,6 +41,8 @@ export default function LoginScreen() {
       } else {
         setApiError(err instanceof Error ? err.message : 'Erro ao fazer login')
       }
+    } finally {
+      setLoading(false)       
     }
   }
 

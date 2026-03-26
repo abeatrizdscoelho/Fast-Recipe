@@ -42,4 +42,11 @@ export const userRepository = {
       },
     })
   },
+
+  async updateProfile(id: string, data: { name?: string; email?: string; password?: string; avatarUrl?: string }) {
+    return prisma.user.update({
+      where: { id },
+      data,
+    })
+  },
 }

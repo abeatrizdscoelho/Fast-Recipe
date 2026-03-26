@@ -32,7 +32,7 @@ export default function OnboardingScreen() {
 
   async function handleStart() {
     await AsyncStorage.setItem('@fastrecipe:onboarding', 'true')
-    router.replace('/')
+    router.replace('/(tabs)/profile')
   }
 
   return (

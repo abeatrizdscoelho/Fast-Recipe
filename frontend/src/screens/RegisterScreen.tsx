@@ -18,11 +18,12 @@ import { fonts } from '../theme/typography';
 import { registerValidation } from '../validations/authValidation';
 
 export default function RegisterScreen() {
-  const { register, loading } = useAuth()
+  const { register } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({})
   const [apiError, setApiError] = useState('')
 
@@ -31,6 +32,7 @@ export default function RegisterScreen() {
       setApiError('')
       await registerValidation.validate({ name, email, password }, { abortEarly: false })
       setErrors({})
+      setLoading(true)
       await register(name, email, password)
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -44,6 +46,8 @@ export default function RegisterScreen() {
       } else {
         setApiError(err instanceof Error ? err.message : 'Erro ao cadastrar')
       }
+    } finally {
+      setLoading(false)       
     }
   }
 
