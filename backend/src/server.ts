@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import recipeRoutes from './routes/recipeRoutes';
+import { authMiddleware } from './middlewares/authMiddleware';
+import favoriteRoutes from './routes/favoriteRoutes';
 
 dotenv.config()
 
@@ -15,6 +17,7 @@ app.use(express.json())
 app.use('/auth', authRoutes)
 app.use('/profile', userRoutes)
 app.use('/recipes', recipeRoutes)
+app.use('/favorites', authMiddleware, favoriteRoutes)
 
 app.get('/health', (req, res) => {res.json({ status: 'ok' })})
 

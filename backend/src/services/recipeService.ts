@@ -47,7 +47,7 @@ export const recipeService = {
         }
 
         const recipe = await recipeRepository.create(createData)
-        return { recipe: formatRecipe(recipe) }
+        return { recipe: { ...formatRecipe(recipe), favorite: false } }
     },
 
     async getById(id: string, userId: string): Promise<RecipeResponseDTO> {
@@ -58,12 +58,12 @@ export const recipeService = {
     },
 
     async getMyRecipes(authorId: string): Promise<RecipeListResponseDTO> {
-        const recipes = await recipeRepository.findByAuthor(authorId)
+        const recipes = await recipeRepository.findByAuthor(authorId, authorId)
         return { recipes: recipes.map(formatRecipe) }
     },
 
-    async getAll(page: number, limit: number): Promise<FeedResponseDTO> {
-        const { recipes, total } = await recipeRepository.findAll(page, limit)
+    async getAll(page: number, limit: number, userId: string): Promise<FeedResponseDTO> {
+        const { recipes, total } = await recipeRepository.findAll(page, limit, userId)
         const totalPages = Math.ceil(total / limit)
 
         return {

@@ -42,7 +42,7 @@ export const recipeController = {
     try {
       const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 10
-      const result = await recipeService.getAll(page, limit)
+      const result = await recipeService.getAll(page, limit, req.userId!) 
       return res.status(200).json(result)
     } catch (err) {
       return handleError(err, res)

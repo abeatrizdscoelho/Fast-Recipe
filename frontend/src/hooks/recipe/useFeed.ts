@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { Alert } from 'react-native'
 import { recipeService } from '../../services/recipeService'
 import { FeedRecipe } from '../../types/recipe'
+import { favoriteService } from '../../services/favoriteService'
 
 export function useFeed() {
     const [page, setPage] = useState(1)
@@ -36,10 +37,18 @@ export function useFeed() {
         loadFeed(1, true)
     }
 
-    function toggleFavorite(id: string) {
+    async function toggleFavorite(id: string) {
         setRecipes(prev =>
-            prev.map(recipe => recipe.id === id ? { ...recipe, favorite: !recipe.favorite } : recipe)
+            prev.map(r => r.id === id ? { ...r, favorite: !r.favorite } : r)
         )
+        try {
+            await favoriteService.toggle(id)
+        } catch {
+            setRecipes(prev =>
+                prev.map(r => r.id === id ? { ...r, favorite: !r.favorite } : r)
+            )
+            Alert.alert('Erro', 'Não foi possível salvar o favorito.')
+        }
     }
 
     return { recipes, loading, refreshing, hasNextPage, loadFeed, loadMore, refresh, toggleFavorite }
