@@ -125,7 +125,7 @@ export function useEditProfile() {
             })
             await updateUser(data.user)
             Alert.alert('Sucesso', 'Perfil atualizado com sucesso!')
-            router.back()
+            router.replace('/(tabs)/profile')
         } catch (err) {
             if (err instanceof ValidationError) {
                 const fieldErrors: typeof errors = {}

@@ -6,6 +6,7 @@ import { BottomNav } from '../../components/BottomNav';
 import { Header } from '../../components/Header';
 import { colors } from '../../theme/color';
 import { useProfile } from '../../hooks/profile/useProfile';
+import { RecipeCard } from '../recipe/components/RecipeCard';
 
 export default function ProfileScreen() {
   const {
@@ -99,64 +100,19 @@ export default function ProfileScreen() {
           )
         }
         renderItem={({ item }) => (
-          <View style={styles.recipeCard}>
-            {item.photos[0] || item.photo ? (
-              <Image source={{ uri: (item.photos[0] ?? item.photo)! }} style={styles.recipeImage} />
-            ) : (
-              <View style={[styles.recipeImage, styles.recipeImagePlaceholder]}>
-                <Ionicons name="image-outline" size={32} color="rgba(0,0,0,0.2)" />
-              </View>
-            )}
-            <View style={styles.recipeInfo}>
-
-              <View style={styles.recipeTitleRow}>
-                <Text style={[styles.recipeTitle, { flex: 1 }]} numberOfLines={2}>{item.title}</Text>
-                {item.authorId === user?.id && ( 
-                  <View style={styles.recipeOwnerActions}>
-                    <TouchableOpacity
-                      onPress={() => router.push({ pathname: '/(tabs)/edit-recipe', params: { id: item.id } })}
-                    >
-                      <Ionicons name="pencil-outline" size={15} color={colors.primary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                      <Ionicons name="trash-outline" size={15} color="#e05c5c" />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-
-              <View style={styles.recipeMeta}>
-                <Ionicons name="time-outline" size={13} color={colors.primary} />
-                <Text style={styles.recipeMetaText}>{item.time}min</Text>
-                {item.difficulty && (
-                  <>
-                    <Text style={styles.recipeDot}>|</Text>
-                    <Text style={styles.recipeMetaText}>{item.difficulty}</Text>
-                  </>
-                )}
-              </View>
-
-              <TouchableOpacity style={styles.favoriteRow} onPress={() => toggleFavorite(item.id)}>
-                <Ionicons
-                  name={item.favorite ? 'heart' : 'heart-outline'}
-                  size={14}
-                  color={item.favorite ? '#e05c5c' : colors.primary}
-                />
-                <Text style={[styles.favoriteText, item.favorite && { color: '#e05c5c' }]}>
-                  {item.favorite ? 'Favoritado' : 'Favoritar'}
-                </Text>
-              </TouchableOpacity>
-
-              {item.description && (
-                <Text style={styles.recipeDescription} numberOfLines={2}>{item.description}</Text>
-              )}
-
-              <TouchableOpacity style={styles.seeMoreBtn}>
-                <Text style={styles.seeMoreText}>Ver mais</Text>
-              </TouchableOpacity>
-
-            </View>
-          </View>
+          <RecipeCard
+            id={item.id}
+            title={item.title}
+            time={item.time}
+            difficulty={item.difficulty}
+            description={item.description}
+            photos={item.photos[0]}
+            favorite={item.favorite}
+            isOwner={item.authorId === user?.id}
+            onFavorite={toggleFavorite}
+            onEdit={(id) => router.push({ pathname: '/(tabs)/edit-recipe', params: { id } })}
+            onDelete={handleDelete}
+          />
         )}
       />
       <BottomNav />
@@ -267,90 +223,6 @@ const styles = StyleSheet.create({
   },
   tabTextActive: {
     color: colors.primary,
-    fontWeight: 'bold',
-  },
-
-  recipeCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    marginHorizontal: 20,
-    marginBottom: 14
-    ,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  recipeImage: {
-    width: 120,
-    height: '100%',
-  },
-  recipeInfo: {
-    flex: 1,
-    padding: 12,
-    gap: 4,
-  },
-  recipeTitle: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: colors.primary,
-    lineHeight: 18,
-  },
-  recipeMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  recipeMetaText: {
-    fontSize: 11,
-    color: colors.primary,
-  },
-  recipeDot: {
-    color: '#ccc',
-    fontSize: 11,
-  },
-  recipeImagePlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  recipeTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  recipeOwnerActions: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingTop: 2,
-  },
-  favoriteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  favoriteText: {
-    fontSize: 11,
-    color: colors.primary,
-  },
-  recipeDescription: {
-    fontSize: 11,
-    color: '#888',
-    lineHeight: 16,
-  },
-  seeMoreBtn: {
-    alignSelf: 'flex-end',
-    backgroundColor: colors.primary,
-    borderRadius: 50,
-    marginTop: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  seeMoreText: {
-    color: colors.white,
-    fontSize: 11,
     fontWeight: 'bold',
   },
 

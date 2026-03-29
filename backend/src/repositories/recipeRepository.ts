@@ -27,10 +27,22 @@ export const recipeRepository = {
     })
   },
 
-  async findAll() {
-    return prisma.recipe.findMany({
-      orderBy: { createdAt: 'desc' },
-    })
+  async findAll(page: number, limit: number) {
+    const skip = (page - 1) * limit
+    const [recipes, total] = await Promise.all([
+      prisma.recipe.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          author: {
+            select: { id: true, name: true, avatarUrl: true },
+          },
+        },
+      }),
+      prisma.recipe.count(),
+    ])
+    return { recipes, total }
   },
 
   async update(id: string, data: {

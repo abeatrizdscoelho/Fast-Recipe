@@ -9,24 +9,42 @@ export interface CreateRecipeDTO {
   description?: string
 }
 
+export interface RecipeDTO {
+  id: string
+  title: string
+  ingredients: string[]
+  preparation: string
+  time: string
+  portions: string
+  category: string
+  difficulty: string | null
+  description: string | null
+  photos: string[]
+  favorite: boolean
+  authorId: string
+  createdAt: string
+}
+
 export interface RecipeResponseDTO {
-  recipe: {
-    id: string
-    title: string
-    ingredients: string[]
-    preparation: string
-    time: string
-    portions: string
-    category: string
-    difficulty: string | null
-    description: string | null
-    photos: string[]
-    favorite: boolean
-    authorId: string
-    createdAt: string
-  }
+  recipe: RecipeDTO
 }
 
 export interface RecipeListResponseDTO {
-  recipes: RecipeResponseDTO['recipe'][]
+  recipes: RecipeDTO[]
+}
+
+export interface FeedRecipe extends RecipeDTO {
+  author: {
+    id: string
+    name: string
+    avatarUrl: string | null
+  }
+}
+
+export interface FeedResponseDTO {
+  recipes: FeedRecipe[]
+  total: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
 }

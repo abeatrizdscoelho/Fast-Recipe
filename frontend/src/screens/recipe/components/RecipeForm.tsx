@@ -42,7 +42,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
             <View style={styles.card}>
                 <View style={styles.cardHeader}>
                     <Text style={styles.cardTitle}>Cadastro de Receita</Text>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                    <TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} style={styles.backBtn}>
                         <Ionicons name="arrow-undo-outline" size={22} color={colors.primary} />
                     </TouchableOpacity>
                 </View>

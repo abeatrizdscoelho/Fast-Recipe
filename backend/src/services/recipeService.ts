@@ -1,6 +1,6 @@
 import { recipeRepository } from '../repositories/recipeRepository'
 import { uploadService } from './uploadService'
-import type { CreateRecipeDTO, RecipeResponseDTO, RecipeListResponseDTO } from '../models/recipeDTO'
+import type { CreateRecipeDTO, RecipeResponseDTO, RecipeListResponseDTO, FeedResponseDTO, FeedRecipe } from '../models/recipeDTO'
 
 function formatRecipe(recipe: {
     id: string
@@ -62,9 +62,24 @@ export const recipeService = {
         return { recipes: recipes.map(formatRecipe) }
     },
 
-    async getAll(): Promise<RecipeListResponseDTO> {
-        const recipes = await recipeRepository.findAll()
-        return { recipes: recipes.map(formatRecipe) }
+    async getAll(page: number, limit: number): Promise<FeedResponseDTO> {
+        const { recipes, total } = await recipeRepository.findAll(page, limit)
+        const totalPages = Math.ceil(total / limit)
+
+        return {
+            recipes: recipes.map(recipe => ({
+                ...formatRecipe(recipe),
+                author: {
+                    id: recipe.author.id,
+                    name: recipe.author.name,
+                    avatarUrl: recipe.author.avatarUrl ?? null,
+                },
+            })) as FeedRecipe[],
+            total,
+            page,
+            totalPages,
+            hasNextPage: page < totalPages,
+        }
     },
 
     async update(id: string, userId: string, data: Partial<CreateRecipeDTO>, photoBuffers?: Buffer[]): Promise<RecipeResponseDTO> {

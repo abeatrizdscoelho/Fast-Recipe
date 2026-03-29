@@ -40,7 +40,9 @@ export const recipeController = {
 
   async getAll(req: AuthRequest, res: Response) {
     try {
-      const result = await recipeService.getAll()
+      const page = parseInt(req.query.page as string) || 1
+      const limit = parseInt(req.query.limit as string) || 10
+      const result = await recipeService.getAll(page, limit)
       return res.status(200).json(result)
     } catch (err) {
       return handleError(err, res)
@@ -74,7 +76,7 @@ export const recipeController = {
 
   async delete(req: AuthRequest, res: Response) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id  
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
       await recipeService.delete(id, req.userId!)
       return res.status(204).send()
     } catch (err) {

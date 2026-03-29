@@ -29,7 +29,7 @@ export function useEditRecipe(id: string) {
         })
       } catch (err) {
         Alert.alert('Erro', 'Não foi possível carregar a receita.')
-        router.back()
+        router.replace('/(tabs)/profile')
       } finally {
         setFetching(false)
       }
@@ -42,7 +42,7 @@ export function useEditRecipe(id: string) {
       setLoading(true)
       await recipeService.update(id, data)
       Alert.alert('Sucesso!', 'Receita atualizada com sucesso.', [
-        { text: 'OK', onPress: () => router.back() },
+        { text: 'OK', onPress: () => router.replace('/(tabs)/profile') },
       ])
     } catch (err) {
       Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível atualizar a receita.')

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { api } from './api'
-import { RecipeFormData, Recipe } from '../types/recipe'
+import { RecipeFormData, Recipe, FeedResponse } from '../types/recipe'
 
 export const recipeService = {
     async create(data: RecipeFormData): Promise<{ recipe: Recipe }> {
@@ -38,7 +38,7 @@ export const recipeService = {
 
     async getMyRecipes(): Promise<{ recipes: Recipe[] }> {
         try {
-            const response = await api.get('/recipes')
+            const response = await api.get('/recipes/me')
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -48,14 +48,12 @@ export const recipeService = {
         }
     },
 
-    async getAll(): Promise<{ recipes: Recipe[] }> {
+    async getAll(page: number = 1, limit: number = 10): Promise<FeedResponse> {
         try {
-            const response = await api.get('/recipes/all')
+            const response = await api.get('/recipes/all', { params: { page, limit } })
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao buscar receitas')
-            }
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao buscar feed')
             throw new Error('Erro inesperado')
         }
     },

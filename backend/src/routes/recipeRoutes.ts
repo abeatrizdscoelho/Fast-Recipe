@@ -19,7 +19,7 @@ const upload = multer({
 const router = Router()
 
 router.post('/', authMiddleware, upload.array('photos', 5), recipeController.create)
-router.get('/', authMiddleware, recipeController.getMyRecipes)
+router.get('/me', authMiddleware, recipeController.getMyRecipes)
 router.get('/all', authMiddleware, recipeController.getAll)
 router.get('/:id', authMiddleware, recipeController.getById)
 router.put('/:id', authMiddleware, upload.array('photos', 5), recipeController.update)
