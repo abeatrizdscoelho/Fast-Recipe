@@ -1,15 +1,12 @@
 import { router } from 'expo-router';
 import React from 'react';
-import {
-    Image, Platform, SafeAreaView, StyleSheet,
-    Text, TextInput, TouchableOpacity, View
-} from 'react-native';
+import { Image, Platform, SafeAreaView, StyleSheet,
+    Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { useLogin } from '../../hooks/auth/useLogin';
 import { colors } from '../../theme/color';
-import { fonts } from '../../theme/typography';
 
 export default function LoginScreen() {
   const {
@@ -131,17 +128,16 @@ const styles = StyleSheet.create({
   },
   title: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 32 },
   inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14, fontFamily: fonts.regular },
+  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
     paddingBottom: 8,
     fontSize: 16,
     color: colors.black,
-    fontFamily: fonts.regular,
   },
   inputError: { borderBottomColor: colors.error },
-  inputNoBorder: { paddingBottom: 8, fontSize: 16, color: colors.black, fontFamily: fonts.regular },
+  inputNoBorder: { paddingBottom: 8, fontSize: 16, color: colors.black },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -150,7 +146,7 @@ const styles = StyleSheet.create({
   },
   passwordRowError: { borderBottomColor: colors.error },
   forgotWrapper: { alignItems: 'flex-end', marginBottom: 16 },
-  forgotText: { color: colors.gray, fontSize: 13, fontFamily: fonts.light },
+  forgotText: { color: colors.gray, fontSize: 13 },
   button: {
     backgroundColor: colors.primary,
     borderRadius: 50,
@@ -162,6 +158,6 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
   registerWrapper: { alignItems: 'center' },
-  registerText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
+  registerText: { color: colors.primary, fontSize: 13 },
   registerBold: { fontWeight: 'bold', },
 })

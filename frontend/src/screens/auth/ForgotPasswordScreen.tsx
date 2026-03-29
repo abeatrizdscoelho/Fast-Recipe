@@ -5,7 +5,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import FieldError from '../../components/FieldError';
 import { useForgotPassword } from '../../hooks/auth/useForgotPassword';
 import { colors } from '../../theme/color';
-import { fonts } from '../../theme/typography';
 
 export default function ForgotPasswordScreen() {
   const {
@@ -121,23 +120,21 @@ const styles = StyleSheet.create({
     }),
   },
   title: { color: colors.primary, fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
-  subtitle: { color: colors.gray, fontSize: 13, fontFamily: fonts.regular, marginBottom: 32 },
+  subtitle: { color: colors.gray, fontSize: 13, marginBottom: 32 },
   successText: {
     color: colors.primary,
     fontSize: 15,
-    fontFamily: fonts.regular,
     textAlign: 'center',
     marginVertical: 32,
   },
   inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14, fontFamily: fonts.regular },
+  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
     paddingBottom: 8,
     fontSize: 16,
     color: colors.black,
-    fontFamily: fonts.regular,
   },
   inputError: { borderBottomColor: colors.error },
   button: {
@@ -151,5 +148,5 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
   backWrapper: { alignItems: 'center' },
-  backText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
+  backText: { color: colors.primary, fontSize: 13 },
 })

@@ -51,10 +51,20 @@ export const recipeService = {
     },
 
     async getById(id: string, userId: string): Promise<RecipeResponseDTO> {
-        const recipe = await recipeRepository.findById(id)
+        const recipe = await recipeRepository.findById(id, userId)
         if (!recipe) throw new Error('Receita não encontrada')
-        if (recipe.authorId !== userId) throw new Error('Sem permissão para acessar esta receita')
-        return { recipe: formatRecipe(recipe) }
+
+        return {
+            recipe: {
+                ...formatRecipe(recipe),
+                favorite: recipe.favorites ? recipe.favorites.length > 0 : false,
+                author: {
+                    id: recipe.author.id,
+                    name: recipe.author.name,
+                    avatarUrl: recipe.author.avatarUrl ?? null,
+                },
+            } as FeedRecipe,
+        }
     },
 
     async getMyRecipes(authorId: string): Promise<RecipeListResponseDTO> {

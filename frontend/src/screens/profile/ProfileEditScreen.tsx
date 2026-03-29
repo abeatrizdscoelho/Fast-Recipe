@@ -8,7 +8,7 @@ import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { colors } from '../../theme/color';
 import { fonts } from '../../theme/typography';
-import { useEditProfile } from '../../hooks/profile/useEditProfile';
+import { useEditProfile } from '../../hooks/profile/useProfileEdit';
 
 const DIETARY_OPTIONS = [
     'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 
@@ -282,13 +282,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 6,
-        fontFamily: fonts.regular,
     },
     labelHint: {
         color: colors.gray,
         fontSize: 12,
         marginBottom: 10,
-        fontFamily: fonts.regular,
     },
     inputRow: {
         flexDirection: 'row',
@@ -302,7 +300,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 15,
         color: colors.black,
-        fontFamily: fonts.regular,
         paddingVertical: 0,
     },
     inputActive: {
@@ -332,7 +329,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: colors.primary,
         fontWeight: '600',
-        fontFamily: fonts.regular,
     },
     chipTextActive: {
         color: colors.white,

@@ -5,7 +5,7 @@ import { RecipeForm } from './components/RecipeForm';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
 import { colors } from '../../theme/color';
-import { useEditRecipe } from '../../hooks/recipe/useEditRecipe';
+import { useEditRecipe } from '../../hooks/recipe/useRecipeEdit';
 
 export default function EditRecipeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()

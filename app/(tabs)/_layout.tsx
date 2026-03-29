@@ -10,10 +10,10 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" />
       <Tabs.Screen name="profile" />
-      <Tabs.Screen name="create-recipe" />
-      <Tabs.Screen name="edit-recipe" />
+      <Tabs.Screen name="profile-edit" />
+      <Tabs.Screen name="recipe-create" />
+      <Tabs.Screen name="recipe-edit" />
       <Tabs.Screen name="recipe-detail" />
-      <Tabs.Screen name="edit-profile" options={{ href: null }} />
     </Tabs>
   )
 }

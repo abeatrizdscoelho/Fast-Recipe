@@ -16,8 +16,17 @@ export const recipeRepository = {
     return prisma.recipe.create({ data })
   },
 
-  async findById(id: string) {
-    return prisma.recipe.findUnique({ where: { id } })
+  async findById(id: string, userId?: string) {
+    return prisma.recipe.findUnique({
+      where: { id },
+      include: {
+        author: { select: { id: true, name: true, avatarUrl: true } },
+        favorites: userId ? {
+          where: { userId },
+          select: { id: true },
+        } : false,
+      },
+    })
   },
 
   async findByAuthor(authorId: string, userId: string) {

@@ -1,2 +1,2 @@
-import FeedScreen from '@/frontend/src/screens/recipe/FeedScreen';
-export default FeedScreen;
+import RecipeFeedScreen from '@/frontend/src/screens/recipe/RecipeFeedScreen';
+export default RecipeFeedScreen;

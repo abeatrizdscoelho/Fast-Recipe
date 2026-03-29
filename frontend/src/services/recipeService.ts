@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { api } from './api'
-import { RecipeFormData, Recipe, FeedResponse } from '../types/recipe'
+import { RecipeFormData, Recipe, FeedResponse, FeedRecipe } from '../types/recipe'
 
 export const recipeService = {
     async create(data: RecipeFormData): Promise<{ recipe: Recipe }> {
@@ -58,7 +58,7 @@ export const recipeService = {
         }
     },
 
-    async getById(id: string): Promise<{ recipe: Recipe }> {
+    async getById(id: string): Promise<{ recipe: FeedRecipe }> {
         try {
             const response = await api.get(`/recipes/${id}`)
             return response.data

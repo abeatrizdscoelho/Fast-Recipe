@@ -3,14 +3,14 @@ import { useFocusEffect } from 'expo-router';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet,
     Text, TextInput, View } from 'react-native';
-import { useFeed } from '../../hooks/recipe/useFeed';
+import { useFeed } from '../../hooks/recipe/useRecipeFeed';
 import { colors } from '../../theme/color';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
 import { FeedRecipe } from '../../types/recipe';
 import { RecipeCard } from './components/RecipeCard';
 
-export default function FeedScreen() {
+export default function RecipeFeedScreen() {
     const { recipes, loading, refreshing, loadFeed, loadMore, refresh, toggleFavorite } = useFeed()
 
     useFocusEffect(

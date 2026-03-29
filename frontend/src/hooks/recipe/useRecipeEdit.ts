@@ -22,10 +22,7 @@ export function useEditRecipe(id: string) {
           category: data.recipe.category,
           difficulty: data.recipe.difficulty ?? '',
           description: data.recipe.description ?? '',
-          photos: data.recipe.photos ?? (
-            data.recipe.photoUrl ? [data.recipe.photoUrl] :
-            data.recipe.photo ? [data.recipe.photo] : []
-          ),
+          photos: data.recipe.photos ?? (data.recipe.photos ? [data.recipe.photos] : []),
         })
       } catch (err) {
         Alert.alert('Erro', 'Não foi possível carregar a receita.')

@@ -7,7 +7,6 @@ import { useRegister } from '../../hooks/auth/useRegister';
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { colors } from '../../theme/color';
-import { fonts } from '../../theme/typography';
 
 export default function RegisterScreen() {
   const {
@@ -134,17 +133,16 @@ const styles = StyleSheet.create({
   },
   title: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 32 },
   inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14, fontFamily: fonts.regular },
+  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
     paddingBottom: 8,
     fontSize: 16,
     color: colors.black,
-    fontFamily: fonts.regular,
   },
   inputError: { borderBottomColor: colors.error },
-  inputNoBorder: { paddingBottom: 8, fontSize: 16, color: colors.black, fontFamily: fonts.regular },
+  inputNoBorder: { paddingBottom: 8, fontSize: 16, color: colors.black },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -163,6 +161,6 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
   loginWrapper: { alignItems: 'center' },
-  loginText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
+  loginText: { color: colors.primary, fontSize: 13 },
   loginBold: { fontWeight: 'bold', },
 })

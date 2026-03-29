@@ -7,7 +7,6 @@ import { useResetPassword } from '../../hooks/auth/useResetPassword';
 import EyeIcon from '../../components/icons/EyeIcon';
 import FieldError from '../../components/FieldError';
 import { colors } from '../../theme/color';
-import { fonts } from '../../theme/typography';
 
 export default function ResetPasswordScreen() {
   const {
@@ -141,21 +140,19 @@ const styles = StyleSheet.create({
     }),
   },
   title: { color: colors.primary, fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
-  subtitle: { color: colors.gray, fontSize: 13, fontFamily: fonts.regular, marginBottom: 32 },
+  subtitle: { color: colors.gray, fontSize: 13, marginBottom: 32 },
   successText: {
     color: colors.primary,
     fontSize: 15,
-    fontFamily: fonts.regular,
     textAlign: 'center',
     marginVertical: 32,
   },
   inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14, fontFamily: fonts.regular },
+  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
   inputNoBorder: {
     paddingBottom: 8,
     fontSize: 16,
     color: colors.black,
-    fontFamily: fonts.regular,
   },
   passwordRow: {
     flexDirection: 'row',
@@ -180,5 +177,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   backWrapper: { alignItems: 'center' },
-  backText: { color: colors.primary, fontSize: 13, fontFamily: fonts.regular },
+  backText: { color: colors.primary, fontSize: 13 },
 })

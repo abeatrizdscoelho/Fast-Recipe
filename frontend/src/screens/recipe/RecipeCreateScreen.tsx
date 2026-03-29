@@ -4,7 +4,7 @@ import { RecipeForm } from './components/RecipeForm';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
 import { colors } from '../../theme/color';
-import { useCreateRecipe } from '../../hooks/recipe/useCreateRecipe';
+import { useCreateRecipe } from '../../hooks/recipe/useRecipeCreate';
 
 export default function CreateRecipeScreen() {
   const { loading, handleSubmit } = useCreateRecipe()
