@@ -1,2 +1,2 @@
-import ResetPasswordScreen from '@/frontend/src/screens/ResetPasswordScreen';
+import ResetPasswordScreen from '@/frontend/src/screens/auth/ResetPasswordScreen';
 export default ResetPasswordScreen;

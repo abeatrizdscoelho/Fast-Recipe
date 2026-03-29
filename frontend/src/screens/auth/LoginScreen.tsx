@@ -1,13 +1,15 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet,
-  Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    Image, Platform, SafeAreaView, StyleSheet,
+    Text, TextInput, TouchableOpacity, View
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import FieldError from '../components/FieldError';
-import EyeIcon from '../components/icons/EyeIcon';
-import { colors } from '../theme/color';
-import { fonts } from '../theme/typography';
-import { useLogin } from '../hooks/auth/useLogin';
+import FieldError from '../../components/FieldError';
+import EyeIcon from '../../components/icons/EyeIcon';
+import { useLogin } from '../../hooks/auth/useLogin';
+import { colors } from '../../theme/color';
+import { fonts } from '../../theme/typography';
 
 export default function LoginScreen() {
   const {

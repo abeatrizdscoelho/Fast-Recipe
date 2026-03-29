@@ -1,2 +1,2 @@
-import ForgotPasswordScreen from '@/frontend/src/screens/ForgotPasswordScreen';
+import ForgotPasswordScreen from '@/frontend/src/screens/auth/ForgotPasswordScreen';
 export default ForgotPasswordScreen;

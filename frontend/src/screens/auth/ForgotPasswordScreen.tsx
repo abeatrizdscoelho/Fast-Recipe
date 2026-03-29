@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity,
-  SafeAreaView, Image, StyleSheet, Platform } from 'react-native';
+import { Image, Platform, SafeAreaView, StyleSheet,
+    Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import FieldError from '../components/FieldError';
-import { fonts } from '../theme/typography';
-import { colors } from '../theme/color';
-import { useForgotPassword } from '../hooks/auth/useForgotPassword';
+import FieldError from '../../components/FieldError';
+import { useForgotPassword } from '../../hooks/auth/useForgotPassword';
+import { colors } from '../../theme/color';
+import { fonts } from '../../theme/typography';
 
 export default function ForgotPasswordScreen() {
   const {
