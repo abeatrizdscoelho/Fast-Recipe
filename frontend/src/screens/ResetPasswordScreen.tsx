@@ -1,50 +1,20 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet, 
+import { router } from 'expo-router';
+import React from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet,
   Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ValidationError } from 'yup';
 import FieldError from '../components/FieldError';
 import EyeIcon from '../components/icons/EyeIcon';
-import { authService } from '../services/authService';
 import { colors } from '../theme/color';
 import { fonts } from '../theme/typography';
-import { resetPasswordValidation } from '../validations/authValidation';
+import { useResetPassword } from '../hooks/auth/useResetPassword';
 
 export default function ResetPasswordScreen() {
-  const { token } = useLocalSearchParams<{ token: string }>()
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({})
-  const [apiError, setApiError] = useState('')
-  const [success, setSuccess] = useState(false)
-
-  async function handleResetPassword() {
-    try {
-      setApiError('')
-      await resetPasswordValidation.validate({ password, confirmPassword }, { abortEarly: false })
-      setErrors({})
-      setLoading(true)
-      await authService.resetPassword(token, password, confirmPassword)
-      setSuccess(true)
-    } catch (err) {
-      if (err instanceof ValidationError) {
-        const fieldErrors: { password?: string; confirmPassword?: string } = {}
-        err.inner.forEach(e => {
-          if (e.path === 'password') fieldErrors.password = e.message
-          if (e.path === 'confirmPassword') fieldErrors.confirmPassword = e.message
-        })
-        setErrors(fieldErrors)
-      } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao redefinir senha')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+  const {
+    password, setPassword, confirmPassword, setConfirmPassword,
+    showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
+    loading, errors, apiError, success, handleResetPassword
+  } = useResetPassword()
 
   return (
     <SafeAreaView style={styles.container}>
@@ -111,7 +81,7 @@ export default function ResetPasswordScreen() {
                 <FieldError message={errors.confirmPassword} />
               </View>
 
-              {apiError ? <FieldError message={apiError} /> : null}
+              {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
               <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}

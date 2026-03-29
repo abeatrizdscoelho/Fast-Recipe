@@ -1,62 +1,22 @@
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet,
-  FlatList, Image
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
-import { BottomNav } from '../components/BottomNav';
-import { colors } from '../theme/color';
-import { Header } from '../components/Header';
-
-// Receitas mockadas (por enquanto)
-const mockRecipes = [
-  {
-    id: '1',
-    title: 'Lasanha de Carne Moída e Queijo',
-    time: '45min',
-    difficulty: 'Fácil',
-    description: 'Uma opção leve e saborosa para o almoço.',
-    image: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=400',
-    favorite: false,
-  },
-  {
-    id: '2',
-    title: 'Frango Grelhado com Legumes',
-    time: '30min',
-    difficulty: 'Fácil',
-    description: 'Prato leve, saudável e muito saboroso.',
-    image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400',
-    favorite: true,
-  },
-  {
-    id: '3',
-    title: 'Risoto de Camarão',
-    time: '60min',
-    difficulty: 'Médio',
-    description: 'Cremoso e cheio de sabor do mar.',
-    image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400',
-    favorite: false,
-  },
-]
-
-type Tab = 'minhas' | 'favoritas';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback } from 'react';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BottomNav } from '../../components/BottomNav';
+import { Header } from '../../components/Header';
+import { colors } from '../../theme/color';
+import { useProfile } from '../../hooks/profile/useProfile';
 
 export default function ProfileScreen() {
-  const { user } = useAuth()
-  const [activeTab, setActiveTab] = useState<Tab>('minhas')
-  const [recipes, setRecipes] = useState(mockRecipes)
+  const {
+    user, activeTab, setActiveTab, fetching, displayed, initials, loadRecipes, toggleFavorite, handleDelete
+  } = useProfile()
 
-  function toggleFavorite(id: string) {
-    setRecipes(prev =>
-      prev.map(recipe => recipe.id === id ? { ...recipe, favorite: !recipe.favorite } : recipe)
-    )
-  }
-
-  const displayed = activeTab === 'minhas' ? recipes : recipes.filter(recipe => recipe.favorite)
-
-  const initials = user?.name?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() ?? '?';
+  useFocusEffect(
+    useCallback(() => {
+      loadRecipes()
+    }, [loadRecipes])
+  )
 
   return (
     <View style={styles.container}>
@@ -84,13 +44,16 @@ export default function ProfileScreen() {
               <Text style={styles.userEmail}>{user?.email ?? ''}</Text>
 
               <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => router.push('/(tabs)/create-recipe')}
+                >
                   <Ionicons name="add-circle-outline" size={18} color={colors.white} />
                   <Text style={styles.actionText}>Nova Receita</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.actionOutline]}
-                  onPress={() => router.push('/edit-profile')}
+                  onPress={() => router.push('/(tabs)/edit-profile')}
                 >
                   <Ionicons name="create-outline" size={18} color="#DDBC9B" />
                   <Text style={[styles.actionText, { color: '#DDBC9B' }]}>Editar Perfil</Text>
@@ -122,26 +85,58 @@ export default function ProfileScreen() {
           </>
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Ionicons name="bookmark-outline" size={48} color="rgba(255,255,255,0.2)" />
-            <Text style={styles.emptyText}>Nenhuma receita favorita ainda.</Text>
-          </View>
+          fetching ? (
+            <View style={styles.empty}>
+              <ActivityIndicator size="large" color="rgba(255,255,255,0.4)" />
+            </View>
+          ) : (
+            <View style={styles.empty}>
+              <Ionicons name="bookmark-outline" size={48} color="rgba(255,255,255,0.2)" />
+              <Text style={styles.emptyText}>
+                {activeTab === 'minhas' ? 'Nenhuma receita criada ainda.' : 'Nenhuma receita favorita ainda.'}
+              </Text>
+            </View>
+          )
         }
         renderItem={({ item }) => (
           <View style={styles.recipeCard}>
-            <Image source={{ uri: item.image }} style={styles.recipeImage} />
+            {item.photos[0] || item.photo ? (
+              <Image source={{ uri: (item.photos[0] ?? item.photo)! }} style={styles.recipeImage} />
+            ) : (
+              <View style={[styles.recipeImage, styles.recipeImagePlaceholder]}>
+                <Ionicons name="image-outline" size={32} color="rgba(0,0,0,0.2)" />
+              </View>
+            )}
             <View style={styles.recipeInfo}>
-              <Text style={styles.recipeTitle} numberOfLines={2}>{item.title}</Text>
+
+              <View style={styles.recipeTitleRow}>
+                <Text style={[styles.recipeTitle, { flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+                {item.authorId === user?.id && ( 
+                  <View style={styles.recipeOwnerActions}>
+                    <TouchableOpacity
+                      onPress={() => router.push({ pathname: '/(tabs)/edit-recipe', params: { id: item.id } })}
+                    >
+                      <Ionicons name="pencil-outline" size={15} color={colors.primary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                      <Ionicons name="trash-outline" size={15} color="#e05c5c" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
               <View style={styles.recipeMeta}>
                 <Ionicons name="time-outline" size={13} color={colors.primary} />
-                <Text style={styles.recipeMetaText}>{item.time}</Text>
-                <Text style={styles.recipeDot}>|</Text>
-                <Text style={styles.recipeMetaText}>{item.difficulty}</Text>
+                <Text style={styles.recipeMetaText}>{item.time}min</Text>
+                {item.difficulty && (
+                  <>
+                    <Text style={styles.recipeDot}>|</Text>
+                    <Text style={styles.recipeMetaText}>{item.difficulty}</Text>
+                  </>
+                )}
               </View>
-              <TouchableOpacity
-                style={styles.favoriteRow}
-                onPress={() => toggleFavorite(item.id)}
-              >
+
+              <TouchableOpacity style={styles.favoriteRow} onPress={() => toggleFavorite(item.id)}>
                 <Ionicons
                   name={item.favorite ? 'heart' : 'heart-outline'}
                   size={14}
@@ -151,12 +146,15 @@ export default function ProfileScreen() {
                   {item.favorite ? 'Favoritado' : 'Favoritar'}
                 </Text>
               </TouchableOpacity>
-              <Text style={styles.recipeDescription} numberOfLines={2}>
-                {item.description}
-              </Text>
+
+              {item.description && (
+                <Text style={styles.recipeDescription} numberOfLines={2}>{item.description}</Text>
+              )}
+
               <TouchableOpacity style={styles.seeMoreBtn}>
                 <Text style={styles.seeMoreText}>Ver mais</Text>
               </TouchableOpacity>
+
             </View>
           </View>
         )}
@@ -277,7 +275,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 16,
     marginHorizontal: 20,
-    marginBottom: 14,
+    marginBottom: 14
+    ,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -285,7 +284,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   recipeImage: {
-    width: 110,
+    width: 120,
     height: '100%',
   },
   recipeInfo: {
@@ -312,6 +311,21 @@ const styles = StyleSheet.create({
     color: '#ccc',
     fontSize: 11,
   },
+  recipeImagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  recipeTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  recipeOwnerActions: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingTop: 2,
+  },
   favoriteRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -330,9 +344,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     backgroundColor: colors.primary,
     borderRadius: 50,
+    marginTop: 5,
     paddingHorizontal: 12,
     paddingVertical: 5,
-    marginTop: 4,
   },
   seeMoreText: {
     color: colors.white,

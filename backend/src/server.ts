@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import recipeRoutes from './routes/recipeRoutes';
 
 dotenv.config()
 
@@ -13,6 +14,7 @@ app.use(express.json())
 
 app.use('/auth', authRoutes)
 app.use('/profile', userRoutes)
+app.use('/recipes', recipeRoutes)
 
 app.get('/health', (req, res) => {res.json({ status: 'ok' })})
 

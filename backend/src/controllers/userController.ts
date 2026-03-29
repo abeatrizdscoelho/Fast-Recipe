@@ -26,12 +26,16 @@ export const userController = {
 
   async updateProfile(req: AuthRequest, res: Response) {
     try {
+      if (req.body.dietaryPreferences && typeof req.body.dietaryPreferences === 'string') {
+        req.body.dietaryPreferences = JSON.parse(req.body.dietaryPreferences)
+      }
       const data = await updateProfileSchema.validate(req.body, { abortEarly: false })
-
-      // O avatar vem como buffer via multer (req.file)
+      const sanitizedData = {
+        ...data,
+        dietaryPreferences: data.dietaryPreferences?.filter((p): p is string => !!p),
+      }
       const avatarBuffer = req.file?.buffer
-
-      const result = await userService.updateProfile(req.userId!, data, avatarBuffer)
+      const result = await userService.updateProfile(req.userId!, sanitizedData, avatarBuffer)
       return res.status(200).json(result)
     } catch (err) {
       return handleError(err, res)

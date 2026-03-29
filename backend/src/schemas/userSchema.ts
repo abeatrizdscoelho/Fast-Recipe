@@ -19,6 +19,7 @@ export const updateProfileSchema = yup.object({
           .required('Confirmação de senha obrigatória')
           .oneOf([yup.ref('password')], 'As senhas não coincidem'),
     }),
+  dietaryPreferences: yup.array().of(yup.string()).optional(),
 })
 
 export type UpdateProfileInput = yup.InferType<typeof updateProfileSchema>

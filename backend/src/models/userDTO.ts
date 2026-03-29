@@ -3,6 +3,7 @@ export interface UpdateProfileDTO {
   email?: string
   password?: string
   confirmPassword?: string
+  dietaryPreferences?: string[] 
 }
 
 export interface UpdateProfileResponseDTO {
@@ -11,5 +12,6 @@ export interface UpdateProfileResponseDTO {
     name: string
     email: string
     avatarUrl: string | null
+    dietaryPreferences: string[] 
   }
 }

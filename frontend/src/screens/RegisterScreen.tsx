@@ -1,55 +1,20 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import {
-  Image,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text, TextInput, TouchableOpacity,
-  View
-} from 'react-native';
+import React from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ValidationError } from 'yup';
 import FieldError from '../components/FieldError';
 import EyeIcon from '../components/icons/EyeIcon';
-import { useAuth } from '../context/AuthContext';
 import { colors } from '../theme/color';
 import { fonts } from '../theme/typography';
-import { registerValidation } from '../validations/authValidation';
+import { useRegister } from '../hooks/auth/useRegister';
 
 export default function RegisterScreen() {
-  const { register } = useAuth()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({})
-  const [apiError, setApiError] = useState('')
-
-  async function handleRegister() {
-    try {
-      setApiError('')
-      await registerValidation.validate({ name, email, password }, { abortEarly: false })
-      setErrors({})
-      setLoading(true)
-      await register(name, email, password)
-    } catch (err) {
-      if (err instanceof ValidationError) {
-        const fieldErrors: { name?: string; email?: string; password?: string } = {}
-        err.inner.forEach(e => {
-          if (e.path === 'name') fieldErrors.name = e.message
-          if (e.path === 'email') fieldErrors.email = e.message
-          if (e.path === 'password') fieldErrors.password = e.message
-        })
-        setErrors(fieldErrors)
-      } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao cadastrar')
-      }
-    } finally {
-      setLoading(false)       
-    }
-  }
+  const {
+    name, setName, email, setEmail,
+    password, setPassword, showPassword, setShowPassword,
+    loading, errors, apiError, handleRegister
+  } = useRegister()
 
   return (
     <SafeAreaView style={styles.container}>
@@ -111,7 +76,7 @@ export default function RegisterScreen() {
             <FieldError message={errors.password} />
           </View>
 
-          {apiError ? <FieldError message={apiError} /> : null}
+          {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}

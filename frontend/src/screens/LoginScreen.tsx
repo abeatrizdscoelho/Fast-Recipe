@@ -1,50 +1,20 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import {
-  Image, Platform, SafeAreaView, StyleSheet,
-  Text, TextInput, TouchableOpacity, View
-} from 'react-native';
+import React from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ValidationError } from 'yup';
 import FieldError from '../components/FieldError';
 import EyeIcon from '../components/icons/EyeIcon';
-import { useAuth } from '../context/AuthContext';
 import { colors } from '../theme/color';
 import { fonts } from '../theme/typography';
-import { loginValidation } from '../validations/authValidation';
+import { useLogin } from '../hooks/auth/useLogin';
 
 export default function LoginScreen() {
-  const { login } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const [apiError, setApiError] = useState('')
-
-  async function handleLogin() {
-    try {
-      setApiError('')
-      await loginValidation.validate({ email, password }, { abortEarly: false })
-      setErrors({})
-      setLoading(true)
-      await login(email, password)
-      router.replace('/onboarding')
-    } catch (err) {
-      if (err instanceof ValidationError) {
-        const fieldErrors: { email?: string; password?: string } = {}
-        err.inner.forEach(e => {
-          if (e.path === 'email') fieldErrors.email = e.message
-          if (e.path === 'password') fieldErrors.password = e.message
-        })
-        setErrors(fieldErrors)
-      } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao fazer login')
-      }
-    } finally {
-      setLoading(false)       
-    }
-  }
+  const {
+    email, setEmail, password, setPassword,
+    showPassword, setShowPassword, loading,
+    errors, apiError, handleLogin
+  } = useLogin()
 
   return (
     <SafeAreaView style={styles.container}>
@@ -101,7 +71,7 @@ export default function LoginScreen() {
             <Text style={styles.forgotText}>Esqueci minha senha</Text>
           </TouchableOpacity>
 
-          {apiError ? <FieldError message={apiError} /> : null}
+          {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
@@ -120,7 +90,7 @@ export default function LoginScreen() {
 
       </KeyboardAwareScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({

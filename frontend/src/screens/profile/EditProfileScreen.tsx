@@ -1,95 +1,28 @@
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity,
-    StyleSheet, SafeAreaView, Platform, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
+import React from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet,
+    Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useAuth } from '../context/AuthContext';
-import { colors } from '../theme/color';
-import { fonts } from '../theme/typography';
-import EyeIcon from '../components/icons/EyeIcon';
-import { userService } from '../services/userService';
-import { editProfileValidation } from '../validations/userValidation';
-import { ValidationError } from 'yup';
-import FieldError from '../components/FieldError';
+import FieldError from '../../components/FieldError';
+import EyeIcon from '../../components/icons/EyeIcon';
+import { colors } from '../../theme/color';
+import { fonts } from '../../theme/typography';
+import { useEditProfile } from '../../hooks/profile/useEditProfile';
+
+const DIETARY_OPTIONS = [
+    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 
+    'Sem açúcar', 'Low carb', 'Cetogênico',
+]
 
 export default function EditProfileScreen() {
-    const { user, updateUser } = useAuth()
-    const [name, setName] = useState(user?.name ?? '')
-    const [email, setEmail] = useState(user?.email ?? '')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [editingField, setEditingField] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
-    const [avatarUri, setAvatarUri] = useState<string | null>(user?.avatarUrl ?? null)
-    const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string }>({})
-    const [apiError, setApiError] = useState('')
-
-    async function handlePickAvatar() {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-        if (status !== 'granted') {
-            Alert.alert('Permissão necessária', 'Precisamos acessar sua galeria.')
-            return
-        }
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.8,
-        })
-        if (!result.canceled) {
-            setAvatarUri(result.assets[0].uri)
-        }
-    }
-
-    async function handleSave() {
-        try {
-            setApiError('')
-            await editProfileValidation.validate({ name, email, password, confirmPassword }, { abortEarly: false })
-            setErrors({})
-            setLoading(true)
-            const isNewAvatar = avatarUri && avatarUri !== user?.avatarUrl
-            const hasChanges = name !== user?.name || email !== user?.email || !!password || !!isNewAvatar
-            if (!hasChanges) {
-                Alert.alert('Aviso', 'Nenhuma alteração foi feita.')
-                setLoading(false)
-                return
-            }
-            const data = await userService.updateProfile({
-                name: name !== user?.name ? name : undefined,
-                email: email !== user?.email ? email : undefined,
-                password: password || undefined,
-                confirmPassword: confirmPassword || undefined,
-                avatar: isNewAvatar ? (() => {
-                    const filename = avatarUri.split('/').pop() ?? 'avatar.jpg'
-                    const match = /\.(\w+)$/.exec(filename)
-                    const type = match ? `image/${match[1]}` : 'image/jpeg'
-                    return { uri: avatarUri, name: filename, type }
-                })() : undefined,
-            })
-            await updateUser(data.user)
-            Alert.alert('Sucesso', 'Perfil atualizado com sucesso!')
-            router.back()
-        } catch (err) {
-            if (err instanceof ValidationError) {
-                const fieldErrors: typeof errors = {}
-                err.inner.forEach(e => {
-                    if (e.path === 'name') fieldErrors.name = e.message
-                    if (e.path === 'email') fieldErrors.email = e.message
-                    if (e.path === 'password') fieldErrors.password = e.message
-                    if (e.path === 'confirmPassword') fieldErrors.confirmPassword = e.message
-                })
-                setErrors(fieldErrors)
-            } else {
-                setApiError(err instanceof Error ? err.message : 'Não foi possível atualizar o perfil.')
-            }
-        } finally {
-            setLoading(false)
-        }
-    }
+    const {
+    user, name, setName, email, setEmail, password, setPassword,
+    confirmPassword, setConfirmPassword, showPassword, setShowPassword,
+    showConfirmPassword, setShowConfirmPassword, editingField, setEditingField,
+    loading, avatarUri, dietaryPreferences, errors, apiError,
+    togglePreference, handlePickAvatar, handleSave
+  } = useEditProfile()
 
     return (
         <SafeAreaView style={styles.container}>
@@ -234,7 +167,31 @@ export default function EditProfileScreen() {
                         </View>
                     )}
 
-                    {apiError ? <FieldError message={apiError} /> : null}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Preferências Alimentares</Text>
+                        <Text style={styles.labelHint}>Toque para selecionar ou remover</Text>
+                        <View style={styles.chipsContainer}>
+                            {DIETARY_OPTIONS.map(pref => {
+                                const isSelected = dietaryPreferences.includes(pref)
+                                return (
+                                    <TouchableOpacity
+                                        key={pref}
+                                        style={[styles.chip, isSelected && styles.chipActive]}
+                                        onPress={() => togglePreference(pref)}
+                                    >
+                                        {isSelected && (
+                                            <Ionicons name="checkmark" size={13} color={colors.white} />
+                                        )}
+                                        <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                                            {pref}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </View>
+                    </View>
+
+                    {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
                     <TouchableOpacity
                         style={[styles.button, loading && styles.buttonDisabled]}
@@ -311,7 +268,7 @@ const styles = StyleSheet.create({
     avatarEditBadge: {
         position: 'absolute',
         bottom: 0,
-        right: '33%',
+        right: '35%',
         backgroundColor: colors.primary,
         borderRadius: 12,
         padding: 4,
@@ -325,6 +282,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 6,
+        fontFamily: fonts.regular,
+    },
+    labelHint: {
+        color: colors.gray,
+        fontSize: 12,
+        marginBottom: 10,
         fontFamily: fonts.regular,
     },
     inputRow: {
@@ -344,6 +307,35 @@ const styles = StyleSheet.create({
     },
     inputActive: {
         color: colors.primary,
+    },
+
+    chipsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    chip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 50,
+        borderWidth: 1.5,
+        borderColor: '#e0d6d0',
+    },
+    chipActive: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+    },
+    chipText: {
+        fontSize: 13,
+        color: colors.primary,
+        fontWeight: '600',
+        fontFamily: fonts.regular,
+    },
+    chipTextActive: {
+        color: colors.white,
     },
 
     button: {

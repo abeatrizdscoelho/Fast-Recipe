@@ -20,6 +20,7 @@ export const userService = {
     password?: string
     confirmPassword?: string
     avatar?: { uri: string; name: string; type: string }
+    dietaryPreferences?: string[]
   }) {
     try {
       const formData = new FormData()
@@ -28,12 +29,9 @@ export const userService = {
       if (data.password) formData.append('password', data.password)
       if (data.confirmPassword) formData.append('confirmPassword', data.confirmPassword)
       if (data.avatar) {
-        formData.append('avatar', {
-          uri: data.avatar.uri,
-          name: data.avatar.name,
-          type: data.avatar.type,
-        } as any)
+        formData.append('avatar', {uri: data.avatar.uri, name: data.avatar.name, type: data.avatar.type} as any)
       }
+      if (data.dietaryPreferences) formData.append('dietaryPreferences', JSON.stringify(data.dietaryPreferences))  
 
       const response = await api.put('/profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
