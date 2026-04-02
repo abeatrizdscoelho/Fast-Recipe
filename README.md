@@ -92,7 +92,7 @@ Uma tarefa é considerada **pronta** quando:
 
 ## 📊 Sprints
 Sprint | Previsão | Status | Vídeo do Projeto |
-|------|--------|------|---------|----------|
+|------|----------|--------|------------------|
 |01 | 16/03/2026 - 05/04/2026 |⏳ Em andamento| <a href=''>Ver Vídeo</a> |
 |02|  13/04/2026 - 03/05/2026 |⏳ A iniciar| <a href=''>Ver Vídeo</a> |
 |03| 11/05/2026 - 31/05/2026 |⏳ A iniciar| <a href=''>Ver Vídeo</a> |
