@@ -3,11 +3,11 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity,
     StyleSheet, ScrollView, Image, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/frontend/src/theme/color';
-import { RecipeFormData } from '@/frontend/src/types/recipe';
-import FieldError from '@/frontend/src/components/FieldError';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useRecipeForm } from '@/frontend/src/hooks/recipe/useRecipeForm';
+import { RecipeFormData } from '@/src/types/recipe';
+import { useRecipeForm } from '@/src/hooks/recipe/useRecipeForm';
+import { colors } from '@/src/theme/color';
+import FieldError from '@/src/components/FieldError';
 
 const CATEGORIES = [
     'Café da manhã', 'Almoço', 'Jantar', 'Lanche',

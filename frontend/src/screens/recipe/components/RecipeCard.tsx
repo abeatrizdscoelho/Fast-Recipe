@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { colors } from '@/frontend/src/theme/color';
+import { colors } from '@/src/theme/color';
 
 type Props = {
   id: string

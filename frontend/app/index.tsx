@@ -2,8 +2,8 @@ import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from '@/frontend/src/context/AuthContext';
-import { colors } from '@/frontend/src/theme/color';
+import { useAuth } from '@/src/context/AuthContext';
+import { colors } from '@/src/theme/color';
 
 export default function Index() {
   const { signed, loading } = useAuth()

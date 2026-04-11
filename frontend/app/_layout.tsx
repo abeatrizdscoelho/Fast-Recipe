@@ -1,8 +1,7 @@
-import '../global.css';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'react-native';
+import { AuthProvider } from '@/src/context/AuthContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from '@/frontend/src/context/AuthContext';
 
 export default function RootLayout() {
   return (

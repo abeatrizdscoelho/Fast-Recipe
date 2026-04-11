@@ -7,7 +7,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { colors } from '../../theme/color';
-import { fonts } from '../../theme/typography';
 import { useEditProfile } from '../../hooks/profile/useProfileEdit';
 
 const DIETARY_OPTIONS = [
