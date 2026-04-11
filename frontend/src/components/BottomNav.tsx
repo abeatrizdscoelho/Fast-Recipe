@@ -8,24 +8,32 @@ type Tab = {
   icon: keyof typeof Ionicons.glyphMap
   iconActive: keyof typeof Ionicons.glyphMap
   route: string
+  matchSegment: string 
 }
 
 const tabs: Tab[] = [
-  { icon: 'home-outline', iconActive: 'home', route: '/(tabs)' },
-  { icon: 'archive-outline', iconActive: 'archive', route: '/pantry' },
-  { icon: 'calendar-outline', iconActive: 'calendar', route: '/calendar' },
-  { icon: 'list-outline', iconActive: 'list', route: '/list' },
-  { icon: 'person-outline', iconActive: 'person', route: '/profile' },
+  { icon: 'home-outline', iconActive: 'home', route: '/(tabs)', matchSegment: 'index' },
+  { icon: 'archive-outline', iconActive: 'archive', route: '/pantry', matchSegment: 'pantry' },
+  { icon: 'calendar-outline', iconActive: 'calendar', route: '/calendar', matchSegment: 'calendar' },
+  { icon: 'list-outline', iconActive: 'list', route: '/list', matchSegment: 'list' },
+  { icon: 'person-outline', iconActive: 'person', route: '/profile', matchSegment: 'profile' },
 ]
 
 export function BottomNav() {
   const router = useRouter()
   const pathname = usePathname()
 
+  function isTabActive(tab: Tab) {
+    if (tab.matchSegment === 'index') {
+      return pathname === '/' || pathname === '/index' || pathname.endsWith('/(tabs)')
+    }
+    return pathname.includes(tab.matchSegment)
+  }
+
   return (
     <View style={styles.container}>
       {tabs.map((tab) => {
-        const isActive = pathname === tab.route
+        const isActive = isTabActive(tab)
         return (
           <TouchableOpacity
             key={tab.route}

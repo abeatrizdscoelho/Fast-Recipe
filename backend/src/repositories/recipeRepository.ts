@@ -46,30 +46,33 @@ export const recipeRepository = {
     }))
   },
 
-  async findAll(page: number, limit: number, userId: string) {
+  async findAll(page: number, limit: number, userId: string, search?: string) {
     const skip = (page - 1) * limit
-    const [recipes, total] = await Promise.all([
-      prisma.recipe.findMany({
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        include: {
-          author: {
-            select: { id: true, name: true, avatarUrl: true },
-          },
-          favorites: {
-            where: { userId },
-            select: { id: true },
-          },
-        },
-      }),
-      prisma.recipe.count(),
-    ])
+
+    const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+
+    const allRecipes = await prisma.recipe.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: { select: { id: true, name: true, avatarUrl: true } },
+        favorites: { where: { userId }, select: { id: true } },
+      },
+    })
+
+    const filtered = search ? allRecipes.filter(r => {
+        const term = normalize(search)
+        return (
+          normalize(r.title).includes(term) ||
+          normalize(r.description ?? '').includes(term) ||
+          r.ingredients.some(i => normalize(i).includes(term))
+        )
+      }) : allRecipes
+
+    const total = filtered.length
+    const paginated = filtered.slice(skip, skip + limit)
+
     return {
-      recipes: recipes.map(r => ({
-        ...r,
-        favorite: r.favorites.length > 0,
-      })),
+      recipes: paginated.map(r => ({ ...r, favorite: r.favorites.length > 0 })),
       total,
     }
   },

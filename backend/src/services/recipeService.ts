@@ -72,8 +72,8 @@ export const recipeService = {
         return { recipes: recipes.map(formatRecipe) }
     },
 
-    async getAll(page: number, limit: number, userId: string): Promise<FeedResponseDTO> {
-        const { recipes, total } = await recipeRepository.findAll(page, limit, userId)
+    async getAll(page: number, limit: number, userId: string, search?: string): Promise<FeedResponseDTO> {
+        const { recipes, total } = await recipeRepository.findAll(page, limit, userId, search)
         const totalPages = Math.ceil(total / limit)
 
         return {

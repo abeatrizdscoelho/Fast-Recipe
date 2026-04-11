@@ -3,7 +3,7 @@ import { useFocusEffect } from 'expo-router';
 import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet,
     Text, TextInput, View } from 'react-native';
-import { useFeed } from '../../hooks/recipe/useRecipeFeed';
+import { feedStore, useFeed } from '../../hooks/recipe/useRecipeFeed';
 import { colors } from '../../theme/color';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
@@ -11,11 +11,14 @@ import { FeedRecipe } from '../../types/recipe';
 import { RecipeCard } from './components/RecipeCard';
 
 export default function RecipeFeedScreen() {
-    const { recipes, loading, refreshing, loadFeed, loadMore, refresh, toggleFavorite } = useFeed()
+    const {
+        recipes, loading, refreshing, loadFeed, loadMore, refresh, toggleFavorite, search, handleSearch
+    } = useFeed()
 
     useFocusEffect(
         useCallback(() => {
-            loadFeed(1, true)
+            const savedSearch = feedStore.getSearch()
+            loadFeed(1, false, savedSearch.trim() || undefined)
         }, [])
     )
 
@@ -39,9 +42,34 @@ export default function RecipeFeedScreen() {
         )
     }
 
+    if (loading && recipes.length === 0) {
+        return (
+            <View style={styles.container}>
+                <Header />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="rgba(255,255,255,0.6)" />
+                </View>
+                <BottomNav />
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
             <Header />
+
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Pesquisar receitas..."
+                    placeholderTextColor="#aaa"
+                    value={search}
+                    onChangeText={handleSearch}
+                    returnKeyType="search"
+                    clearButtonMode="while-editing"
+                />
+                <Ionicons name="search-outline" size={20} color="#aaa" style={styles.searchIcon} />
+            </View>
 
             <FlatList
                 data={recipes}
@@ -53,31 +81,24 @@ export default function RecipeFeedScreen() {
                 onEndReachedThreshold={0.3}
                 refreshing={refreshing}
                 onRefresh={refresh}
-                ListHeaderComponent={
-                    <View style={styles.searchContainer}>
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Pesquisar receitas..."
-                            placeholderTextColor="#aaa"
-                        />
-                        <Ionicons name="search-outline" size={20} color="#aaa" style={styles.searchIcon} />
-                    </View>
-                }
                 ListEmptyComponent={
-                    loading ? (
-                        <View style={styles.empty}>
-                            <ActivityIndicator size="large" color="rgba(255,255,255,0.4)" />
-                        </View>
-                    ) : (
-                        <View style={styles.empty}>
-                            <Ionicons name="restaurant-outline" size={48} color="rgba(255,255,255,0.2)" />
-                            <Text style={styles.emptyText}>Nenhuma receita publicada ainda.</Text>
-                        </View>
-                    )
+                    <View style={styles.empty}>
+                        <Ionicons name="restaurant-outline" size={48} color="rgba(255,255,255,0.2)" />
+                        <Text style={styles.emptyText}>
+                            {search
+                                ? `Nenhuma receita encontrada para "${search}".`
+                                : 'Nenhuma receita publicada ainda.'
+                            }
+                        </Text>
+                    </View>
                 }
                 ListFooterComponent={
                     loading && recipes.length > 0 ? (
-                        <ActivityIndicator size="small" color="rgba(255,255,255,0.4)" style={{ marginVertical: 16 }} />
+                        <ActivityIndicator
+                            size="small"
+                            color="rgba(255,255,255,0.4)"
+                            style={{ marginVertical: 16 }}
+                        />
                     ) : null
                 }
             />
@@ -90,6 +111,7 @@ export default function RecipeFeedScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.primary },
     listContent: { paddingBottom: 16 },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
     searchContainer: {
         margin: 16,

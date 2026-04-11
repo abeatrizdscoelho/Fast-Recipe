@@ -6,16 +6,21 @@ import { useAuth } from '@/src/context/AuthContext';
 import { colors } from '@/src/theme/color';
 
 export default function Index() {
-  const { signed, loading } = useAuth()
+  const { signed, loading, user } = useAuth()
   const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null)
 
   useEffect(() => {
+    if (loading) return
+    if (!signed || !user?.id) {
+      setOnboardingDone(null)
+      return
+    }
     async function checkOnboarding() {
-      const done = await AsyncStorage.getItem('@fastrecipe:onboarding')
+      const done = await AsyncStorage.getItem(`@fastrecipe:onboarding:${user!.id}`)
       setOnboardingDone(done === 'true')
     }
-    if (signed) checkOnboarding()
-  }, [signed])
+    checkOnboarding()
+  }, [loading, signed, user?.id]) 
 
   if (loading || (signed && onboardingDone === null)) {
     return (

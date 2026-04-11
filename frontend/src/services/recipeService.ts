@@ -48,9 +48,11 @@ export const recipeService = {
         }
     },
 
-    async getAll(page: number = 1, limit: number = 10): Promise<FeedResponse> {
+    async getAll(page: number = 1, limit: number = 10, search?: string): Promise<FeedResponse> {
         try {
-            const response = await api.get('/recipes/all', { params: { page, limit } })
+            const response = await api.get('/recipes/all', {
+                params: { page, limit, ...(search ? { search } : {}) },
+            })
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao buscar feed')

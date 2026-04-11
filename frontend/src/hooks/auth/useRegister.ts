@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ValidationError } from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { registerValidation } from '../../validations/authValidation';
+import { router } from 'expo-router';
 
 export function useRegister() {
   const { register } = useAuth()
@@ -20,6 +21,7 @@ export function useRegister() {
       setErrors({})
       setLoading(true)
       await register(name, email, password)
+      router.replace('/(auth)/login')
     } catch (err) {
       if (err instanceof ValidationError) {
         const fieldErrors: { name?: string; email?: string; password?: string } = {}

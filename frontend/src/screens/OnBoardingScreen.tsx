@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { colors } from '../theme/color';
+import { useAuth } from '../context/AuthContext';
 
 const { height } = Dimensions.get('window')
 
@@ -29,9 +30,10 @@ const features = [
 ]
 
 export default function OnboardingScreen() {
+  const { user } = useAuth()
 
   async function handleStart() {
-    await AsyncStorage.setItem('@fastrecipe:onboarding', 'true')
+    await AsyncStorage.setItem(`@fastrecipe:onboarding:${user?.id}`, 'true')
     router.replace('/(tabs)/profile')
   }
 

@@ -20,7 +20,7 @@ export function useLogin() {
       setErrors({})
       setLoading(true)
       await login(email, password)
-      router.replace('/onboarding')
+      router.replace('/')
     } catch (err) {
       if (err instanceof ValidationError) {
         const fieldErrors: { email?: string; password?: string } = {}
