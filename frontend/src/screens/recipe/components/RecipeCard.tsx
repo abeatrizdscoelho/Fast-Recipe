@@ -120,7 +120,7 @@ export function RecipeCard({
 
           <TouchableOpacity
             style={styles.seeMoreBtn}
-            onPress={() => router.push({ pathname: '/(tabs)/recipe-detail', params: { id } })}
+            onPress={() => router.push({ pathname: '/recipe/[id]', params: { id } })}
           >
             <Text style={styles.seeMoreText}>Ver mais</Text>
           </TouchableOpacity>

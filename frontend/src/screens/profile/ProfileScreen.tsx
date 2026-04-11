@@ -47,14 +47,14 @@ export default function ProfileScreen() {
               <View style={styles.actions}>
                 <TouchableOpacity
                   style={styles.actionButton}
-                  onPress={() => router.push('/(tabs)/recipe-create')}
+                  onPress={() => router.push('/recipe/create')}
                 >
                   <Ionicons name="add-circle-outline" size={18} color={colors.white} />
                   <Text style={styles.actionText}>Nova Receita</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.actionOutline]}
-                  onPress={() => router.push('/(tabs)/profile-edit')}
+                  onPress={() => router.push('/profile/edit')}
                 >
                   <Ionicons name="create-outline" size={18} color="#DDBC9B" />
                   <Text style={[styles.actionText, { color: '#DDBC9B' }]}>Editar Perfil</Text>
@@ -110,7 +110,7 @@ export default function ProfileScreen() {
             favorite={item.favorite}
             isOwner={item.authorId === user?.id}
             onFavorite={toggleFavorite}
-            onEdit={(id) => router.push({ pathname: '/(tabs)/recipe-edit', params: { id } })}
+            onEdit={(id) => router.push({ pathname: '/recipe/edit', params: { id } })}
             onDelete={handleDelete}
           />
         )}
