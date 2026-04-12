@@ -19,7 +19,7 @@ if (!URL_BASE) throw new Error('URL_BASE não definido.')
 
 export const emailService = {
   async sendPasswordReset(to: string, name: string, token: string) {
-    const resetUrl = `http://192.168.0.10:3000/auth/reset-password?token=${token}` // Para emular: http://10.0.2.2:3000
+    const resetUrl = `${process.env.URL_BASE}/auth/reset-password?token=${token}` // Para emular: http://10.0.2.2:3000
 
     await transporter.sendMail({
       from: `"Fast Recipe" <${GMAIL_USER}>`,

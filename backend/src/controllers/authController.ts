@@ -62,6 +62,6 @@ export const authController = {
       return res.status(400).send('Token inválido')
     }
     // return res.redirect(`fastrecipe://reset-password?token=${token}`)
-    return res.redirect(`exp://192.168.0.10:8081/--/(auth)/reset-password?token=${token}`)
+    return res.redirect(`${process.env.EXPO_URL}/--/(auth)/reset-password?token=${token}`)
   },
 }
