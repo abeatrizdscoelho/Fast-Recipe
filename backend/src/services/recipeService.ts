@@ -41,7 +41,7 @@ export const recipeService = {
         if (photoBuffers && photoBuffers.length > 0) {
             createData.photos = await Promise.all(
                 photoBuffers.map((buffer, i) =>
-                    uploadService.uploadAvatar(buffer, `recipe-${Date.now()}-${i}`)
+                    uploadService.uploadRecipePhoto(buffer, `recipe-${Date.now()}-${i}`)
                 )
             )
         }
@@ -102,7 +102,7 @@ export const recipeService = {
         if (photoBuffers && photoBuffers.length > 0) {
             updateData.photos = await Promise.all(
                 photoBuffers.map((buffer, i) =>
-                    uploadService.uploadAvatar(buffer, `recipe-${id}-${i}`)
+                    uploadService.uploadRecipePhoto(buffer, `recipe-${id}-${i}`)
                 )
             )
         }

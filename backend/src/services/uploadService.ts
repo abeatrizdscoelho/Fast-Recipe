@@ -31,4 +31,28 @@ export const uploadService = {
       readable.pipe(uploadStream)
     })
   },
+
+  async uploadRecipePhoto(buffer: Buffer, publicId: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'fastrecipe/recipes',
+          public_id: publicId,
+          overwrite: true,
+          transformation: [
+            { width: 1200, crop: 'limit', quality: 'auto:best', fetch_format: 'auto' },
+          ],
+        },
+        (error, result) => {
+          if (error || !result) return reject(error ?? new Error('Upload falhou'))
+          resolve(result.secure_url)
+        }
+      )
+
+      const readable = new Readable()
+      readable.push(buffer)
+      readable.push(null)
+      readable.pipe(uploadStream)
+    })
+  },
 }
