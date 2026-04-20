@@ -19,6 +19,16 @@ export const createRecipeSchema = yup.object({
   category: yup.string().required('Categoria obrigatória'),
   difficulty: yup.string().required('Dificuldade obrigatória'),
   description: yup.string().optional(),
+  dietaryRestrictions: yup
+    .array()
+    .of(yup.string().required()).optional()
+    .default([])
+    .transform((val) => {
+      if (typeof val === 'string') {
+        try { return JSON.parse(val) } catch { return val }
+      }
+      return val
+    }),
 })
 
 export const updateRecipeSchema = yup.object({
@@ -39,6 +49,15 @@ export const updateRecipeSchema = yup.object({
   category: yup.string().optional(),
   difficulty: yup.string().optional(),
   description: yup.string().optional(),
+  dietaryRestrictions: yup
+    .array()
+    .of(yup.string().required()).optional()
+    .transform((val) => {
+      if (typeof val === 'string') {
+        try { return JSON.parse(val) } catch { return val }
+      }
+      return val
+    }),
 })
 
 export type CreateRecipeInput = yup.InferType<typeof createRecipeSchema>

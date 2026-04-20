@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
 import React from 'react'
-import { ActivityIndicator, Dimensions, Image, ScrollView,
-    StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+    ActivityIndicator, Dimensions, Image, ScrollView,
+    StyleSheet, Text, TouchableOpacity, View
+} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomNav } from '../../components/BottomNav'
 import { colors } from '../../theme/color'
@@ -18,8 +20,8 @@ const MOCK_REVIEWS = [
 export default function RecipeDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>()
     const insets = useSafeAreaInsets()
-    const { 
-        recipe, loading, activePhoto, setActivePhoto, toggleFavorite, photos, authorInitials 
+    const {
+        recipe, loading, activePhoto, setActivePhoto, toggleFavorite, photos, authorInitials
     } = useRecipeDetail(id)
 
     if (loading) {
@@ -138,6 +140,17 @@ export default function RecipeDetailScreen() {
                             </Text>
                         </View>
                     </View>
+
+                    {recipe.dietaryRestrictions && recipe.dietaryRestrictions.length > 0 && (
+                        <View style={styles.restrictionsRow}>
+                            {recipe.dietaryRestrictions.map(restriction => (
+                                <View key={restriction} style={styles.restrictionChip}>
+                                    <Ionicons name="leaf-outline" size={11} color="#4CAF50" />
+                                    <Text style={styles.restrictionChipText}>{restriction}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    )}
 
                     <View style={styles.divider} />
 
@@ -323,6 +336,16 @@ const styles = StyleSheet.create({
     authorName: { fontSize: 13, fontWeight: 'bold', color: colors.primary },
     authorDate: { fontSize: 11, color: '#aaa' },
 
+    restrictionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
+    restrictionChip: {
+        flexDirection: 'row', alignItems: 'center', gap: 4,
+        backgroundColor: '#f0faf0',
+        borderRadius: 50,
+        paddingHorizontal: 10, paddingVertical: 5,
+        borderWidth: 1, borderColor: '#c8e6c9',
+    },
+    restrictionChipText: { fontSize: 11, color: '#388E3C', fontWeight: '600' },
+
     divider: { height: 1, backgroundColor: '#f0ebe8', marginVertical: 20 },
     descriptionText: { fontSize: 14, color: '#555', lineHeight: 22 },
     sectionTitle: { fontSize: 17, fontWeight: 'bold', color: colors.primary, marginBottom: 14 },
@@ -340,7 +363,7 @@ const styles = StyleSheet.create({
     stepNumberText: { color: '#DDBC9B', fontSize: 12, fontWeight: 'bold' },
     stepText: { flex: 1, fontSize: 14, color: '#444', lineHeight: 22 },
 
-    ratingBox: { gap: 12, backgroundColor: '#faf8f6',  borderRadius: 16, padding: 14, marginBottom: 20 },
+    ratingBox: { gap: 12, backgroundColor: '#faf8f6', borderRadius: 16, padding: 14, marginBottom: 20 },
     ratingBoxHeader: { flexDirection: 'row', gap: 12 },
     ratingBoxAvatar: {
         width: 40, height: 40, borderRadius: 20,

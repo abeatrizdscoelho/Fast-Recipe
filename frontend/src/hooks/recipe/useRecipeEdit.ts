@@ -20,6 +20,7 @@ export function useEditRecipe(id: string) {
           preparation: data.recipe.preparation,
           portions: data.recipe.portions,
           category: data.recipe.category,
+          dietaryRestrictions: data.recipe.dietaryRestrictions,
           difficulty: data.recipe.difficulty ?? '',
           description: data.recipe.description ?? '',
           photos: data.recipe.photos ?? (data.recipe.photos ? [data.recipe.photos] : []),

@@ -10,6 +10,7 @@ function formatRecipe(recipe: {
     time: string
     portions: string
     category: string
+    dietaryRestrictions: string[]
     difficulty: string | null
     description: string | null
     photos: string[]
@@ -25,6 +26,7 @@ function formatRecipe(recipe: {
         time: recipe.time,
         portions: recipe.portions,
         category: recipe.category,
+        dietaryRestrictions: recipe.dietaryRestrictions,
         difficulty: recipe.difficulty,
         description: recipe.description,
         photos: recipe.photos,
@@ -72,8 +74,13 @@ export const recipeService = {
         return { recipes: recipes.map(formatRecipe) }
     },
 
-    async getAll(page: number, limit: number, userId: string, search?: string): Promise<FeedResponseDTO> {
-        const { recipes, total } = await recipeRepository.findAll(page, limit, userId, search)
+    async getAll(
+        page: number, limit: number, userId: string, search?: string, 
+        categories?: string[], dietaryRestrictions?: string[]
+    ): Promise<FeedResponseDTO> {
+        const { recipes, total } = await recipeRepository.findAll(
+            page, limit, userId, search, categories, dietaryRestrictions
+        )
         const totalPages = Math.ceil(total / limit)
 
         return {

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { api } from './api'
 import { RecipeFormData, Recipe, FeedResponse, FeedRecipe } from '../types/recipe'
+import { ActiveFilters } from '../components/FilterModal'
 
 export const recipeService = {
     async create(data: RecipeFormData): Promise<{ recipe: Recipe }> {
@@ -14,6 +15,10 @@ export const recipeService = {
             formData.append('ingredients', JSON.stringify(data.ingredients))
             formData.append('difficulty', data.difficulty)
             formData.append('description', data.description)
+
+            if (data.dietaryRestrictions && data.dietaryRestrictions.length > 0) {
+                formData.append('dietaryRestrictions', JSON.stringify(data.dietaryRestrictions))
+            }
 
             if (data.photos && data.photos.length > 0) {
                 data.photos.forEach((uri, index) => {
@@ -48,10 +53,19 @@ export const recipeService = {
         }
     },
 
-    async getAll(page: number = 1, limit: number = 10, search?: string): Promise<FeedResponse> {
+    async getAll(page: number = 1, limit: number = 10, search?: string, filters?: ActiveFilters): Promise<FeedResponse> {
         try {
             const response = await api.get('/recipes/all', {
-                params: { page, limit, ...(search ? { search } : {}) },
+                params: {
+                    page,
+                    limit,
+                    ...(search ? { search } : {}),
+                    ...(filters?.categories.length ? { categories: filters.categories.join(',') } : {}),
+                    ...(filters?.dietaryRestrictions.length 
+                        ? { dietaryRestrictions: filters.dietaryRestrictions.join(',') } 
+                        : {}
+                    ),
+                },
             })
             return response.data
         } catch (err) {
@@ -83,6 +97,10 @@ export const recipeService = {
             if (data.ingredients) formData.append('ingredients', JSON.stringify(data.ingredients))
             if (data.difficulty) formData.append('difficulty', data.difficulty)
             if (data.description) formData.append('description', data.description)
+
+            if (data.dietaryRestrictions) {
+                formData.append('dietaryRestrictions', JSON.stringify(data.dietaryRestrictions))
+            }
 
             if (data.photos && data.photos.length > 0) {
                 data.photos.forEach((uri, index) => {

@@ -12,6 +12,7 @@ export const recipeRepository = {
     description?: string
     photos?: string[]
     authorId: string
+    dietaryRestrictions?: string[]
   }) {
     return prisma.recipe.create({ data })
   },
@@ -46,7 +47,9 @@ export const recipeRepository = {
     }))
   },
 
-  async findAll(page: number, limit: number, userId: string, search?: string) {
+  async findAll(
+    page: number, limit: number, userId: string, search?: string, categories?: string[], dietaryRestrictions?: string[]
+  ) {
     const skip = (page - 1) * limit
 
     const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
@@ -59,14 +62,27 @@ export const recipeRepository = {
       },
     })
 
-    const filtered = search ? allRecipes.filter(r => {
+    const filtered = allRecipes.filter(r => {
+      if (search) {
         const term = normalize(search)
-        return (
+        const matchesSearch =
           normalize(r.title).includes(term) ||
           normalize(r.description ?? '').includes(term) ||
           r.ingredients.some(i => normalize(i).includes(term))
-        )
-      }) : allRecipes
+        if (!matchesSearch) return false
+      }
+
+      if (categories && categories.length > 0) {
+        if (!categories.includes(r.category)) return false
+      }
+
+      if (dietaryRestrictions && dietaryRestrictions.length > 0) {
+        const hasAll = dietaryRestrictions.every(d => r.dietaryRestrictions.includes(d))
+        if (!hasAll) return false
+      }
+
+      return true
+    })
 
     const total = filtered.length
     const paginated = filtered.slice(skip, skip + limit)
@@ -87,6 +103,7 @@ export const recipeRepository = {
     difficulty?: string
     description?: string
     photos?: string[]
+    dietaryRestrictions?: string[]
   }) {
     return prisma.recipe.update({ where: { id }, data })
   },

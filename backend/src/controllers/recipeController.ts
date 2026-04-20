@@ -46,7 +46,13 @@ export const recipeController = {
       const search = rawSearch
         ? rawSearch.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
         : undefined
-      const result = await recipeService.getAll(page, limit, req.userId!, search)
+      const categories = req.query.categories
+        ? (req.query.categories as string).split(',').map(s => s.trim()).filter(Boolean)
+        : undefined
+      const dietaryRestrictions = req.query.dietaryRestrictions
+        ? (req.query.dietaryRestrictions as string).split(',').map(s => s.trim()).filter(Boolean)
+        : undefined
+      const result = await recipeService.getAll(page, limit, req.userId!, search, categories, dietaryRestrictions)
       return res.status(200).json(result)
     } catch (err) {
       return handleError(err, res)

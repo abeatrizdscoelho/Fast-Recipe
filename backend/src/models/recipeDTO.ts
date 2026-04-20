@@ -7,6 +7,7 @@ export interface CreateRecipeDTO {
   category: string
   difficulty?: string
   description?: string
+  dietaryRestrictions?: string[]
 }
 
 export interface RecipeDTO {
@@ -17,6 +18,7 @@ export interface RecipeDTO {
   time: string
   portions: string
   category: string
+  dietaryRestrictions: string[]
   difficulty: string | null
   description: string | null
   photos: string[]

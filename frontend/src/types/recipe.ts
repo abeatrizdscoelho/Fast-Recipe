@@ -8,6 +8,7 @@ export type RecipeFormData = {
   photos: string[]
   difficulty: string   
   description: string  
+  dietaryRestrictions: string[]
 }
 
 export type Recipe = {
@@ -18,6 +19,7 @@ export type Recipe = {
   preparation: string
   portions: string
   category: string
+  dietaryRestrictions: string[]
   photo: string | null     
   photoUrl: string | null 
   photos: string[] 
@@ -36,6 +38,7 @@ export type FeedRecipe = {
   preparation: string
   portions: string
   category: string
+  dietaryRestrictions: string[]
   photos: string[]
   favorite: boolean
   difficulty: string | null
@@ -55,4 +58,9 @@ export type FeedResponse = {
   page: number
   totalPages: number
   hasNextPage: boolean
+}
+
+export type SavedFilters = { 
+  categories: string[] 
+  dietaryRestrictions: string[]
 }

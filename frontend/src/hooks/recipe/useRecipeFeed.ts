@@ -1,13 +1,17 @@
 import { useState, useCallback, useRef } from 'react'
 import { Alert } from 'react-native'
 import { recipeService } from '../../services/recipeService'
-import { FeedRecipe } from '../../types/recipe'
+import { FeedRecipe, SavedFilters } from '../../types/recipe'
 import { favoriteService } from '../../services/favoriteService'
+import { ActiveFilters } from '@/src/components/FilterModal'
 
 let _search = ''
+let _filters: SavedFilters = { categories: [], dietaryRestrictions: [] }
 export const feedStore = {
     getSearch: () => _search,
-    setSearch: (v: string) => { _search = v }
+    setSearch: (v: string) => { _search = v },
+    getFilters: () => _filters,
+    setFilters: (f: SavedFilters) => { _filters = f },
 }
 
 export function useFeed() {
@@ -17,11 +21,14 @@ export function useFeed() {
     const [refreshing, setRefreshing] = useState(false)
     const [recipes, setRecipes] = useState<FeedRecipe[]>([])
     const [search, setSearch] = useState(feedStore.getSearch())
+    const [filters, setFilters] = useState<ActiveFilters>(feedStore.getFilters())
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const loadingRef = useRef(false)
     const recipesRef = useRef<FeedRecipe[]>([])
 
-    const loadFeed = useCallback(async (pageToLoad: number, isRefresh = false, searchTerm?: string): Promise<void> => {
+    const loadFeed = useCallback(async (
+        pageToLoad: number, isRefresh = false, searchTerm?: string, activeFilters?: ActiveFilters
+    ): Promise<void> => {
         if (loadingRef.current) return
         loadingRef.current = true
         try {
@@ -30,7 +37,7 @@ export function useFeed() {
             } else if (pageToLoad === 1 && recipesRef.current.length === 0) {
                 setLoading(true)
             }
-            const data = await recipeService.getAll(pageToLoad, 10, searchTerm)
+            const data = await recipeService.getAll(pageToLoad, 10, searchTerm, activeFilters)
             const next = isRefresh || pageToLoad === 1 ? data.recipes : [...recipesRef.current, ...data.recipes]
             recipesRef.current = next
             setRecipes(next)
@@ -50,16 +57,22 @@ export function useFeed() {
         feedStore.setSearch(text)
         if (debounceRef.current) clearTimeout(debounceRef.current)
         debounceRef.current = setTimeout(() => {
-            loadFeed(1, true, text.trim() || undefined)
+            loadFeed(1, true, text.trim() || undefined, filters)
         }, 500)
     }
 
+    function handleApplyFilters(newFilters: ActiveFilters) {
+        setFilters(newFilters)
+        feedStore.setFilters(newFilters)
+        loadFeed(1, true, search.trim() || undefined, newFilters)
+    }
+
     function loadMore() {
-        if (hasNextPage && !loadingRef.current) loadFeed(page + 1, false, search.trim() || undefined)
+        if (hasNextPage && !loadingRef.current) loadFeed(page + 1, false, search.trim() || undefined, filters)
     }
 
     function refresh() {
-        loadFeed(1, true, search.trim() || undefined)
+        loadFeed(1, true, search.trim() || undefined, filters)
     }
 
     async function toggleFavorite(id: string) {
@@ -72,5 +85,5 @@ export function useFeed() {
         }
     }
 
-    return { recipes, loading, refreshing, hasNextPage, search, loadFeed, loadMore, refresh, toggleFavorite, handleSearch }
+    return { recipes, loading, refreshing, hasNextPage, search, loadFeed, loadMore, refresh, toggleFavorite, handleSearch, filters, handleApplyFilters }
 }

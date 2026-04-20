@@ -5,9 +5,9 @@ import { ValidationError } from 'yup';
 import { RecipeFormData } from '../../types/recipe';
 import { recipeValidation } from '../../validations/recipeValidation';
 
-export const CATEGORIES = [
-    'Café da manhã', 'Almoço', 'Jantar', 'Lanche',
-    'Sobremesa', 'Bebida', 'Vegano', 'Vegetariano',
+export const CATEGORIES = ['Café da manhã', 'Almoço', 'Jantar', 'Lanche', 'Sobremesa', 'Bebida']
+export const DIETARY_RESTRICTIONS = [
+  'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico',
 ]
 
 export const DIFFICULTIES = ['Fácil', 'Médio', 'Difícil']
@@ -26,6 +26,7 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
     const [portions, setPortions] = useState(initialData?.portions ?? '')
     const [category, setCategory] = useState(initialData?.category ?? '')
     const [categoryOpen, setCategoryOpen] = useState(false)
+    const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>(initialData?.dietaryRestrictions ?? [])
     const [difficulty, setDifficulty] = useState(initialData?.difficulty ?? '')
     const [description, setDescription] = useState(initialData?.description ?? '')
     const [difficultyOpen, setDifficultyOpen] = useState(false)
@@ -121,10 +122,18 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
         setIngredients(prev => prev.filter((_, i) => i !== index))
     }
 
+    function toggleDietaryRestrictions(option: string) {
+        setDietaryRestrictions(prev =>
+            prev.includes(option) ? prev.filter(d => d !== option) : [...prev, option]
+        )
+    }
+
     async function handleSubmit() {
         try {
             setApiError('')
-            const data = { title, time, ingredients, preparation, portions, category, photos, difficulty, description }
+            const data = { 
+                title, time, ingredients, preparation, portions, category, dietaryRestrictions, photos, difficulty, description 
+            }
             await recipeValidation.validate(data, { abortEarly: false })
             setErrors({})
             onSubmit(data as RecipeFormData)
@@ -144,7 +153,8 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
     return {
         title, setTitle, time, setTime, ingredients, ingredientInput, setIngredientInput,
         preparation, setPreparation, portions, setPortions, category, setCategory,
-        categoryOpen, setCategoryOpen, difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
+        categoryOpen, setCategoryOpen, dietaryRestrictions, toggleDietaryRestrictions, 
+        difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
         description, setDescription, photos, errors, apiError,
         handlePhotoPress, removePhoto, addIngredient, removeIngredient, handleSubmit
     }

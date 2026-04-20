@@ -5,16 +5,9 @@ import { View, Text, TextInput, TouchableOpacity,
 import { Ionicons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RecipeFormData } from '@/src/types/recipe';
-import { useRecipeForm } from '@/src/hooks/recipe/useRecipeForm';
+import { CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES, useRecipeForm } from '@/src/hooks/recipe/useRecipeForm';
 import { colors } from '@/src/theme/color';
 import FieldError from '@/src/components/FieldError';
-
-const CATEGORIES = [
-    'Café da manhã', 'Almoço', 'Jantar', 'Lanche',
-    'Sobremesa', 'Bebida', 'Vegano', 'Vegetariano',
-]
-
-const DIFFICULTIES = ['Fácil', 'Médio', 'Difícil']
 
 type Props = {
     initialData?: Partial<RecipeFormData>
@@ -27,7 +20,8 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
     const {
         title, setTitle, time, setTime, ingredients, ingredientInput, setIngredientInput,
         preparation, setPreparation, portions, setPortions, category, setCategory,
-        categoryOpen, setCategoryOpen, difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
+        categoryOpen, setCategoryOpen, dietaryRestrictions, toggleDietaryRestrictions,
+        difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
         description, setDescription, photos, errors, apiError,
         handlePhotoPress, removePhoto, addIngredient, removeIngredient, handleSubmit
     } = useRecipeForm({ initialData, onSubmit })
@@ -214,6 +208,28 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     </View>
                 )}
 
+                <Text style={styles.label}>
+                    Restrições Alimentares <Text style={styles.labelHint}>(opcional)</Text>
+                </Text>
+                <Text style={styles.dietaryHint}>Toque para selecionar ou remover</Text>
+                <View style={styles.chipsContainer}>
+                    {DIETARY_RESTRICTIONS.map(opt => {
+                        const isSelected = dietaryRestrictions.includes(opt)
+                        return (
+                            <TouchableOpacity
+                                key={opt}
+                                style={[styles.chip, isSelected && styles.chipActive]}
+                                onPress={() => toggleDietaryRestrictions(opt)}
+                            >
+                                {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
+                                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                                    {opt}
+                                </Text>
+                            </TouchableOpacity>
+                        )
+                    })}
+                </View>
+
                 <Text style={styles.label}>Descrição</Text>
                 <TextInput
                     style={[styles.input, styles.textArea, errors.description ? styles.inputError : null]}
@@ -387,6 +403,36 @@ const styles = StyleSheet.create({
     dropdownItemActive: { backgroundColor: '#FFF5EC' },
     dropdownText: { fontSize: 14, color: '#333' },
     dropdownTextActive: { color: colors.primary, fontWeight: 'bold' },
+
+    dietaryHint: {
+        fontSize: 12,
+        color: colors.gray,
+        marginBottom: 10,
+        marginTop: -4,
+    },
+    chipsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 4,
+    },
+    chip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 50,
+        borderWidth: 1.5,
+        borderColor: '#e0d6d0',
+    },
+    chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    chipText: {
+        fontSize: 13,
+        color: colors.primary,
+        fontWeight: '600',
+    },
+    chipTextActive: { color: colors.white },
 
     submitButton: {
         backgroundColor: colors.primary,

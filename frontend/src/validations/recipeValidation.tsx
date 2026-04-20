@@ -17,6 +17,10 @@ export const recipeValidation = yup.object({
   time: yup.string().required('Tempo de preparo obrigatório'),
   portions: yup.string().required('Porções obrigatórias'),
   category: yup.string().required('Categoria obrigatória'),
+  dietaryRestrictions: yup.array()
+    .of(yup.string().required())
+    .optional()
+    .default([]),
   photos: yup
     .array()
     .of(yup.string().required())
