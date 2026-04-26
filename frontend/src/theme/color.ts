@@ -7,4 +7,10 @@ export const colors = {
   gray: '#9CA3AF',
   grayLight: '#D8D8D8',
   error: '#DC2626',
-};
+  danger: '#e05c5c',
+  border: '#f0ebe8',
+  surface: '#faf8f6',
+  star: '#F5C518',
+  green: '#4CAF50',
+  greenDark: '#388E3C',
+}
