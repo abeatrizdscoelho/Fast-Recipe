@@ -12,6 +12,7 @@ export interface CommentDTO {
   text: string
   userId: string
   recipeId: string
+  hidden: boolean
   author: {
     id: string
     name: string

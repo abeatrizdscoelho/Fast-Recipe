@@ -1,9 +1,9 @@
 import prisma from "../database/prisma"
 
 export const reportRepository = {
-  async create(userId: string, commentId: string, reason: string) {
+  async create(userId: string, commentId: string) {
     return prisma.report.create({
-      data: { userId, commentId, reason },
+      data: { userId, commentId },
     })
   },
 

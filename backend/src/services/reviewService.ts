@@ -8,6 +8,7 @@ function toCommentDTO(
     text: string
     userId: string
     recipeId: string
+    hidden: boolean
     createdAt: Date
     updatedAt: Date
     user: { id: string; name: string; avatarUrl: string | null }
@@ -19,6 +20,7 @@ function toCommentDTO(
     text: comment.text,
     userId: comment.userId,
     recipeId: comment.recipeId,
+    hidden: comment.hidden,
     author: comment.user,
     createdAt: comment.createdAt.toISOString(),
     updatedAt: comment.updatedAt.toISOString(),
@@ -117,7 +119,9 @@ export const reviewService = {
 
     const comments = await reviewRepository.findCommentsByRecipe(recipeId)
     return {
-      comments: comments.map(c => toCommentDTO(c, userId)),
+      comments: comments
+        .filter(c => !c.hidden || c.userId === userId)
+        .map(c => toCommentDTO(c, userId)),
     }
   },
 }

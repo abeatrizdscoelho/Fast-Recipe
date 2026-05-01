@@ -1,12 +1,9 @@
+import prisma from "../database/prisma"
 import { reportRepository } from "../repositories/reportRepository"
 import { reviewRepository } from "../repositories/reviewRepository"
 
 export const reportService = {
-  async reportComment(userId: string, commentId: string, reason: string) {
-    const trimmed = reason.trim()
-    if (!trimmed) throw new Error('O motivo da denúncia é obrigatório.')
-    if (trimmed.length > 500) throw new Error('Motivo muito longo (máximo 500 caracteres).')
-
+  async reportComment(userId: string, commentId: string) {
     const comment = await reviewRepository.findCommentById(commentId)
     if (!comment) throw new Error('Comentário não encontrado.')
 
@@ -17,6 +14,14 @@ export const reportService = {
     const existing = await reportRepository.findByUserAndComment(userId, commentId)
     if (existing) throw new Error('Você já denunciou este comentário.')
 
-    await reportRepository.create(userId, commentId, trimmed)
+    await reportRepository.create(userId, commentId)
+
+    const newCount = comment.reportCount + 1
+    await prisma.comment.update({
+      where: { id: commentId },
+      data: {
+        reportCount: newCount, hidden: newCount >= 5,
+      },
+    })
   },
 }

@@ -80,22 +80,23 @@ model Review {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  text      String
-  userId    String
-  recipeId  String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  reports   Report[]
+  id          String   @id @default(uuid())
+  text        String
+  userId      String
+  recipeId    String
+  reportCount Int      @default(0)
+  hidden      Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reports     Report[]
 
   @@map("comments")
 }
 
 model Report {
   id          String   @id @default(uuid())
-  reason      String
   userId      String
   commentId   String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)

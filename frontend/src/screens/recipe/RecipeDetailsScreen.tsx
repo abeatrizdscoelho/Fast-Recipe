@@ -12,24 +12,30 @@ import { RatingAverage } from './components/ReviewComponents/RatingAverage'
 import { RatingBox } from './components/ReviewComponents/RatingBox'
 import { CommentCard } from './components/ReviewComponents/CommentCard'
 import { ReportModal } from './components/ReviewComponents/ReportModal'
+import { useRecipeRating } from '@/src/hooks/recipe/useRecipeRating'
+import { useRecipeComments } from '@/src/hooks/recipe/useRecipeComments'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 export default function RecipeDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>()
     const insets = useSafeAreaInsets()
-    const {
-        recipe, loading, activePhoto, setActivePhoto,
-        photos, authorInitials, toggleFavorite,
-        userAvatarUrl, userInitials,
-        ratingAverage, ratingCount, userRating, isAuthor,
-        submittingRating, submitRating,
-        comments, commentText, setCommentText,
-        submittingComment, submitComment,
-        editingCommentId, editingText, setEditingText,
-        startEditComment, cancelEditComment, saveEditComment, confirmDeleteComment,
-        reportingCommentId, setReportingCommentId, confirmReport,
+
+    const { 
+        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor 
     } = useRecipeDetail(id)
+
+    const { 
+        ratingAverage, ratingCount, userRating, submittingRating, submitRating 
+    } = useRecipeRating(id)
+
+    const { comments, commentText, setCommentText,
+        submitComment, submittingComment,
+        editingCommentId, editingText, setEditingText,
+        startEditComment, cancelEditComment, saveEditComment,
+        confirmDeleteComment,
+        reportingCommentId, setReportingCommentId, confirmReport 
+    } = useRecipeComments(id)
 
     if (loading) {
         return (
