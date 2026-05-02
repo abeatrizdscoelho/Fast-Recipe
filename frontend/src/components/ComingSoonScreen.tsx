@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitle: {
-    color: '#DDBC9B',
+    color: colors.cream,
     fontSize: 14,
     fontWeight: 'bold',
     letterSpacing: 2,

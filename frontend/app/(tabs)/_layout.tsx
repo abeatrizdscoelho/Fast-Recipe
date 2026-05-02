@@ -7,7 +7,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="profile" />
       <Tabs.Screen name="list" />
       <Tabs.Screen name="pantry" />
-      <Tabs.Screen name="calendar" />
+      <Tabs.Screen name="planning" />
     </Tabs>
   )
 }

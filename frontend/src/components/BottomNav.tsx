@@ -14,7 +14,7 @@ type Tab = {
 const tabs: Tab[] = [
   { icon: 'home-outline', iconActive: 'home', route: '/(tabs)', matchSegment: 'index' },
   { icon: 'archive-outline', iconActive: 'archive', route: '/pantry', matchSegment: 'pantry' },
-  { icon: 'calendar-outline', iconActive: 'calendar', route: '/calendar', matchSegment: 'calendar' },
+  { icon: 'calendar-outline', iconActive: 'calendar', route: '/planning', matchSegment: 'planning' },
   { icon: 'list-outline', iconActive: 'list', route: '/list', matchSegment: 'list' },
   { icon: 'person-outline', iconActive: 'person', route: '/profile', matchSegment: 'profile' },
 ]
@@ -43,7 +43,7 @@ export function BottomNav() {
             <Ionicons
               name={isActive ? tab.iconActive : tab.icon}
               size={26}
-              color={isActive ? '#DDBC9B' : 'rgba(255,255,255,0.5)'}
+              color={isActive ? colors.cream : 'rgba(255,255,255,0.5)'}
             />
           </TouchableOpacity>
         )

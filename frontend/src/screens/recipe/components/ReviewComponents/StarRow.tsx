@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { colors } from '@/src/theme/color'
 
 type Props = {
     rating: number
@@ -22,7 +23,7 @@ export function StarRow({ rating, interactive = false, size = 20, onRate }: Prop
                     <Ionicons
                         name={star <= rating ? 'star' : 'star-outline'}
                         size={size}
-                        color={star <= rating ? '#F5C518' : '#DDBC9B'}
+                        color={star <= rating ? colors.star : colors.cream}
                     />
                 </TouchableOpacity>
             ))}

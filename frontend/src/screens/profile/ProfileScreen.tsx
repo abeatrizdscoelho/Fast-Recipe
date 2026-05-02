@@ -57,7 +57,7 @@ export default function ProfileScreen() {
                   onPress={() => router.push('/profile/edit')}
                 >
                   <Ionicons name="create-outline" size={18} color="#DDBC9B" />
-                  <Text style={[styles.actionText, { color: '#DDBC9B' }]}>Editar Perfil</Text>
+                  <Text style={[styles.actionText, { color: colors.cream }]}>Editar Perfil</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   avatarText: {
-    color: '#DDBC9B',
+    color: colors.cream,
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   actionOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: '#DDBC9B',
+    borderColor: colors.cream,
   },
   actionText: {
     color: colors.white,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    color: '#DDBC9B',
+    color: colors.cream,
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 12,
@@ -214,8 +214,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
   tabBtnActive: {
-    backgroundColor: '#DDBC9B',
-    borderColor: '#DDBC9B',
+    backgroundColor: colors.cream,
+    borderColor: colors.cream,
   },
   tabText: {
     color: 'rgba(255,255,255,0.6)',

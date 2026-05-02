@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   iconImage: {
     width: 85,
     height: 85,
-    tintColor: '#DDBC9B',
+    tintColor: colors.cream,
   },
   featureTitle: {
     color: colors.white,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   button: {
-    backgroundColor: '#DDBC9B',
+    backgroundColor: colors.cream,
     borderRadius: 50,
     paddingVertical: 16,
     alignItems: 'center',

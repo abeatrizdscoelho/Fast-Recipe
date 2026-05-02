@@ -23,6 +23,7 @@ model User {
   reviews              Review[]
   comments             Comment[]
   reports              Report[]
+  mealPlans            MealPlan[]
 
   @@map("users")
 }
@@ -47,6 +48,7 @@ model Recipe {
   favorites             Favorite[]
   reviews               Review[]
   comments              Comment[]
+  mealPlanEntries       MealPlanEntry[]
 
   @@map("recipes")
 }
@@ -105,4 +107,31 @@ model Report {
 
   @@unique([userId, commentId])
   @@map("reports")
+}
+
+model MealPlan {
+  id        String         @id @default(uuid())
+  userId    String
+  weekStart DateTime       
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries   MealPlanEntry[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([userId, weekStart])
+  @@map("meal_plans")
+}
+
+model MealPlanEntry {
+  id         String   @id @default(uuid())
+  mealPlanId String
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipeId   String
+  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  dayOfWeek  Int      
+  mealType   String   
+  createdAt  DateTime @default(now())
+
+  @@unique([mealPlanId, recipeId, dayOfWeek, mealType])
+  @@map("meal_plan_entries")
 }
