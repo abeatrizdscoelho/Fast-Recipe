@@ -1,6 +1,21 @@
+export interface IngredientDTO {
+  id: string
+  name: string
+  quantity: number
+  unit: string
+  category: string
+}
+
+export interface CreateIngredientDTO {
+  name: string
+  quantity: number
+  unit: string
+  category?: string
+}
+
 export interface CreateRecipeDTO {
   title: string
-  ingredients: string[]
+  ingredients: CreateIngredientDTO[]
   preparation: string
   time: string
   portions: string
@@ -8,12 +23,13 @@ export interface CreateRecipeDTO {
   difficulty?: string
   description?: string
   dietaryRestrictions?: string[]
+  photos?: string[]
 }
 
 export interface RecipeDTO {
   id: string
   title: string
-  ingredients: string[]
+  ingredients: IngredientDTO[]
   preparation: string
   time: string
   portions: string

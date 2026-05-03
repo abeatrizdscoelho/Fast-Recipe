@@ -1,5 +1,5 @@
-import type { Response } from 'express'
-import type { AuthRequest } from '../middlewares/authMiddleware'
+import { Response } from 'express'
+import { AuthRequest } from '../middlewares/authMiddleware'
 import { mealPlanService } from '../services/mealPlanService'
 import { ValidationError } from 'yup'
 import { addEntrySchema, replaceEntrySchema } from '../schemas/mealPlanSchema'
@@ -51,6 +51,16 @@ export const mealPlanController = {
         try {
             const entryId = Array.isArray(req.params.entryId) ? req.params.entryId[0] : req.params.entryId
             const result = await mealPlanService.removeEntry(req.userId!, entryId)
+            return res.status(200).json(result)
+        } catch (err) {
+            return handleError(err, res)
+        }
+    },
+
+    async toggleCompleted(req: AuthRequest, res: Response) {
+        try {
+            const entryId = Array.isArray(req.params.entryId) ? req.params.entryId[0] : req.params.entryId
+            const result = await mealPlanService.toggleCompleted(req.userId!, entryId)
             return res.status(200).json(result)
         } catch (err) {
             return handleError(err, res)

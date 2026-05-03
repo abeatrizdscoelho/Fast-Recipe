@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { FilledSlot, EmptySlot } from './RecipeSlot'
 import { MEAL_TYPE_LABELS, MealPlanEntry, MealType } from '@/src/types/mealPlan'
@@ -17,18 +17,34 @@ interface Props {
     onAdd: () => void
     onRemove: (entryId: string) => void
     onReplace: (entryId: string) => void
+    onToggleCompleted: (entryId: string) => void
 }
 
 const MAX_SLOTS = 3
 
-export function MealSection({ mealType, entries, onAdd, onRemove, onReplace }: Props) {
+export function MealSection({ mealType, entries, onAdd, onRemove, onReplace, onToggleCompleted }: Props) {
     const emptyCount = Math.max(0, MAX_SLOTS - entries.length)
+    const allCompleted = entries.length > 0 && entries.every(e => e.completed)
 
     return (
         <View style={styles.section}>
             <View style={styles.labelCol}>
                 <Ionicons name={MEAL_ICONS[mealType]} size={26} color={colors.primary} />
                 <Text style={styles.mealLabel}>{MEAL_TYPE_LABELS[mealType]}</Text>
+
+                {entries.length > 0 && (
+                    <TouchableOpacity
+                        onPress={() => entries.forEach(e => onToggleCompleted(e.id))}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        style={{ marginLeft: 'auto' }}
+                    >
+                        <Ionicons
+                            name={allCompleted ? 'checkmark-circle' : 'checkmark-circle-outline'}
+                            size={22}
+                            color={allCompleted ? colors.primary : '#ccc'}
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
 
             <ScrollView

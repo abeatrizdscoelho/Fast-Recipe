@@ -1,9 +1,23 @@
 import prisma from '../database/prisma'
+import { CreateIngredientDTO } from '../models/recipeDTO'
+
+const ingredientSelect = {
+  id: true,
+  name: true,
+  quantity: true,
+  unit: true,
+  category: true,
+}
+
+const recipeInclude = {
+  ingredients: { select: ingredientSelect },
+  author: { select: { id: true, name: true, avatarUrl: true } },
+}
 
 export const recipeRepository = {
   async create(data: {
     title: string
-    ingredients: string[]
+    ingredients: CreateIngredientDTO[]
     preparation: string
     time: string
     portions: string
@@ -14,18 +28,32 @@ export const recipeRepository = {
     authorId: string
     dietaryRestrictions?: string[]
   }) {
-    return prisma.recipe.create({ data })
+    const { ingredients, ...recipeData } = data
+
+    return prisma.recipe.create({
+      data: {
+        ...recipeData,
+        ingredients: {
+          create: ingredients.map(i => ({
+            name: i.name,
+            quantity: i.quantity,
+            unit: i.unit,
+            category: i.category ?? 'Outros',
+          })),
+        },
+      },
+      include: recipeInclude,
+    })
   },
 
   async findById(id: string, userId?: string) {
     return prisma.recipe.findUnique({
       where: { id },
       include: {
-        author: { select: { id: true, name: true, avatarUrl: true } },
-        favorites: userId ? {
-          where: { userId },
-          select: { id: true },
-        } : false,
+        ...recipeInclude,
+        favorites: userId
+          ? { where: { userId }, select: { id: true } }
+          : false,
       },
     })
   },
@@ -35,29 +63,29 @@ export const recipeRepository = {
       where: { authorId },
       orderBy: { createdAt: 'desc' },
       include: {
-        favorites: {
-          where: { userId },
-          select: { id: true },
-        },
+        ...recipeInclude,
+        favorites: { where: { userId }, select: { id: true } },
       },
     })
-    return recipes.map(r => ({
-      ...r,
-      favorite: r.favorites.length > 0,
-    }))
+    return recipes.map(r => ({ ...r, favorite: r.favorites.length > 0 }))
   },
 
   async findAll(
-    page: number, limit: number, userId: string, search?: string, categories?: string[], dietaryRestrictions?: string[]
+    page: number,
+    limit: number,
+    userId: string,
+    search?: string,
+    categories?: string[],
+    dietaryRestrictions?: string[]
   ) {
     const skip = (page - 1) * limit
-
-    const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+    const normalize = (s: string) =>
+      s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 
     const allRecipes = await prisma.recipe.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        author: { select: { id: true, name: true, avatarUrl: true } },
+        ...recipeInclude,
         favorites: { where: { userId }, select: { id: true } },
       },
     })
@@ -68,7 +96,7 @@ export const recipeRepository = {
         const matchesSearch =
           normalize(r.title).includes(term) ||
           normalize(r.description ?? '').includes(term) ||
-          r.ingredients.some(i => normalize(i).includes(term))
+          r.ingredients.some(i => normalize(i.name).includes(term))
         if (!matchesSearch) return false
       }
 
@@ -93,19 +121,44 @@ export const recipeRepository = {
     }
   },
 
-  async update(id: string, data: {
-    title?: string
-    ingredients?: string[]
-    preparation?: string
-    time?: string
-    portions?: string
-    category?: string
-    difficulty?: string
-    description?: string
-    photos?: string[]
-    dietaryRestrictions?: string[]
-  }) {
-    return prisma.recipe.update({ where: { id }, data })
+  async update(
+    id: string,
+    data: {
+      title?: string
+      ingredients?: CreateIngredientDTO[]
+      preparation?: string
+      time?: string
+      portions?: string
+      category?: string
+      difficulty?: string
+      description?: string
+      photos?: string[]
+      dietaryRestrictions?: string[]
+    }
+  ) {
+    const { ingredients, ...recipeData } = data
+
+    if (ingredients) {
+      await prisma.ingredient.deleteMany({ where: { recipeId: id } })
+    }
+
+    return prisma.recipe.update({
+      where: { id },
+      data: {
+        ...recipeData,
+        ...(ingredients && {
+          ingredients: {
+            create: ingredients.map(i => ({
+              name: i.name,
+              quantity: i.quantity,
+              unit: i.unit,
+              category: i.category ?? 'Outros',
+            })),
+          },
+        }),
+      },
+      include: recipeInclude,
+    })
   },
 
   async delete(id: string) {

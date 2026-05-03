@@ -8,6 +8,7 @@ import { authMiddleware } from './middlewares/authMiddleware';
 import favoriteRoutes from './routes/favoriteRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import mealPlanRoutes from './routes/mealPlanRoutes';
+import shoppingListRoutes from './routes/shoppingListRoutes';
 
 dotenv.config()
 
@@ -22,6 +23,7 @@ app.use('/recipes', recipeRoutes)
 app.use('/favorites', authMiddleware, favoriteRoutes)
 app.use('/recipes', reviewRoutes)
 app.use('/meal-plan', mealPlanRoutes)
+app.use('/shopping-list', shoppingListRoutes)
 
 app.get('/health', (req, res) => {res.json({ status: 'ok' })})
 

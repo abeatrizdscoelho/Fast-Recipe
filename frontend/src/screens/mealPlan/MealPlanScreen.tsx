@@ -2,38 +2,27 @@ import React from 'react'
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useMealPlan } from '@/src/hooks/mealPlan/useMealPlan'
-import { DAY_LABELS, MEAL_TYPES } from '@/src/types/mealPlan'
 import { colors } from '@/src/theme/color'
 import { WeekDayPicker } from './components/WeekDayPicker'
 import { MealSection } from './components/MealSection'
 import { RecipePickerModal } from './components/RecipePickerModal'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
+import { MEAL_TYPES } from '@/src/types/mealPlan'
 
 export default function MealPlanScreen() {
     const {
-        mealPlan, loading, refreshing, onRefresh,
+        loading, refreshing, onRefresh,
         selectedDay, setSelectedDay,
-        currentWeekStart, getWeekDates,
         goToPrevWeek, goToNextWeek,
-        getEntriesForDay, totalEntries,
+        getEntriesForDay,
         recipeModalVisible, setRecipeModalVisible,
         recipeSearch, setRecipeSearch,
         filteredRecipes,
-        openRecipeSelector, handleSelectRecipe, handleRemoveEntry,
+        openRecipeSelector, handleSelectRecipe,
+        handleRemoveEntry, handleToggleCompleted,
+        dayLabel, dayIsEmpty, weekDates,
     } = useMealPlan()
-
-    const weekDates = getWeekDates()
-    const selectedDate = weekDates[selectedDay]
-
-    const monthNames = [
-        'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
-        'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO',
-    ]
-    const dayLabel = `${DAY_LABELS[selectedDay]} - ${selectedDate.getDate()} DE ${monthNames[selectedDate.getMonth()]}`
-
-    const dayEntries = MEAL_TYPES.flatMap(mt => getEntriesForDay(selectedDay, mt))
-    const dayIsEmpty = dayEntries.length === 0
 
     return (
         <View style={styles.container}>
@@ -41,13 +30,11 @@ export default function MealPlanScreen() {
 
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                    {/* <Ionicons name="restaurant-outline" size={28} color={colors.white} /> */}
                     <View>
                         <Text style={styles.headerTitle}>Planejamento</Text>
                         <Text style={styles.headerSub}>Organize suas refeições da semana!</Text>
                     </View>
                 </View>
-                {/* <Ionicons name="calendar-outline" size={24} color={colors.white} /> */}
             </View>
 
             <View style={styles.pickerWrapper}>
@@ -89,6 +76,7 @@ export default function MealPlanScreen() {
                             onAdd={() => openRecipeSelector(selectedDay, mealType)}
                             onRemove={handleRemoveEntry}
                             onReplace={(entryId) => openRecipeSelector(selectedDay, mealType, entryId)}
+                            onToggleCompleted={handleToggleCompleted}
                         />
                     ))}
 
@@ -113,71 +101,21 @@ export default function MealPlanScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.primary },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 8,
-        paddingBottom: 16,
+        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+        paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16,
     },
-    headerLeft: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 12 
-    },
-    headerTitle: { 
-        fontSize: 22, 
-        fontWeight: 'bold', 
-        color: colors.white 
-    },
-    headerSub: { 
-        fontSize: 12, 
-        color: 'rgba(255,255,255,0.75)', 
-        marginTop: 2 
-    },
-    pickerWrapper: { 
-        backgroundColor: colors.primary, 
-        paddingBottom: 8 
-    },
-    scroll: { 
-        flex: 1, 
-        backgroundColor: '#f5f5f5', 
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius: 20 
-    },
-    scrollContent: { 
-        padding: 16, 
-        paddingTop: 20 
-    },
-    loadingWrapper: { 
-        flex: 1, 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        backgroundColor: '#f5f5f5' 
-    },
-    dayTitle: {
-        fontSize: 13,
-        fontWeight: '700',
-        color: '#999',
-        letterSpacing: 0.5,
-        marginBottom: 14,
-    },
+    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    headerTitle: { fontSize: 22, fontWeight: 'bold', color: colors.white },
+    headerSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
+    pickerWrapper: { backgroundColor: colors.primary, paddingBottom: 8 },
+    scroll: { flex: 1, backgroundColor: '#f5f5f5', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+    scrollContent: { padding: 16, paddingTop: 20 },
+    loadingWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f5' },
+    dayTitle: { fontSize: 13, fontWeight: '700', color: '#999', letterSpacing: 0.5, marginBottom: 14 },
     emptyBanner: {
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        borderRadius: 16,
-        padding: 28,
-        marginBottom: 16,
-        gap: 4,
+        alignItems: 'center', backgroundColor: colors.white,
+        borderRadius: 16, padding: 28, marginBottom: 16, gap: 4,
     },
-    emptyText: { 
-        fontSize: 14, 
-        fontWeight: '600', 
-        color: '#555', 
-        marginTop: 8 
-    },
-    emptySubText: { 
-        fontSize: 13, 
-        color: '#aaa' 
-    },
+    emptyText: { fontSize: 14, fontWeight: '600', color: '#555', marginTop: 8 },
+    emptySubText: { fontSize: 13, color: '#aaa' },
 })

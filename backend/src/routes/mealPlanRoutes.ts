@@ -8,5 +8,6 @@ router.get('/', authMiddleware, mealPlanController.getWeekPlan)
 router.post('/entries', authMiddleware, mealPlanController.addEntry)
 router.put('/entries/:entryId', authMiddleware, mealPlanController.replaceEntry)
 router.delete('/entries/:entryId', authMiddleware, mealPlanController.removeEntry)
+router.patch('/entries/:entryId/completed', authMiddleware, mealPlanController.toggleCompleted)
 
 export default router

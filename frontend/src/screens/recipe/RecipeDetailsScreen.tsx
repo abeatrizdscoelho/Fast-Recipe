@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
 import React from 'react'
-import { ActivityIndicator, Dimensions, Image,
-    ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+    ActivityIndicator, Dimensions, Image,
+    ScrollView, StyleSheet, Text, TouchableOpacity, View
+} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { BottomNav } from '../../components/BottomNav'
@@ -21,12 +23,12 @@ export default function RecipeDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>()
     const insets = useSafeAreaInsets()
 
-    const { 
-        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor 
+    const {
+        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor
     } = useRecipeDetail(id)
 
-    const { 
-        ratingAverage, ratingCount, userRating, submittingRating, submitRating 
+    const {
+        ratingAverage, ratingCount, userRating, submittingRating, submitRating
     } = useRecipeRating(id)
 
     const { comments, commentText, setCommentText,
@@ -34,7 +36,7 @@ export default function RecipeDetailScreen() {
         editingCommentId, editingText, setEditingText,
         startEditComment, cancelEditComment, saveEditComment,
         confirmDeleteComment,
-        reportingCommentId, setReportingCommentId, confirmReport 
+        reportingCommentId, setReportingCommentId, confirmReport
     } = useRecipeComments(id)
 
     if (loading) {
@@ -176,11 +178,15 @@ export default function RecipeDetailScreen() {
                         </>
                     )}
 
-                    <Text style={styles.sectionTitle}>Ingredientes</Text>
                     {recipe.ingredients.map((ingredient, index) => (
                         <View key={index} style={styles.ingredientRow}>
                             <View style={styles.ingredientBullet} />
-                            <Text style={styles.ingredientText}>{ingredient}</Text>
+                            <Text style={styles.ingredientText}>
+                                <Text style={styles.ingredientQty}>
+                                    {ingredient.quantity} {ingredient.unit}
+                                </Text>
+                                {' — '}{ingredient.name}
+                            </Text>
                         </View>
                     ))}
 
@@ -252,28 +258,45 @@ export default function RecipeDetailScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.primary },
     loadingContainer: {
-        flex: 1, backgroundColor: colors.primary,
-        alignItems: 'center', justifyContent: 'center',
+        flex: 1, 
+        backgroundColor: colors.primary,
+        alignItems: 'center', 
+        justifyContent: 'center',
     },
+
     header: {
-        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20,
-        flexDirection: 'row', justifyContent: 'space-between',
-        paddingHorizontal: 20, paddingBottom: 8,
+        position: 'absolute', 
+        top: 0, left: 0, right: 0, zIndex: 20,
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
+        paddingHorizontal: 20, 
+        paddingBottom: 8,
     },
     headerBtn: {
-        width: 38, height: 38, borderRadius: 19,
+        width: 38, height: 38, 
+        borderRadius: 19,
         backgroundColor: 'rgba(0,0,0,0.35)',
-        alignItems: 'center', justifyContent: 'center',
+        alignItems: 'center', 
+        justifyContent: 'center',
     },
+
     scrollContent: { paddingBottom: 24 },
     galleryContainer: { backgroundColor: colors.primary },
     mainPhoto: { width: SCREEN_WIDTH, height: 320 },
+
     dotsRow: {
-        position: 'absolute', bottom: 14, left: 0, right: 0,
-        flexDirection: 'row', justifyContent: 'center', gap: 6,
+        position: 'absolute', 
+        bottom: 14, left: 0, right: 0,
+        flexDirection: 'row', 
+        justifyContent: 'center', gap: 6,
     },
-    dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
+    dot: {
+        width: 6, height: 6, 
+        borderRadius: 3, 
+        backgroundColor: 'rgba(255,255,255,0.4)' 
+    },
     dotActive: { backgroundColor: colors.cream, width: 16 },
+
     photoCounter: {
         position: 'absolute', bottom: 38, right: 16,
         backgroundColor: 'rgba(0,0,0,0.45)', borderRadius: 50,
@@ -281,60 +304,168 @@ const styles = StyleSheet.create({
     },
     photoCounterText: { color: colors.white, fontSize: 12, fontWeight: 'bold' },
     photoPlaceholder: {
-        height: 220, alignItems: 'center', justifyContent: 'center',
+        height: 220, 
+        alignItems: 'center', 
+        justifyContent: 'center',
         backgroundColor: 'rgba(0,0,0,0.15)', gap: 8,
     },
     photoPlaceholderText: { color: 'rgba(255,255,255,0.4)', fontSize: 13 },
+
     card: {
         backgroundColor: colors.white,
-        borderTopLeftRadius: 28, borderTopRightRadius: 28,
-        paddingHorizontal: 24, paddingTop: 24, paddingBottom: 16,
+        borderTopLeftRadius: 28, 
+        borderTopRightRadius: 28,
+        paddingHorizontal: 24, 
+        paddingTop: 24, 
+        paddingBottom: 16,
         marginTop: -24,
     },
-    titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-    title: { flex: 1, fontSize: 22, fontWeight: 'bold', color: colors.primary, lineHeight: 28 },
+
+    titleRow: { 
+        flexDirection: 'row', 
+        alignItems: 'flex-start', 
+        gap: 12 
+    },
+    title: { 
+        flex: 1, 
+        fontSize: 22, 
+        fontWeight: 'bold', 
+        color: colors.primary, 
+        lineHeight: 28 
+    },
+
     favoriteBtn: {
-        width: 40, height: 40, borderRadius: 20,
+        width: 40, height: 40, 
+        borderRadius: 20,
         backgroundColor: colors.surface,
-        alignItems: 'center', justifyContent: 'center',
+        alignItems: 'center', 
+        justifyContent: 'center',
     },
-    authorRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
+
+    authorRow: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        gap: 10, 
+        marginBottom: 16 
+    },
     authorAvatar: {
-        width: 38, height: 38, borderRadius: 19,
-        backgroundColor: colors.border, borderWidth: 1.5, borderColor: colors.primary,
-        alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+        width: 38, height: 38, 
+        borderRadius: 19,
+        backgroundColor: colors.border, 
+        borderWidth: 1.5, 
+        borderColor: colors.primary,
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        overflow: 'hidden',
     },
-    authorInitials: { fontSize: 13, fontWeight: 'bold', color: colors.primary },
-    authorName: { fontSize: 13, fontWeight: 'bold', color: colors.primary },
+    authorInitials: { 
+        fontSize: 13, 
+        fontWeight: 'bold', 
+        color: colors.primary 
+    },
+    authorName: { 
+        fontSize: 13, 
+        fontWeight: 'bold', 
+        color: colors.primary 
+    },
     authorDate: { fontSize: 11, color: '#aaa' },
+
     metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
     metaChip: {
-        flexDirection: 'row', alignItems: 'center', gap: 4,
-        backgroundColor: colors.surface, borderRadius: 50,
-        paddingHorizontal: 12, paddingVertical: 6,
-        borderWidth: 1, borderColor: '#ede8e4',
+        flexDirection: 'row', 
+        alignItems: 'center', gap: 4,
+        backgroundColor: colors.surface, 
+        borderRadius: 50,
+        paddingHorizontal: 12, 
+        paddingVertical: 6,
+        borderWidth: 1, 
+        borderColor: '#ede8e4',
     },
     metaChipText: { fontSize: 12, color: colors.primary },
-    restrictionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
+
+    restrictionsRow: { 
+        flexDirection: 'row', 
+        flexWrap: 'wrap', 
+        gap: 6, marginTop: 10 
+    },
     restrictionChip: {
-        flexDirection: 'row', alignItems: 'center', gap: 4,
-        backgroundColor: '#f0faf0', borderRadius: 50,
+        flexDirection: 'row', 
+        alignItems: 'center', gap: 4,
+        backgroundColor: '#f0faf0', 
+        borderRadius: 50,
         paddingHorizontal: 10, paddingVertical: 5,
         borderWidth: 1, borderColor: '#c8e6c9',
     },
-    restrictionChipText: { fontSize: 11, color: colors.greenDark, fontWeight: '600' },
-    divider: { height: 1, backgroundColor: colors.border, marginVertical: 20 },
-    descriptionText: { fontSize: 14, color: '#555', lineHeight: 22 },
-    sectionTitle: { fontSize: 17, fontWeight: 'bold', color: colors.primary, marginBottom: 14 },
-    ingredientRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 8 },
-    ingredientBullet: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.primary, marginTop: 6 },
-    ingredientText: { flex: 1, fontSize: 14, color: '#444', lineHeight: 20 },
-    stepRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
-    stepNumber: {
-        width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primary,
-        alignItems: 'center', justifyContent: 'center', marginTop: 1,
+    restrictionChipText: { 
+        fontSize: 11, 
+        color: colors.greenDark, 
+        fontWeight: '600' 
     },
-    stepNumberText: { color: colors.cream, fontSize: 12, fontWeight: 'bold' },
-    stepText: { flex: 1, fontSize: 14, color: '#444', lineHeight: 22 },
+
+    divider: { 
+        height: 1, 
+        backgroundColor: colors.border, 
+        marginVertical: 20 
+    },
+    descriptionText: { 
+        fontSize: 14, 
+        color: '#555', 
+        lineHeight: 22 
+    },
+    sectionTitle: { 
+        fontSize: 17, 
+        fontWeight: 'bold', 
+        color: colors.primary, 
+        marginBottom: 14 
+    },
+
+    ingredientRow: { 
+        flexDirection: 'row', 
+        alignItems: 'flex-start', 
+        gap: 10, marginBottom: 8 
+    },
+    ingredientBullet: { 
+        width: 7, height: 7, 
+        borderRadius: 4, 
+        backgroundColor: colors.primary, 
+        marginTop: 6 
+    },
+    ingredientText: { 
+        flex: 1, 
+        fontSize: 14, 
+        color: '#444', 
+        lineHeight: 20 
+    },
+    ingredientQty: { 
+        fontWeight: 'bold', 
+        color: colors.primary 
+    },
+
+    stepRow: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        gap: 12, 
+        marginBottom: 14 
+    },
+    stepNumber: {
+        width: 26, height: 26, 
+        borderRadius: 13, 
+        backgroundColor: colors.primary,
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        marginTop: 1,
+    },
+    stepNumberText: { 
+        color: colors.cream, 
+        fontSize: 12, 
+        fontWeight: 'bold' 
+    },
+    stepText: { 
+        flex: 1, 
+        fontSize: 14, 
+        color: '#444', 
+        lineHeight: 22 
+    },
+
     emptyComments: { fontSize: 13, color: '#aaa', textAlign: 'center', paddingVertical: 16 },
 })

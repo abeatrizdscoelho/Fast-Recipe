@@ -1,4 +1,2 @@
-import { ComingSoonScreen } from '@/src/components/ComingSoonScreen';
-export default function ListScreen() {
-  return <ComingSoonScreen icon="list" title="Lista de Compras" />
-}
+import ShoppingListScreen from "@/src/screens/shoppingList/ShoppingListScreen";
+export default ShoppingListScreen;

@@ -1,11 +1,33 @@
+import { CreateRecipeDTO, FeedRecipe, FeedResponseDTO, IngredientDTO, RecipeListResponseDTO, RecipeResponseDTO } from '../models/recipeDTO'
 import { recipeRepository } from '../repositories/recipeRepository'
 import { uploadService } from './uploadService'
-import type { CreateRecipeDTO, RecipeResponseDTO, RecipeListResponseDTO, FeedResponseDTO, FeedRecipe } from '../models/recipeDTO'
+
+function formatIngredient(ingredient: {
+    id: string
+    name: string
+    quantity: number
+    unit: string
+    category: string
+}): IngredientDTO {
+    return {
+        id: ingredient.id,
+        name: ingredient.name,
+        quantity: ingredient.quantity,
+        unit: ingredient.unit,
+        category: ingredient.category,
+    }
+}
 
 function formatRecipe(recipe: {
     id: string
     title: string
-    ingredients: string[]
+    ingredients: {
+        id: string
+        name: string
+        quantity: number
+        unit: string
+        category: string
+    }[]
     preparation: string
     time: string
     portions: string
@@ -21,7 +43,7 @@ function formatRecipe(recipe: {
     return {
         id: recipe.id,
         title: recipe.title,
-        ingredients: recipe.ingredients,
+        ingredients: recipe.ingredients.map(formatIngredient),
         preparation: recipe.preparation,
         time: recipe.time,
         portions: recipe.portions,
@@ -38,7 +60,7 @@ function formatRecipe(recipe: {
 
 export const recipeService = {
     async create(authorId: string, data: CreateRecipeDTO, photoBuffers?: Buffer[]): Promise<RecipeResponseDTO> {
-        const createData: Parameters<typeof recipeRepository.create>[0] = { ...data, authorId }
+        const createData = { ...data, authorId }
 
         if (photoBuffers && photoBuffers.length > 0) {
             createData.photos = await Promise.all(
@@ -75,7 +97,7 @@ export const recipeService = {
     },
 
     async getAll(
-        page: number, limit: number, userId: string, search?: string, 
+        page: number, limit: number, userId: string, search?: string,
         categories?: string[], dietaryRestrictions?: string[]
     ): Promise<FeedResponseDTO> {
         const { recipes, total } = await recipeRepository.findAll(
@@ -104,7 +126,7 @@ export const recipeService = {
         if (!recipe) throw new Error('Receita não encontrada')
         if (recipe.authorId !== userId) throw new Error('Sem permissão para editar esta receita')
 
-        const updateData: Parameters<typeof recipeRepository.update>[1] = { ...data }
+        const updateData = { ...data }
 
         if (photoBuffers && photoBuffers.length > 0) {
             updateData.photos = await Promise.all(

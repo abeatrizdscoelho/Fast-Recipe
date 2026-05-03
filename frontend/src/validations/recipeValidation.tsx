@@ -7,7 +7,18 @@ export const recipeValidation = yup.object({
     .required('Título obrigatório'),
   ingredients: yup
     .array()
-    .of(yup.string().required())
+    .of(
+      yup.object({
+        name: yup.string().required('Nome do ingrediente obrigatório'),
+        quantity: yup
+          .number()
+          .typeError('Quantidade deve ser um número')
+          .positive('Quantidade deve ser maior que zero')
+          .required('Quantidade obrigatória'),
+        unit: yup.string().required('Unidade obrigatória'),
+        category: yup.string().default('Outros'),
+      })
+    )
     .min(1, 'Informe pelo menos um ingrediente')
     .required('Ingredientes obrigatórios'),
   preparation: yup
@@ -17,7 +28,8 @@ export const recipeValidation = yup.object({
   time: yup.string().required('Tempo de preparo obrigatório'),
   portions: yup.string().required('Porções obrigatórias'),
   category: yup.string().required('Categoria obrigatória'),
-  dietaryRestrictions: yup.array()
+  dietaryRestrictions: yup
+    .array()
     .of(yup.string().required())
     .optional()
     .default([]),

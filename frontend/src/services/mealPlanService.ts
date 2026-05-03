@@ -52,4 +52,14 @@ export const mealPlanService = {
       throw new Error('Erro inesperado')
     }
   },
+
+  async toggleCompleted(entryId: string): Promise<{ mealPlan: MealPlan }> {
+    try {
+      const response = await api.patch(`/meal-plan/entries/${entryId}/completed`)
+      return response.data
+    } catch (err) {
+      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao atualizar receita')
+      throw new Error('Erro inesperado')
+    }
+  },
 }

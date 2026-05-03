@@ -1,11 +1,10 @@
 import { mealPlanService } from '@/src/services/mealPlanService'
 import { recipeService } from '@/src/services/recipeService'
-import { MealPlan, MealPlanEntry, MealType } from '@/src/types/mealPlan'
+import { DAY_LABELS, MEAL_TYPES, MealPlan, MealPlanEntry, MealType } from '@/src/types/mealPlan'
 import { FeedRecipe } from '@/src/types/recipe'
 import { useState, useCallback, useEffect } from 'react'
 import { Alert } from 'react-native'
 
-// Retorna a segunda-feira da semana de uma data
 function getWeekStart(date: Date): Date {
     const d = new Date(date)
     const day = d.getDay()
@@ -24,13 +23,13 @@ export function useMealPlan() {
     const [currentWeekStart, setCurrentWeekStart] = useState<Date>(getWeekStart(today))
     const [selectedDay, setSelectedDay] = useState<number>(() => {
         const day = today.getDay()
-        return day === 0 ? 6 : day - 1 // 0=seg, 6=dom
+        return day === 0 ? 6 : day - 1
     })
     const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
     const [selectingSlot, setSelectingSlot] = useState<{
-     dayOfWeek: number; mealType: MealType; replaceEntryId?: string
+        dayOfWeek: number; mealType: MealType; replaceEntryId?: string
     } | null>(null)
     const [recipes, setRecipes] = useState<FeedRecipe[]>([])
     const [recipeSearch, setRecipeSearch] = useState('')
@@ -51,69 +50,50 @@ export function useMealPlan() {
         }
     }, [])
 
-    useEffect(() => {
-        loadPlan(weekStartStr)
-    }, [weekStartStr])
+    useEffect(() => { loadPlan(weekStartStr) }, [weekStartStr])
 
     const onRefresh = useCallback(() => {
         setRefreshing(true)
         loadPlan(weekStartStr, true)
     }, [weekStartStr])
 
-    // Navegação entre semanas
     function goToPrevWeek() {
         setCurrentWeekStart(prev => {
-            const d = new Date(prev)
-            d.setDate(d.getDate() - 7)
-            return d
+            const d = new Date(prev); d.setDate(d.getDate() - 7); return d
         })
         setSelectedDay(0)
     }
 
     function goToNextWeek() {
         setCurrentWeekStart(prev => {
-            const d = new Date(prev)
-            d.setDate(d.getDate() + 7)
-            return d
+            const d = new Date(prev); d.setDate(d.getDate() + 7); return d
         })
         setSelectedDay(0)
     }
 
-    // Datas dos 7 dias da semana atual
     function getWeekDates(): Date[] {
         return Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(currentWeekStart)
-            d.setDate(d.getDate() + i)
-            return d
+            const d = new Date(currentWeekStart); d.setDate(d.getDate() + i); return d
         })
     }
 
-    // Entries filtradas pelo dia selecionado
     function getEntriesForDay(dayOfWeek: number, mealType: MealType): MealPlanEntry[] {
         if (!mealPlan) return []
-        return mealPlan.entries.filter(
-            e => e.dayOfWeek === dayOfWeek && e.mealType === mealType
-        )
+        return mealPlan.entries.filter(e => e.dayOfWeek === dayOfWeek && e.mealType === mealType)
     }
 
-    // Verifica se o plano tem alguma receita no dia selecionado
     function dayHasAnyEntry(dayOfWeek: number): boolean {
         if (!mealPlan) return false
         return mealPlan.entries.some(e => e.dayOfWeek === dayOfWeek)
     }
 
-    // Abre modal para adicionar ou substituir
-    async function openRecipeSelector(
-        dayOfWeek: number, mealType: MealType, replaceEntryId?: string
-    ) {
+    async function openRecipeSelector(dayOfWeek: number, mealType: MealType, replaceEntryId?: string) {
         setSelectingSlot({ dayOfWeek, mealType, replaceEntryId })
         setRecipeSearch('')
         try {
             const data = await recipeService.getAll(1, 100)
             setRecipes(data.recipes)
-        } catch {
-            setRecipes([])
-        }
+        } catch { setRecipes([]) }
         setRecipeModalVisible(true)
     }
 
@@ -137,9 +117,7 @@ export function useMealPlan() {
             setMealPlan(updated)
         } catch (err) {
             Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao adicionar receita')
-        } finally {
-            setSelectingSlot(null)
-        }
+        } finally { setSelectingSlot(null) }
     }
 
     async function handleRemoveEntry(entryId: string) {
@@ -158,34 +136,74 @@ export function useMealPlan() {
         ])
     }
 
+    async function handleToggleCompleted(entryId: string) {
+        setMealPlan(prev => {
+            if (!prev) return prev
+            return {
+                ...prev,
+                entries: prev.entries.map(e =>
+                    e.id === entryId ? { ...e, completed: !e.completed } : e
+                ),
+            }
+        })
+        try {
+            const res = await mealPlanService.toggleCompleted(entryId)
+            setMealPlan(prev => {
+                if (!prev) return prev
+                return {
+                    ...prev,
+                    entries: prev.entries.map(e =>
+                        e.id === entryId
+                            ? { ...e, completed: res.mealPlan.entries.find(r => r.id === entryId)?.completed ?? e.completed }
+                            : e
+                    ),
+                }
+            })
+        } catch (err) {
+            setMealPlan(prev => {
+                if (!prev) return prev
+                return {
+                    ...prev,
+                    entries: prev.entries.map(e =>
+                        e.id === entryId ? { ...e, completed: !e.completed } : e
+                    ),
+                }
+            })
+            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao atualizar receita')
+        }
+    }
+
     const filteredRecipes = recipes.filter(r =>
         r.title.toLowerCase().includes(recipeSearch.toLowerCase())
     )
 
     const totalEntries = mealPlan?.entries.length ?? 0
 
+    const MONTH_NAMES = [
+        'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+        'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO',
+    ]
+
+    const weekDates = getWeekDates()
+    const selectedDate = weekDates[selectedDay]
+    const dayLabel = `${DAY_LABELS[selectedDay]} - ${selectedDate.getDate()} DE ${MONTH_NAMES[selectedDate.getMonth()]}`
+    const dayEntries = MEAL_TYPES.flatMap(mt => getEntriesForDay(selectedDay, mt))
+    const dayIsEmpty = dayEntries.length === 0
+
     return {
         mealPlan,
-        loading,
-        refreshing,
-        onRefresh,
-        selectedDay,
-        setSelectedDay,
-        currentWeekStart,
-        weekStartStr,
-        goToPrevWeek,
-        goToNextWeek,
-        getWeekDates,
-        getEntriesForDay,
-        dayHasAnyEntry,
+        loading, refreshing, onRefresh,
+        selectedDay, setSelectedDay,
+        currentWeekStart, weekStartStr,
+        goToPrevWeek, goToNextWeek,
+        getWeekDates, weekDates,
+        getEntriesForDay, dayHasAnyEntry,
         totalEntries,
-        recipeModalVisible,
-        setRecipeModalVisible,
-        recipeSearch,
-        setRecipeSearch,
+        recipeModalVisible, setRecipeModalVisible,
+        recipeSearch, setRecipeSearch,
         filteredRecipes,
-        openRecipeSelector,
-        handleSelectRecipe,
-        handleRemoveEntry,
+        openRecipeSelector, handleSelectRecipe,
+        handleRemoveEntry, handleToggleCompleted,
+        dayLabel, dayIsEmpty,
     }
 }

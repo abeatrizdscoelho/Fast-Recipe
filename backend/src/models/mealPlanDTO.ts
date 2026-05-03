@@ -5,6 +5,7 @@ export interface MealPlanEntryDTO {
   recipeId: string
   dayOfWeek: number
   mealType: MealType
+  completed: boolean 
   recipe: {
     id: string
     title: string
@@ -26,7 +27,7 @@ export interface MealPlanResponseDTO {
 
 export interface AddMealPlanEntryDTO {
   recipeId: string
-  dayOfWeek: number   
+  dayOfWeek: number
   mealType: MealType
 }
 

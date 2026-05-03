@@ -56,7 +56,7 @@ export const mealPlanRepository = {
     async replaceEntry(entryId: string, recipeId: string) {
         return prisma.mealPlanEntry.update({
             where: { id: entryId },
-            data: { recipeId },
+            data: { recipeId, completed: false },
             include: { recipe: { select: recipeSelect } },
         })
     },
@@ -74,5 +74,12 @@ export const mealPlanRepository = {
             },
         })
         return !!entry
+    },
+
+    async toggleCompleted(entryId: string, completed: boolean) {
+        return prisma.mealPlanEntry.update({
+            where: { id: entryId },
+            data: { completed },
+        })
     },
 }

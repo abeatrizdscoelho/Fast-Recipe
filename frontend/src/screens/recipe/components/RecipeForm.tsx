@@ -1,13 +1,17 @@
-import { router } from 'expo-router';
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity,
-    StyleSheet, ScrollView, Image, } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { RecipeFormData } from '@/src/types/recipe';
-import { CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES, useRecipeForm } from '@/src/hooks/recipe/useRecipeForm';
-import { colors } from '@/src/theme/color';
-import FieldError from '@/src/components/FieldError';
+import { router } from 'expo-router'
+import React from 'react'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { RecipeFormData } from '@/src/types/recipe'
+import {
+    CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES,
+    INGREDIENT_CATEGORIES, INGREDIENT_UNITS,
+    useRecipeForm,
+} from '@/src/hooks/recipe/useRecipeForm'
+import { colors } from '@/src/theme/color'
+import FieldError from '@/src/components/FieldError'
+import { SelectDropdown } from '@/src/components/SelectDropdown'
 
 type Props = {
     initialData?: Partial<RecipeFormData>
@@ -18,12 +22,15 @@ type Props = {
 
 export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Receita', loading = false }: Props) {
     const {
-        title, setTitle, time, setTime, ingredients, ingredientInput, setIngredientInput,
-        preparation, setPreparation, portions, setPortions, category, setCategory,
-        categoryOpen, setCategoryOpen, dietaryRestrictions, toggleDietaryRestrictions,
+        title, setTitle, time, setTime,
+        ingredients, ingredientInput, setIngredientInput, ingredientError,
+        preparation, setPreparation, portions, setPortions,
+        category, setCategory, categoryOpen, setCategoryOpen,
+        dietaryRestrictions, toggleDietaryRestrictions,
         difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
         description, setDescription, photos, errors, apiError,
-        handlePhotoPress, removePhoto, addIngredient, removeIngredient, handleSubmit
+        handlePhotoPress, removePhoto, addIngredient, removeIngredient, handleSubmit,
+        unitOpen, setUnitOpen, catIngOpen, setCatIngOpen, closeAllDropdowns
     } = useRecipeForm({ initialData, onSubmit })
 
     return (
@@ -78,26 +85,58 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 <FieldError message={errors.title} />
 
                 <Text style={styles.label}>Ingredientes</Text>
-                <TextInput
-                    style={[styles.input, errors.ingredients ? styles.inputError : null]}
-                    placeholder="Ex: 2 xícaras de farinha"
-                    placeholderTextColor="#aaa"
-                    value={ingredientInput}
-                    onChangeText={setIngredientInput}
-                    onSubmitEditing={addIngredient}
-                    returnKeyType="done"
-                />
+                <View style={styles.ingredientForm}>
+                    <TextInput
+                        style={[styles.input, ingredientError ? styles.inputError : null]}
+                        placeholder="Nome do ingrediente"
+                        placeholderTextColor="#aaa"
+                        value={ingredientInput.name}
+                        onChangeText={v => setIngredientInput(prev => ({ ...prev, name: v }))}
+                        returnKeyType="next"
+                    />
+
+                    <View style={styles.ingredientRow}>
+                        <TextInput
+                            style={[styles.input, styles.inputQty, ingredientError ? styles.inputError : null]}
+                            placeholder="Qtd."
+                            placeholderTextColor="#aaa"
+                            value={ingredientInput.quantity}
+                            onChangeText={v => setIngredientInput(prev => ({ ...prev, quantity: v }))}
+                            keyboardType="decimal-pad"
+                            returnKeyType="next"
+                        />
+                        <View style={styles.selectUnit}>
+                            <SelectDropdown
+                                value={ingredientInput.unit}
+                                placeholder="Selecione a unidade"
+                                options={INGREDIENT_UNITS}
+                                open={unitOpen}
+                                onToggle={() => { setUnitOpen(p => !p); setCatIngOpen(false) }}
+                                onSelect={v => { setIngredientInput(prev => ({ ...prev, unit: v })); setUnitOpen(false) }}
+                                error={ingredientError}
+                            />
+                        </View>
+                    </View>
+
+                    <SelectDropdown
+                        value={ingredientInput.category}
+                        placeholder="Categoria do ingrediente"
+                        options={INGREDIENT_CATEGORIES}
+                        open={catIngOpen}
+                        onToggle={() => { setCatIngOpen(p => !p); setUnitOpen(false) }}
+                        onSelect={v => { setIngredientInput(prev => ({ ...prev, category: v })); setCatIngOpen(false) }}
+                        error={ingredientError}
+                    />
+                </View>
+
+                {ingredientError ? <FieldError message={ingredientError} /> : null}
                 <FieldError message={errors.ingredients} />
 
                 {ingredients.length > 0 && (
                     <View style={styles.tagsContainer}>
                         {ingredients.map((ing, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={styles.tag}
-                                onPress={() => removeIngredient(index)}
-                            >
-                                <Text style={styles.tagText}>{ing}</Text>
+                            <TouchableOpacity key={index} style={styles.tag} onPress={() => removeIngredient(index)}>
+                                <Text style={styles.tagText}>{ing.quantity} {ing.unit} — {ing.name}</Text>
                                 <Ionicons name="close" size={12} color={colors.white} />
                             </TouchableOpacity>
                         ))}
@@ -116,9 +155,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     placeholderTextColor="#aaa"
                     value={preparation}
                     onChangeText={setPreparation}
-                    multiline
-                    numberOfLines={4}
-                    textAlignVertical="top"
+                    multiline numberOfLines={4} textAlignVertical="top"
                 />
                 <FieldError message={errors.preparation} />
 
@@ -127,9 +164,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     style={[styles.input, errors.time ? styles.inputError : null]}
                     placeholder="Ex: 45min"
                     placeholderTextColor="#aaa"
-                    value={time}
-                    onChangeText={setTime}
-                    keyboardType="numeric"
+                    value={time} onChangeText={setTime} keyboardType="numeric"
                 />
                 <FieldError message={errors.time} />
 
@@ -138,75 +173,33 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     style={[styles.input, errors.portions ? styles.inputError : null]}
                     placeholder="Ex: 4 porções"
                     placeholderTextColor="#aaa"
-                    value={portions}
-                    onChangeText={setPortions}
-                    keyboardType="numeric"
+                    value={portions} onChangeText={setPortions} keyboardType="numeric"
                 />
                 <FieldError message={errors.portions} />
 
                 <Text style={styles.label}>Categoria</Text>
-                <TouchableOpacity
-                    style={[styles.select, errors.category ? styles.inputError : null]}
-                    onPress={() => setCategoryOpen(prev => !prev)}
-                >
-                    <Text style={[styles.selectText, !category && { color: '#aaa' }]}>
-                        {category || 'Selecione uma categoria'}
-                    </Text>
-                    <Ionicons
-                        name={categoryOpen ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color="#aaa"
-                    />
-                </TouchableOpacity>
+                <SelectDropdown
+                    value={category}
+                    placeholder="Selecione uma categoria"
+                    options={CATEGORIES}
+                    open={categoryOpen}
+                    onToggle={() => { setCategoryOpen(p => !p)}}
+                    onSelect={v => { setCategory(v); setCategoryOpen(false) }}
+                    error={errors.category}
+                />
                 <FieldError message={errors.category} />
 
-                {categoryOpen && (
-                    <View style={styles.dropdown}>
-                        {CATEGORIES.map((cat) => (
-                            <TouchableOpacity
-                                key={cat}
-                                style={[styles.dropdownItem, category === cat && styles.dropdownItemActive]}
-                                onPress={() => { setCategory(cat); setCategoryOpen(false) }}
-                            >
-                                <Text style={[styles.dropdownText, category === cat && styles.dropdownTextActive]}>
-                                    {cat}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
-
                 <Text style={styles.label}>Dificuldade</Text>
-                <TouchableOpacity
-                    style={[styles.select, errors.difficulty ? styles.inputError : null]}
-                    onPress={() => setDifficultyOpen(prev => !prev)}
-                >
-                    <Text style={[styles.selectText, !difficulty && { color: '#aaa' }]}>
-                        {difficulty || 'Selecione a dificuldade'}
-                    </Text>
-                    <Ionicons
-                        name={difficultyOpen ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color="#aaa"
-                    />
-                </TouchableOpacity>
+                <SelectDropdown
+                    value={difficulty}
+                    placeholder="Selecione a dificuldade"
+                    options={DIFFICULTIES}
+                    open={difficultyOpen}
+                    onToggle={() => setDifficultyOpen(p => !p)}
+                    onSelect={v => { setDifficulty(v); setDifficultyOpen(false) }}
+                    error={errors.difficulty}
+                />
                 <FieldError message={errors.difficulty} />
-
-                {difficultyOpen && (
-                    <View style={styles.dropdown}>
-                        {DIFFICULTIES.map((diff) => (
-                            <TouchableOpacity
-                                key={diff}
-                                style={[styles.dropdownItem, difficulty === diff && styles.dropdownItemActive]}
-                                onPress={() => { setDifficulty(diff); setDifficultyOpen(false) }}
-                            >
-                                <Text style={[styles.dropdownText, difficulty === diff && styles.dropdownTextActive]}>
-                                    {diff}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
 
                 <Text style={styles.label}>
                     Restrições Alimentares <Text style={styles.labelHint}>(opcional)</Text>
@@ -222,9 +215,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                                 onPress={() => toggleDietaryRestrictions(opt)}
                             >
                                 {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
-                                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                                    {opt}
-                                </Text>
+                                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>{opt}</Text>
                             </TouchableOpacity>
                         )
                     })}
@@ -235,11 +226,8 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     style={[styles.input, styles.textArea, errors.description ? styles.inputError : null]}
                     placeholder="Uma breve descrição da receita..."
                     placeholderTextColor="#aaa"
-                    value={description}
-                    onChangeText={setDescription}
-                    multiline
-                    numberOfLines={3}
-                    textAlignVertical="top"
+                    value={description} onChangeText={setDescription}
+                    multiline numberOfLines={3} textAlignVertical="top"
                 />
                 <FieldError message={errors.description} />
 
@@ -275,9 +263,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
     },
-    cardTitle: { fontSize: 20, fontWeight: 'bold', color: colors.primary },
+    cardTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: colors.primary,
+    },
     backBtn: { padding: 4 },
-
     label: {
         fontSize: 14,
         fontWeight: 'bold',
@@ -290,12 +281,8 @@ const styles = StyleSheet.create({
         fontWeight: 'normal',
         color: colors.gray,
     },
-
     photoText: { color: 'rgba(0,0,0,0.35)', fontSize: 13 },
-    photosRow: {
-        flexDirection: 'row',
-        marginTop: 4,
-    },
+    photosRow: { flexDirection: 'row', marginTop: 4 },
     photoThumb: {
         width: 100,
         height: 100,
@@ -303,11 +290,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
         position: 'relative',
     },
-    photoThumbImage: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 10,
-    },
+    photoThumbImage: { width: '100%', height: '100%', borderRadius: 10 },
     photoBadge: {
         position: 'absolute',
         bottom: 4,
@@ -317,16 +300,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
     },
-    photoBadgeText: {
-        color: colors.white,
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
-    photoRemove: {
-        position: 'absolute',
-        top: -2,
-        right: -2,
-    },
+    photoBadgeText: { color: colors.white, fontSize: 10, fontWeight: 'bold' },
+    photoRemove: { position: 'absolute', top: -2, right: -2 },
     photoAddBtn: {
         width: 100,
         height: 100,
@@ -336,7 +311,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 6,
     },
-
     input: {
         borderWidth: 1,
         borderColor: '#e0e0e0',
@@ -349,8 +323,16 @@ const styles = StyleSheet.create({
     },
     inputError: { borderColor: colors.error ?? '#e05c5c' },
     textArea: { height: 100, paddingTop: 12 },
-
-    tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+    ingredientForm: { gap: 8, marginTop: 4 },
+    ingredientRow: { flexDirection: 'row', gap: 8 },
+    inputQty: { width: 90 },
+    selectUnit: { flex: 1 },
+    tagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginTop: 10,
+    },
     tag: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -361,7 +343,6 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
     },
     tagText: { color: colors.white, fontSize: 12, fontWeight: 'bold' },
-
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -373,37 +354,6 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     addButtonText: { color: colors.white, fontSize: 14, fontWeight: 'bold' },
-
-    select: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        borderRadius: 10,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        backgroundColor: '#fafafa',
-    },
-    selectText: { fontSize: 14, color: '#333' },
-    dropdown: {
-        borderWidth: 1,
-        borderColor: '#e0e0e0',
-        borderRadius: 10,
-        marginTop: 4,
-        overflow: 'hidden',
-        backgroundColor: '#fff',
-    },
-    dropdownItem: {
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    dropdownItemActive: { backgroundColor: '#FFF5EC' },
-    dropdownText: { fontSize: 14, color: '#333' },
-    dropdownTextActive: { color: colors.primary, fontWeight: 'bold' },
-
     dietaryHint: {
         fontSize: 12,
         color: colors.gray,
@@ -426,14 +376,16 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#e0d6d0',
     },
-    chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    chipActive: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+    },
     chipText: {
         fontSize: 13,
         color: colors.primary,
         fontWeight: '600',
     },
     chipTextActive: { color: colors.white },
-
     submitButton: {
         backgroundColor: colors.primary,
         borderRadius: 50,
@@ -442,5 +394,10 @@ const styles = StyleSheet.create({
         marginTop: 28,
     },
     submitDisabled: { opacity: 0.7 },
-    submitText: { color: colors.white, fontSize: 16, fontWeight: 'bold', letterSpacing: 0.5 },
+    submitText: {
+        color: colors.white,
+        fontSize: 16,
+        fontWeight: 'bold',
+        letterSpacing: 0.5,
+    },
 })

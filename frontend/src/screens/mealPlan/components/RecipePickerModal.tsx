@@ -1,9 +1,12 @@
 import React from 'react'
-import { Modal, View, Text, TextInput, FlatList,
-    TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native'
+import {
+    Modal, View, Text, FlatList,
+    TouchableOpacity, Image, StyleSheet, SafeAreaView
+} from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { FeedRecipe } from '@/src/types/recipe'
 import { colors } from '@/src/theme/color'
+import { SearchBar } from '@/src/components/SearchBar'
 
 interface Props {
     visible: boolean
@@ -26,13 +29,10 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
                 </View>
 
                 <View style={styles.searchRow}>
-                    <Ionicons name="search" size={18} color="#aaa" style={styles.searchIcon} />
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Pesquisar receitas..."
-                        placeholderTextColor="#aaa"
+                    <SearchBar
                         value={search}
                         onChangeText={onSearchChange}
+                        placeholder="Pesquisar receitas..."
                         autoFocus
                     />
                 </View>
@@ -89,22 +89,13 @@ const styles = StyleSheet.create({
     title: { fontSize: 18, fontWeight: 'bold', color: colors.primary },
     searchRow: {
         flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.white,
         marginHorizontal: 16,
         marginTop: 12,
         marginBottom: 8,
-        borderRadius: 12,
+        borderRadius: 50,
+        overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#e0e0e0',
-        paddingHorizontal: 12,
-    },
-    searchIcon: { marginRight: 8 },
-    searchInput: { 
-        flex: 1, 
-        paddingVertical: 12, 
-        fontSize: 14, 
-        color: '#333' 
     },
     list: { padding: 16, gap: 10 },
     recipeItem: {
@@ -119,16 +110,8 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 1,
     },
-    recipeThumb: {
-        width: 60, 
-        height: 60, 
-        borderRadius: 10, 
-        backgroundColor: '#f0f0f0',
-    },
-    noPhoto: { 
-        alignItems: 'center', 
-        justifyContent: 'center' 
-    },
+    recipeThumb: { width: 60, height: 60, borderRadius: 10, backgroundColor: '#f0f0f0' },
+    noPhoto: { alignItems: 'center', justifyContent: 'center' },
     recipeInfo: { flex: 1 },
     recipeName: { 
         fontSize: 14, 
@@ -143,10 +126,6 @@ const styles = StyleSheet.create({
     },
     metaText: { fontSize: 12, color: '#999' },
     metaDot: { fontSize: 12, color: '#ccc' },
-    empty: { 
-        alignItems: 'center', 
-        paddingTop: 60, 
-        gap: 12 
-    },
+    empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
     emptyText: { fontSize: 14, color: '#bbb' },
 })

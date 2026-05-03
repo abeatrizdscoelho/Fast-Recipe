@@ -1,28 +1,21 @@
 import { mealPlanRepository } from '../repositories/mealPlanRepository'
 import { recipeRepository } from '../repositories/recipeRepository'
-import type {
-    AddMealPlanEntryDTO,
-    ReplaceMealPlanEntryDTO,
-    MealPlanResponseDTO,
+import { shoppingListRepository } from '../repositories/shoppingListRepository'
+import { getWeekStart } from '../utils/dateUtil'
+import {
     MealPlanDTO,
     MealPlanEntryDTO,
+    MealPlanResponseDTO,
     MealType,
+    AddMealPlanEntryDTO,
+    ReplaceMealPlanEntryDTO,
 } from '../models/mealPlanDTO'
-
-// Retorna a segunda-feira da semana de uma data (meia-noite UTC)
-function getWeekStart(date: Date): Date {
-    const d = new Date(date)
-    const day = d.getUTCDay() // 0 = domingo
-    const diff = day === 0 ? -6 : 1 - day // ajuste para segunda
-    d.setUTCDate(d.getUTCDate() + diff)
-    d.setUTCHours(0, 0, 0, 0)
-    return d
-}
 
 function formatEntry(entry: {
     id: string
     dayOfWeek: number
     mealType: string
+    completed: boolean
     recipe: { id: string; title: string; photos: string[]; category: string; time: string }
 }): MealPlanEntryDTO {
     return {
@@ -30,6 +23,7 @@ function formatEntry(entry: {
         recipeId: entry.recipe.id,
         dayOfWeek: entry.dayOfWeek,
         mealType: entry.mealType as MealType,
+        completed: entry.completed,
         recipe: entry.recipe,
     }
 }
@@ -41,6 +35,7 @@ function formatMealPlan(plan: {
         id: string
         dayOfWeek: number
         mealType: string
+        completed: boolean
         recipe: { id: string; title: string; photos: string[]; category: string; time: string }
     }>
 }): MealPlanDTO {
@@ -74,7 +69,7 @@ export const mealPlanService = {
         if (alreadyExists) throw new Error('Esta receita já está neste slot do planejamento')
 
         await mealPlanRepository.addEntry(plan.id, data)
-        
+
         const updated = await mealPlanRepository.findByWeek(userId, weekStart)
         return { mealPlan: formatMealPlan(updated!) }
     },
@@ -89,6 +84,8 @@ export const mealPlanService = {
         const recipe = await recipeRepository.findById(data.recipeId)
         if (!recipe) throw new Error('Receita não encontrada')
 
+        await shoppingListRepository.clearBoughtItemsByRecipe(userId, entry.recipeId)
+
         await mealPlanRepository.replaceEntry(entryId, data.recipeId)
 
         const weekStart = getWeekStart(entry.mealPlan.weekStart)
@@ -101,9 +98,25 @@ export const mealPlanService = {
         if (!entry) throw new Error('Entrada não encontrada no planejamento')
         if (entry.mealPlan.userId !== userId) throw new Error('Sem permissão para editar este planejamento')
 
+        await shoppingListRepository.clearBoughtItemsByRecipe(userId, entry.recipeId)
+
         const weekStart = getWeekStart(entry.mealPlan.weekStart)
         await mealPlanRepository.removeEntry(entryId)
 
+        const updated = await mealPlanRepository.findByWeek(userId, weekStart)
+        return { mealPlan: formatMealPlan(updated!) }
+    },
+
+    async toggleCompleted(userId: string, entryId: string): Promise<MealPlanResponseDTO> {
+        const entry = await mealPlanRepository.findEntryById(entryId)
+        if (!entry) throw new Error('Entrada não encontrada no planejamento')
+        if (entry.mealPlan.userId !== userId) throw new Error('Sem permissão para editar este planejamento')
+
+        const newValue = !entry.completed 
+
+        await mealPlanRepository.toggleCompleted(entryId, newValue)
+
+        const weekStart = getWeekStart(entry.mealPlan.weekStart)
         const updated = await mealPlanRepository.findByWeek(userId, weekStart)
         return { mealPlan: formatMealPlan(updated!) }
     },

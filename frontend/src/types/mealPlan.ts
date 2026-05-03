@@ -24,6 +24,7 @@ export interface MealPlanEntry {
   dayOfWeek: number
   mealType: MealType
   recipe: MealPlanRecipe
+  completed: boolean   
 }
 
 export interface MealPlan {

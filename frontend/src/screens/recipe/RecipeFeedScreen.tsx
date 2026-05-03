@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet,
-    Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { feedStore, useFeed } from '../../hooks/recipe/useRecipeFeed';
 import { colors } from '../../theme/color';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
+import { SearchBar } from '../../components/SearchBar';
 import { FeedRecipe } from '../../types/recipe';
 import { RecipeCard } from './components/RecipeCard';
 import { FilterModal } from '@/src/components/FilterModal';
@@ -64,28 +64,17 @@ export default function RecipeFeedScreen() {
             <Header />
 
             <View style={styles.searchRow}>
-                <View style={styles.searchContainer}>
-                    <Ionicons name="search-outline" size={20} color="#aaa" style={styles.searchIcon} />
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Pesquisar receitas..."
-                        placeholderTextColor="#aaa"
-                        value={search}
-                        onChangeText={handleSearch}
-                        returnKeyType="search"
-                        clearButtonMode="while-editing"
-                    />
-                </View>
+                <SearchBar
+                    value={search}
+                    onChangeText={handleSearch}
+                    placeholder="Pesquisar receitas..."
+                />
 
                 <TouchableOpacity
                     style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
                     onPress={() => setFilterVisible(true)}
                 >
-                    <Ionicons
-                        name="options-outline"
-                        size={22}
-                        color={activeFilterCount > 0 ? colors.white : colors.white}
-                    />
+                    <Ionicons name="options-outline" size={22} color={colors.white} />
                     {activeFilterCount > 0 && (
                         <View style={styles.filterBadge}>
                             <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -141,25 +130,16 @@ export default function RecipeFeedScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.primary },
+    container: { 
+        flex: 1, 
+        backgroundColor: colors.primary 
+    },
     listContent: { paddingBottom: 16 },
-    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-
-    searchContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.white,
-        borderRadius: 50,
-        paddingHorizontal: 16,
+    loadingContainer: { 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center' 
     },
-    searchInput: {
-        flex: 1,
-        paddingVertical: 12,
-        fontSize: 14,
-        color: '#333',
-    },
-    searchIcon: { marginRight: 8 },
     searchRow: {
         flexDirection: 'row',
         alignItems: 'center',
