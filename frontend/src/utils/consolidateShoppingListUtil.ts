@@ -28,10 +28,10 @@ function normalizeUnit(unit: string | null | undefined): string {
 // Converte dentro da mesma grandeza para a unidade maior quando atingir o limiar
 function convertUnit(quantity: number, unit: string): { quantity: number; unit: string } {
     if (unit === 'grama' && quantity >= 1000) {
-        return { quantity: parseFloat((quantity / 1000).toFixed(3)), unit: 'quilograma' }
+        return { quantity: parseFloat((quantity / 1000).toFixed(2)), unit: 'quilograma' }
     }
     if (unit === 'mililitro' && quantity >= 1000) {
-        return { quantity: parseFloat((quantity / 1000).toFixed(3)), unit: 'litro' }
+        return { quantity: parseFloat((quantity / 1000).toFixed(2)), unit: 'litro' }
     }
     return { quantity, unit }
 }
