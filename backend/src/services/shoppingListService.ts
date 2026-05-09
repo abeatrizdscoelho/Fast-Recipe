@@ -4,16 +4,23 @@ import { getWeekStart } from '../utils/dateUtil'
 import {
     ShoppingListItemDTO,
     ShoppingListResponseDTO,
+    AddItemDTO,
+    UpdateItemDTO,
 } from '../models/shoppingListDTO'
+
+const MANUAL_PREFIX = 'manual_'
 
 export const shoppingListService = {
     async getShoppingList(userId: string, dateRef?: string): Promise<ShoppingListResponseDTO> {
         const ref = dateRef ? new Date(dateRef) : new Date()
         const weekStart = getWeekStart(ref)
 
-        const ingredients = await shoppingListRepository.findIngredientsByWeekPlan(userId, weekStart)
+        const [ingredients, manualItems] = await Promise.all([
+            shoppingListRepository.findIngredientsByWeekPlan(userId, weekStart),
+            shoppingListRepository.findManualItems(userId),
+        ])
 
-        if (ingredients.length === 0) {
+        if (ingredients.length === 0 && manualItems.length === 0) {
             return {
                 shoppingList: null,
                 message: 'Nenhuma receita encontrada no planejamento semanal. Adicione receitas ao planejamento para gerar sua lista de compras.',
@@ -23,16 +30,13 @@ export const shoppingListService = {
         const normalize = (s: string) =>
             s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 
-        const consolidationMap = new Map<
-            string,
-            {
-                ingredientIds: string[]
-                name: string
-                quantity: number
-                unit: string
-                category: string
-            }
-        >()
+        const consolidationMap = new Map<string, {
+            ingredientIds: string[]
+            name: string
+            quantity: number
+            unit: string
+            category: string
+        }>()
 
         for (const ingredient of ingredients) {
             const key = `${normalize(ingredient.name)}_${normalize(ingredient.unit)}`
@@ -56,7 +60,7 @@ export const shoppingListService = {
         const boughtItems = await shoppingListRepository.findBoughtItems(userId, allIngredientIds)
         const boughtIds = new Set(boughtItems.map(b => b.ingredientId))
 
-        const consolidatedItems: ShoppingListItemDTO[] = Array.from(consolidationMap.values()).map(item => ({
+        const planItems: ShoppingListItemDTO[] = Array.from(consolidationMap.values()).map(item => ({
             ingredientIds: item.ingredientIds,
             name: item.name,
             quantity: item.quantity,
@@ -64,6 +68,17 @@ export const shoppingListService = {
             category: item.category,
             bought: item.ingredientIds.every(id => boughtIds.has(id)),
         }))
+
+        const manualDTOs: ShoppingListItemDTO[] = manualItems.map(item => ({
+            ingredientIds: [`${MANUAL_PREFIX}${item.id}`],
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            category: item.category,
+            bought: item.bought,
+        }))
+
+        const consolidatedItems = [...planItems, ...manualDTOs]
 
         consolidatedItems.sort((a, b) => {
             if (a.bought !== b.bought) return a.bought ? 1 : -1
@@ -89,9 +104,59 @@ export const shoppingListService = {
 
     async toggleBought(userId: string, ingredientIds: string[], bought: boolean): Promise<void> {
         await Promise.all(
-            ingredientIds.map(id =>
-                shoppingListRepository.upsertBoughtItem(userId, id, bought)
-            )
+            ingredientIds.map(id => {
+                if (id.startsWith(MANUAL_PREFIX)) {
+                    const realId = id.replace(MANUAL_PREFIX, '')
+                    return shoppingListRepository.toggleManualItemBought(realId, userId, bought)
+                }
+                return shoppingListRepository.upsertBoughtItem(userId, id, bought)
+            })
         )
+    },
+
+    async addItem(userId: string, data: AddItemDTO): Promise<ShoppingListItemDTO> {
+        const item = await shoppingListRepository.createManualItem(userId, data)
+        return {
+            ingredientIds: [`${MANUAL_PREFIX}${item.id}`],
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            category: item.category,
+            bought: item.bought,
+        }
+    },
+
+    async updateItem(userId: string, data: UpdateItemDTO): Promise<ShoppingListItemDTO> {
+        const rawId = data.ingredientIds[0]
+
+        if (!rawId.startsWith(MANUAL_PREFIX)) {
+            throw new Error('Apenas itens adicionados manualmente podem ser editados.')
+        }
+
+        const realId = rawId.replace(MANUAL_PREFIX, '')
+        const { name, quantity, unit, category } = data
+        const item = await shoppingListRepository.updateManualItem(realId, userId, {
+            name, quantity, unit, category,
+        })
+
+        return {
+            ingredientIds: [`${MANUAL_PREFIX}${item.id}`],
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            category: item.category,
+            bought: item.bought,
+        }
+    },
+
+    async deleteItem(userId: string, ingredientIds: string[]): Promise<void> {
+        const rawId = ingredientIds[0]
+
+        if (!rawId.startsWith(MANUAL_PREFIX)) {
+            throw new Error('Apenas itens adicionados manualmente podem ser removidos.')
+        }
+
+        const realId = rawId.replace(MANUAL_PREFIX, '')
+        await shoppingListRepository.deleteManualItem(realId, userId)
     },
 }

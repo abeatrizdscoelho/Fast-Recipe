@@ -1,15 +1,20 @@
 import React from 'react'
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native'
+import {
+    View, Text, ScrollView, StyleSheet,
+    ActivityIndicator, RefreshControl, TouchableOpacity
+} from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useFocusEffect } from 'expo-router'
+import { useCallback } from 'react'
 import { colors } from '@/src/theme/color'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
 import { useShoppingList } from '@/src/hooks/shoppingList/useShoppingList'
 import { SummaryBanner } from './components/SummaryBanner'
-import { CategoryFilter } from './components/CategoryFilter'
-import { ShoppingItem } from './components/ShoppingItem'
+import { CategorySection } from './components/CategorySection'
 import { SearchBar } from '@/src/components/SearchBar'
 import { router } from 'expo-router'
+import { formatWeekRange } from '@/src/utils/formatWeekUtil'
 
 export default function ShoppingListScreen() {
     const {
@@ -17,15 +22,27 @@ export default function ShoppingListScreen() {
         loading, refreshing, onRefresh,
         message,
         search, setSearch,
-        selectedCategory, setSelectedCategory,
-        sortAZ, setSortAZ,
-        categories,
         filteredItems,
-        totalCount,
         handleToggleBought,
+        handleOpenAdd, handleOpenEdit, handleDeleteItem,
     } = useShoppingList()
 
+    useFocusEffect(
+        useCallback(() => {
+            onRefresh()
+        }, [])
+    )
+
     const isEmpty = !shoppingList || shoppingList.items.length === 0
+    const pendingCount = shoppingList?.items.filter(i => !i.bought).length ?? 0
+    const boughtCount = shoppingList?.items.filter(i => i.bought).length ?? 0
+
+    const grouped = filteredItems.reduce<Record<string, typeof filteredItems>>((acc, item) => {
+        const cat = item.category ?? 'Outros'
+        if (!acc[cat]) acc[cat] = []
+        acc[cat].push(item)
+        return acc
+    }, {})
 
     return (
         <View style={styles.container}>
@@ -35,6 +52,11 @@ export default function ShoppingListScreen() {
                 <View>
                     <Text style={styles.headerTitle}>Lista de Compras</Text>
                     <Text style={styles.headerSub}>Gerada automaticamente do seu planejamento!</Text>
+                    {shoppingList?.weekStart && (
+                        <Text style={styles.headerWeek}>
+                            Semana: {formatWeekRange(shoppingList.weekStart)}
+                        </Text>
+                    )}
                 </View>
                 <TouchableOpacity style={styles.refreshBadge} onPress={onRefresh}>
                     <Ionicons name="refresh-outline" size={14} color={colors.white} />
@@ -50,72 +72,49 @@ export default function ShoppingListScreen() {
                 ) : (
                     <ScrollView
                         showsVerticalScrollIndicator={false}
-                        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+                        }
                         contentContainerStyle={styles.scrollContent}
                     >
-                        {!isEmpty && (
-                            <SummaryBanner
-                                totalRecipes={shoppingList!.totalRecipes}
-                                weekStart={shoppingList!.weekStart}
-                            />
-                        )}
-
                         {!isEmpty && (
                             <View style={styles.searchRow}>
                                 <SearchBar
                                     value={search}
                                     onChangeText={setSearch}
-                                    placeholder="Buscar ingrediente"
+                                    placeholder="Buscar ingrediente..."
                                 />
                             </View>
                         )}
 
                         {!isEmpty && (
-                            <CategoryFilter
-                                categories={categories}
-                                selected={selectedCategory}
-                                totalCount={totalCount}
-                                onSelect={setSelectedCategory}
-                            />
+                            <SummaryBanner pending={pendingCount} bought={boughtCount} />
                         )}
 
-                        {!isEmpty && (
-                            <View style={styles.countRow}>
-                                <Text style={styles.countText}>{filteredItems.length} itens</Text>
-                                <TouchableOpacity onPress={() => setSortAZ(p => !p)} style={styles.sortBtn}>
-                                    <Text style={styles.sortText}>Ordenar: {sortAZ ? 'A-Z' : 'Z-A'}</Text>
-                                    <Ionicons name="chevron-down" size={14} color="#666" />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
-                        {isEmpty && (
-                            <View style={styles.emptyBanner}>
-                                <Ionicons name="cart-outline" size={40} color={colors.primary} style={{ opacity: 0.4 }} />
-                                <Text style={styles.emptyText}>
-                                    {message ?? 'Nenhum item na lista de compras.'}
-                                </Text>
-                                <Text style={styles.emptySubText}>Adicione receitas ao planejamento para gerar sua lista!</Text>
-                                <TouchableOpacity style={styles.emptyBtn} onPress={() => router.push('/planning')}>
-                                    <Text style={styles.emptyBtnText}>Ir para o planejamento</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
-                        {filteredItems.map(item => (
-                            <ShoppingItem
-                                key={item.ingredientIds.join('-')}
-                                item={item}
+                        {!isEmpty && Object.entries(grouped).map(([cat, items]) => (
+                            <CategorySection
+                                key={cat}
+                                category={cat}
+                                items={items}
                                 onToggle={handleToggleBought}
+                                onEdit={handleOpenEdit}
+                                onDelete={handleDeleteItem}
                             />
                         ))}
 
-                        {!isEmpty && (
-                            <View style={styles.hint}>
-                                <Ionicons name="bulb-outline" size={16} color={colors.primary} />
-                                <Text style={styles.hintText}>
-                                    Unidades diferentes não são consolidadas.
+                        {isEmpty && (
+                            <View style={styles.emptyBanner}>
+                                <View style={styles.emptyIllustration}>
+                                    <Ionicons name="cart-outline" size={64} color={colors.primary} style={{ opacity: 0.35 }} />
+                                </View>
+                                <Text style={styles.emptyTitle}>Sua lista de compras{'\n'}está vazia</Text>
+                                <Text style={styles.emptySubText}>
+                                    {message ?? 'Adicione receitas ao seu planejamento\nsemanal para gerar sua lista\nautomaticamente.'}
                                 </Text>
+                                <TouchableOpacity style={styles.emptyBtn} onPress={() => router.push('/planning')}>
+                                    <Ionicons name="calendar-outline" size={16} color={colors.white} />
+                                    <Text style={styles.emptyBtnText}>Ir para o Planejamento Semanal</Text>
+                                </TouchableOpacity>
                             </View>
                         )}
 
@@ -123,6 +122,10 @@ export default function ShoppingListScreen() {
                     </ScrollView>
                 )}
             </View>
+
+            <TouchableOpacity style={styles.fab} onPress={handleOpenAdd}>
+                <Ionicons name="add" size={26} color={colors.white} />
+            </TouchableOpacity>
 
             <BottomNav />
         </View>
@@ -132,126 +135,116 @@ export default function ShoppingListScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.primary },
     header: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        paddingHorizontal: 20, 
-        paddingTop: 8, 
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 8,
         paddingBottom: 16,
     },
-    headerTitle: { 
-        fontSize: 22, 
-        fontWeight: 'bold', 
-        color: colors.white 
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: colors.white,
     },
-    headerSub: { 
-        fontSize: 12, 
-        color: 'rgba(255,255,255,0.75)', 
-        marginTop: 2 
+    headerSub: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.75)',
+        marginTop: 2,
     },
-
+    headerWeek: {
+        fontSize: 11,
+        color: 'rgba(255,255,255,0.6)',
+        marginTop: 3,
+    },
     refreshBadge: {
-        flexDirection: 'row', 
-        alignItems: 'center', 
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 4,
-        backgroundColor: 'rgba(255,255,255,0.15)', 
+        backgroundColor: 'rgba(255,255,255,0.15)',
         borderRadius: 20,
-        paddingHorizontal: 10, 
+        paddingHorizontal: 10,
         paddingVertical: 5,
     },
-    refreshText: { 
-        fontSize: 11, 
-        color: colors.white 
+    refreshText: {
+        fontSize: 11,
+        color: colors.white,
     },
-
-    body: { 
-        flex: 1, 
-        backgroundColor: '#f5f5f5', 
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius: 20 
+    body: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     },
-    loadingWrapper: { 
-        flex: 1, 
-        alignItems: 'center', 
-        justifyContent: 'center' 
+    loadingWrapper: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    scrollContent: { 
-        padding: 16, 
-        paddingTop: 20 
+    scrollContent: {
+        padding: 16,
+        paddingTop: 20,
     },
-    searchRow: { 
-        flexDirection: 'row', 
-        marginBottom: 12 
+    searchRow: { marginBottom: 12 },
+    fab: {
+        position: 'absolute',
+        bottom: 90,
+        right: 20,
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        backgroundColor: colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 6,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
     },
-
-    countRow: {
-        flexDirection: 'row', 
-        justifyContent: 'space-between',
-        alignItems: 'center', 
-        marginBottom: 10,
-    },
-    countText: { 
-        fontSize: 13, 
-        color: '#999', 
-        fontWeight: '600' 
-    },
-
-    sortBtn: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 4 
-    },
-    sortText: { 
-        fontSize: 13, 
-        color: '#666' 
-    },
-
     emptyBanner: {
-        alignItems: 'center', 
+        alignItems: 'center',
         backgroundColor: colors.white,
-        borderRadius: 16, 
-        padding: 32, 
-        marginTop: 20, 
-        gap: 6,
+        borderRadius: 20,
+        padding: 36,
+        marginTop: 20,
+        gap: 8,
     },
-    emptyText: { 
-        fontSize: 15, 
-        fontWeight: '600', 
-        color: '#555', 
-        marginTop: 8, 
-        textAlign: 'center' 
+    emptyIllustration: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#FFF0EC',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 8,
     },
-    emptySubText: { 
-        fontSize: 13, 
-        color: '#aaa', 
-        textAlign: 'center' 
+    emptyTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: colors.primary,
+        textAlign: 'center',
+        lineHeight: 26,
+    },
+    emptySubText: {
+        fontSize: 13,
+        color: '#aaa',
+        textAlign: 'center',
+        lineHeight: 20,
     },
     emptyBtn: {
-        marginTop: 12, 
-        backgroundColor: colors.primary,
-        borderRadius: 20, 
-        paddingHorizontal: 20, 
-        paddingVertical: 10,
-    },
-    emptyBtnText: { 
-        color: colors.white, 
-        fontWeight: '700', 
-        fontSize: 13 
-    },
-
-    hint: {
-        flexDirection: 'row', 
-        alignItems: 'center', 
+        marginTop: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 8,
-        backgroundColor: '#FFF8F6', 
-        borderRadius: 12,
-        padding: 12, 
-        marginTop: 8,
+        backgroundColor: colors.primary,
+        borderRadius: 25,
+        paddingHorizontal: 24,
+        paddingVertical: 13,
     },
-    hintText: { 
-        flex: 1, 
-        fontSize: 12, 
-        color: '#888', 
-        lineHeight: 17 
+    emptyBtnText: {
+        color: colors.white,
+        fontWeight: '700',
+        fontSize: 14,
     },
 })

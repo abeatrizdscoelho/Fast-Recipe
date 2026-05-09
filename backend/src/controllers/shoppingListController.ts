@@ -2,6 +2,12 @@ import { Response } from 'express'
 import { AuthRequest } from '../middlewares/authMiddleware'
 import { shoppingListService } from '../services/shoppingListService'
 import { ValidationError } from 'yup'
+import {
+    toggleBoughtSchema,
+    addItemSchema,
+    updateItemSchema,
+    deleteItemSchema,
+} from '../schemas/shoppingListSchema'
 
 function handleError(err: unknown, res: Response): Response {
     if (err instanceof ValidationError) {
@@ -26,17 +32,50 @@ export const shoppingListController = {
 
     async toggleBought(req: AuthRequest, res: Response) {
         try {
-            const { ingredientIds, bought } = req.body
+            const { ingredientIds, bought } = await toggleBoughtSchema.validate(req.body, {
+                abortEarly: true,
+                stripUnknown: true,
+            })
+            await shoppingListService.toggleBought(req.userId!, ingredientIds as string[], bought)
+            return res.status(204).send()
+        } catch (err) {
+            return handleError(err, res)
+        }
+    },
 
-            if (!Array.isArray(ingredientIds) || ingredientIds.length === 0) {
-                return res.status(400).json({ error: 'ingredientIds deve ser um array não vazio' })
-            }
+    async addItem(req: AuthRequest, res: Response) {
+        try {
+            const data = await addItemSchema.validate(req.body, {
+                abortEarly: true,
+                stripUnknown: true,
+            })
+            const item = await shoppingListService.addItem(req.userId!, data)
+            return res.status(201).json(item)
+        } catch (err) {
+            return handleError(err, res)
+        }
+    },
 
-            if (typeof bought !== 'boolean') {
-                return res.status(400).json({ error: 'bought deve ser um booleano' })
-            }
+    async updateItem(req: AuthRequest, res: Response) {
+        try {
+            const data = await updateItemSchema.validate(req.body, {
+                abortEarly: true,
+                stripUnknown: true,
+            })
+            const item = await shoppingListService.updateItem(req.userId!, data)
+            return res.status(200).json(item)
+        } catch (err) {
+            return handleError(err, res)
+        }
+    },
 
-            await shoppingListService.toggleBought(req.userId!, ingredientIds, bought)
+    async deleteItem(req: AuthRequest, res: Response) {
+        try {
+            const { ingredientIds } = await deleteItemSchema.validate(req.body, {
+                abortEarly: true,
+                stripUnknown: true,
+            })
+            await shoppingListService.deleteItem(req.userId!, ingredientIds as string[])
             return res.status(204).send()
         } catch (err) {
             return handleError(err, res)

@@ -7,12 +7,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { colors } from '../../theme/color';
-import { useEditProfile } from '../../hooks/profile/useProfileEdit';
-
-const DIETARY_OPTIONS = [
-    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 
-    'Sem açúcar', 'Low carb', 'Cetogênico',
-]
+import { DIETARY_OPTIONS, useEditProfile } from '../../hooks/profile/useProfileEdit';
 
 export default function EditProfileScreen() {
     const {

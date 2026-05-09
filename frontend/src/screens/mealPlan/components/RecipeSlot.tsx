@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { MealPlanEntry } from '@/src/types/mealPlan'
 import { colors } from '@/src/theme/color'
 import { router } from 'expo-router'
+import { DotsMenu } from '@/src/components/DotsMenu'
 
 interface FilledSlotProps {
     entry: MealPlanEntry
@@ -13,7 +14,7 @@ interface FilledSlotProps {
 
 export function FilledSlot({ entry, onRemove, onReplace }: FilledSlotProps) {
     const photo = entry.recipe.photos?.[0]
-    
+
     return (
         <View style={styles.filledSlot}>
             <View style={styles.cardShadow}>
@@ -37,16 +38,15 @@ export function FilledSlot({ entry, onRemove, onReplace }: FilledSlotProps) {
 
                     <View style={styles.cardFooter}>
                         <Text style={styles.recipeTitle} numberOfLines={2}>{entry.recipe.title}</Text>
-                        <TouchableOpacity onPress={() => onReplace(entry.id)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                            <Ionicons name="ellipsis-vertical" size={16} color="#999" />
-                        </TouchableOpacity>
+                        <DotsMenu
+                            options={[
+                                { label: 'Substituir receita', icon: 'repeat-outline', onPress: () => onReplace(entry.id) },
+                                { label: 'Remover', icon: 'trash-outline', onPress: () => onRemove(entry.id), destructive: true },
+                            ]}
+                        />
                     </View>
                 </TouchableOpacity>
             </View>
-
-            <TouchableOpacity style={styles.removeBtn} onPress={() => onRemove(entry.id)}>
-                <Ionicons name="close-circle" size={24} color={colors.primary} />
-            </TouchableOpacity>
         </View>
     )
 }
@@ -66,22 +66,22 @@ export function EmptySlot({ onPress }: EmptySlotProps) {
 
 const styles = StyleSheet.create({
     filledSlot: {
-        width: 140, 
+        width: 140,
         position: 'relative',
     },
     cardShadow: {
-        marginTop: 8, 
-        marginRight: 8, 
+        marginTop: 8,
+        marginRight: 8,
         backgroundColor: colors.white,
         borderRadius: 12,
         shadowColor: '#000',
         elevation: 4,
         borderWidth: 1,
-        borderColor: '#F3F3F3', 
+        borderColor: '#F3F3F3',
     },
     card: {
         borderRadius: 12,
-        overflow: 'hidden', 
+        overflow: 'hidden',
         backgroundColor: colors.white,
     },
     recipeImage: {
@@ -115,28 +115,20 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 8,
-        minHeight: 44, 
+        minHeight: 44,
     },
     recipeTitle: {
-        flex: 1, 
+        flex: 1,
         fontSize: 12,
         fontWeight: '600',
         color: colors.primary,
         lineHeight: 16,
         paddingRight: 4,
     },
-    removeBtn: {
-        position: 'absolute',
-        top: 12,
-        right: 12,
-        backgroundColor: colors.white,
-        borderRadius: 12,
-        zIndex: 10,
-    },
     emptySlot: {
-        width: 132, 
+        width: 132,
         height: 129,
-        marginTop: 8, 
+        marginTop: 8,
         borderRadius: 12,
         borderWidth: 1.5,
         borderStyle: 'dashed',

@@ -86,7 +86,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
     },
-    title: { fontSize: 18, fontWeight: 'bold', color: colors.primary },
+    title: { 
+        fontSize: 18, 
+        fontWeight: 'bold', 
+        color: colors.primary 
+    },
     searchRow: {
         flexDirection: 'row',
         marginHorizontal: 16,
@@ -110,8 +114,16 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 1,
     },
-    recipeThumb: { width: 60, height: 60, borderRadius: 10, backgroundColor: '#f0f0f0' },
-    noPhoto: { alignItems: 'center', justifyContent: 'center' },
+    recipeThumb: { 
+        width: 60, 
+        height: 60, 
+        borderRadius: 10, 
+        backgroundColor: '#f0f0f0' 
+    },
+    noPhoto: { 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+    },
     recipeInfo: { flex: 1 },
     recipeName: { 
         fontSize: 14, 
@@ -124,8 +136,21 @@ const styles = StyleSheet.create({
         alignItems: 'center', 
         gap: 4 
     },
-    metaText: { fontSize: 12, color: '#999' },
-    metaDot: { fontSize: 12, color: '#ccc' },
-    empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
-    emptyText: { fontSize: 14, color: '#bbb' },
+    metaText: { 
+        fontSize: 12, 
+        color: '#999' 
+    },
+    metaDot: { 
+        fontSize: 12, 
+        color: '#ccc' 
+    },
+    empty: { 
+        alignItems: 'center', 
+        paddingTop: 60, 
+        gap: 12 
+    },
+    emptyText: { 
+        fontSize: 14, 
+        color: '#bbb' 
+    },
 })

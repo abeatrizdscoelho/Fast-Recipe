@@ -1,4 +1,5 @@
 import prisma from '../database/prisma'
+import { AddItemDTO, UpdateItemDTO } from '../models/shoppingListDTO'
 
 export const shoppingListRepository = {
     async findIngredientsByWeekPlan(userId: string, weekStart: Date) {
@@ -6,12 +7,10 @@ export const shoppingListRepository = {
             where: { userId_weekStart: { userId, weekStart } },
             include: {
                 entries: {
-                    where: { completed: false }, 
+                    where: { completed: false },
                     include: {
                         recipe: {
-                            include: {
-                                ingredients: true,
-                            },
+                            include: { ingredients: true },
                         },
                     },
                 },
@@ -19,7 +18,6 @@ export const shoppingListRepository = {
         })
 
         if (!mealPlan) return []
-
         return mealPlan.entries.flatMap(entry => entry.recipe.ingredients)
     },
 
@@ -52,6 +50,39 @@ export const shoppingListRepository = {
 
         await prisma.shoppingListItem.deleteMany({
             where: { userId, ingredientId: { in: ids } },
+        })
+    },
+
+    async findManualItems(userId: string) {
+        return prisma.manualShoppingItem.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'asc' },
+        })
+    },
+
+    async createManualItem(userId: string, data: AddItemDTO) {
+        return prisma.manualShoppingItem.create({
+            data: { userId, ...data },
+        })
+    },
+
+    async updateManualItem(id: string, userId: string, data: Omit<UpdateItemDTO, 'ingredientIds'>) {
+        return prisma.manualShoppingItem.update({
+            where: { id, userId },
+            data,
+        })
+    },
+
+    async toggleManualItemBought(id: string, userId: string, bought: boolean) {
+        return prisma.manualShoppingItem.update({
+            where: { id, userId },
+            data: { bought },
+        })
+    },
+
+    async deleteManualItem(id: string, userId: string) {
+        return prisma.manualShoppingItem.delete({
+            where: { id, userId },
         })
     },
 }

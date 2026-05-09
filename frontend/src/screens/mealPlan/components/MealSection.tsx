@@ -65,12 +65,12 @@ export function MealSection({ mealType, entries, onAdd, onRemove, onReplace, onT
                 ))}
             </ScrollView>
 
-            {entries.length >= 2 && (
+            {/* {entries.length >= 2 && (
                 <View style={styles.badge}>
                     <Ionicons name="people-outline" size={13} color={colors.primary} />
                     <Text style={styles.badgeText}>{entries.length} receitas adicionadas</Text>
                 </View>
-            )}
+            )} */}
         </View>
     )
 }

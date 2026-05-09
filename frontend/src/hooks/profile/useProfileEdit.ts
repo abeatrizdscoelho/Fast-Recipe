@@ -7,6 +7,10 @@ import { useAuth } from '../../context/AuthContext';
 import { editProfileValidation } from '../../validations/userValidation';
 import { userService } from '../../services/userService';
 
+export const DIETARY_OPTIONS = [
+    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico'
+]
+
 export function useEditProfile() {
     const { user, updateUser } = useAuth()
     const [name, setName] = useState(user?.name ?? '')

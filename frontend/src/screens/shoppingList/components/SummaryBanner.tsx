@@ -1,91 +1,120 @@
 import React from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
-import { router } from 'expo-router'
 
 interface Props {
-    totalRecipes: number
-    weekStart: string
+    pending: number
+    bought: number
 }
 
-function formatWeekLabel(weekStart: string): string {
-    const start = new Date(weekStart)
-    const end = new Date(start)
-    end.setDate(end.getDate() + 6)
-    const fmt = (d: Date) => `${d.getDate()} de ${d.toLocaleString('pt-BR', { month: 'long' })}`
-    return `Semana de ${fmt(start)} a ${fmt(end)}`
-}
+export function SummaryBanner({ pending, bought }: Props) {
+    const total = pending + bought
+    const progress = total > 0 ? bought / total : 0
 
-export function SummaryBanner({ totalRecipes, weekStart }: Props) {
     return (
         <View style={styles.container}>
-            <View style={styles.top}>
-                <View style={styles.iconBox}>
-                    <Ionicons name="bag-check-outline" size={22} color={colors.primary} />
+
+            <View style={styles.counters}>
+                <View style={styles.side}>
+                    <View style={styles.iconBox}>
+                        <Ionicons name="cart-outline" size={20} color={colors.primary} />
+                    </View>
+                    <Text style={styles.count}>{pending}</Text>
+                    <Text style={styles.label}>Pendentes</Text>
                 </View>
-                <View style={styles.textCol}>
-                    <Text style={styles.title} numberOfLines={1}>
-                        Lista gerada com base em {totalRecipes} receita{totalRecipes !== 1 ? 's' : ''}
-                    </Text>
-                    <Text style={styles.week} numberOfLines={1}>{formatWeekLabel(weekStart)}</Text>
+
+                <View style={styles.divider} />
+
+                <View style={styles.side}>
+                    <View style={[styles.iconBox, styles.iconBoxDone]}>
+                        <Ionicons name="checkmark-circle-outline" size={20} color="#4CAF50" />
+                    </View>
+                    <Text style={[styles.count, bought > 0 && styles.countDone]}>{bought}</Text>
+                    <Text style={styles.label}>Comprados</Text>
                 </View>
             </View>
-            <TouchableOpacity style={styles.planBtn} onPress={() => router.push('/planning')}>
-                <Text style={styles.planBtnText}>Ver planejamento</Text>
-                <Ionicons name="chevron-forward" size={13} color={colors.primary} />
-            </TouchableOpacity>
+
+            {total > 0 && (
+                <View style={styles.progressWrapper}>
+                    <View style={styles.progressTrack}>
+                        <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
+                    </View>
+                    <Text style={styles.progressLabel}>
+                        {Math.round(progress * 100)}% concluído
+                    </Text>
+                </View>
+            )}
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: colors.white, 
+        backgroundColor: '#fff',
         borderRadius: 16,
-        padding: 14, 
-        marginBottom: 16, 
+        padding: 16,
+        marginBottom: 16,
         gap: 12,
     },
-    top: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 10 
+    counters: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    textCol: { flex: 1 },
-    iconBox: {
-        width: 40, 
-        height: 40, 
-        borderRadius: 10,
-        backgroundColor: '#FFF0EC', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-    },
-    title: { 
-        fontSize: 13, 
-        fontWeight: '700', 
-        color: '#333' 
-    },
-    week: { 
-        fontSize: 11, 
-        color: '#999', 
-        marginTop: 2 
-    },
-    planBtn: {
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
+    side: {
+        flex: 1,
+        alignItems: 'center',
         gap: 4,
-        borderWidth: 1, 
-        borderColor: colors.primary,
-        borderRadius: 20, 
-        paddingHorizontal: 14, 
-        paddingVertical: 7,
-        alignSelf: 'flex-start',
     },
-    planBtnText: { 
-        fontSize: 12, 
-        color: colors.primary, 
-        fontWeight: '600' 
+    iconBox: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#FFF0EC',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 2,
+    },
+    iconBoxDone: {
+        backgroundColor: '#E8F5E9',
+    },
+    divider: {
+        width: 1,
+        height: 50,
+        backgroundColor: '#eee',
+        marginHorizontal: 8,
+    },
+    count: {
+        fontSize: 22,
+        fontWeight: '800',
+        color: '#222',
+    },
+    countDone: {
+        color: '#4CAF50',
+    },
+    label: {
+        fontSize: 12,
+        color: '#999',
+        fontWeight: '500',
+    },
+    progressWrapper: {
+        gap: 6,
+    },
+    progressTrack: {
+        height: 6,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 3,
+        overflow: 'hidden',
+    },
+    progressFill: {
+        height: '100%',
+        backgroundColor: '#4CAF50',
+        borderRadius: 3,
+    },
+    progressLabel: {
+        fontSize: 11,
+        color: '#aaa',
+        textAlign: 'right',
+        fontWeight: '500',
     },
 })

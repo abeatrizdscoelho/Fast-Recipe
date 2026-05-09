@@ -1,7 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Alert } from 'react-native'
+import { router } from 'expo-router'
 import { shoppingListService } from '@/src/services/shoppingListService'
 import { ShoppingList, ShoppingListItem } from '@/src/types/shoppingList'
+import { consolidateShoppingList } from '@/src/utils/consolidateShoppingListUtil'
 
 export function useShoppingList(weekStart?: string) {
     const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null)
@@ -9,14 +11,15 @@ export function useShoppingList(weekStart?: string) {
     const [refreshing, setRefreshing] = useState(false)
     const [message, setMessage] = useState<string | undefined>()
     const [search, setSearch] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState<string>('Todos')
-    const [sortAZ, setSortAZ] = useState(true)
 
     const loadList = useCallback(async (silent = false) => {
         if (!silent) setLoading(true)
         try {
             const data = await shoppingListService.getList(weekStart)
-            setShoppingList(data.shoppingList)
+            const list = data.shoppingList
+            if (!list) return
+            const consolidatedItems = consolidateShoppingList(list.items) as ShoppingListItem[]
+            setShoppingList({ ...list, items: consolidatedItems })
             setMessage(data.message)
         } catch (err) {
             Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao carregar lista de compras')
@@ -43,9 +46,8 @@ export function useShoppingList(weekStart?: string) {
                 ),
             }
         })
-
         try {
-            await shoppingListService.toggleBought({ingredientIds: item.ingredientIds, bought: !item.bought})
+            await shoppingListService.toggleBought({ ingredientIds: item.ingredientIds, bought: !item.bought })
         } catch (err) {
             setShoppingList(prev => {
                 if (!prev) return prev
@@ -60,30 +62,68 @@ export function useShoppingList(weekStart?: string) {
         }
     }
 
+    function handleOpenAdd() {
+        router.push({
+            pathname: '/shoppingList/ingredient-form',
+            params: {
+                mode: 'add',
+                categories: JSON.stringify(shoppingList?.categories ?? []),
+            },
+        })
+    }
+
+    function handleOpenEdit(item: ShoppingListItem) {
+        router.push({
+            pathname: '/shoppingList/ingredient-form',
+            params: {
+                mode: 'edit',
+                item: JSON.stringify(item),
+                categories: JSON.stringify(shoppingList?.categories ?? []),
+            },
+        })
+    }
+
+    function handleDeleteItem(item: ShoppingListItem) {
+        Alert.alert(
+            'Remover item',
+            `Deseja remover "${item.name}" da lista?`,
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                { text: 'Remover', style: 'destructive',
+                    onPress: async () => {
+                        setShoppingList(prev => {
+                            if (!prev) return prev
+                            return {
+                                ...prev,
+                                items: prev.items.filter(i => i.ingredientIds.join() !== item.ingredientIds.join()),
+                            }
+                        })
+                        try {
+                            await shoppingListService.deleteItem({ ingredientIds: item.ingredientIds })
+                        } catch (err) {
+                            loadList(true)
+                            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao remover item')
+                        }
+                    },
+                },
+            ]
+        )
+    }
+
     const categories = ['Todos', ...(shoppingList?.categories ?? [])]
 
     const filteredItems = (shoppingList?.items ?? [])
-        .filter(item => {
-            const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase())
-            const matchesCategory = selectedCategory === 'Todos' || item.category === selectedCategory
-            return matchesSearch && matchesCategory
-        })
-        .sort((a, b) => sortAZ ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
-
-    const boughtCount = (shoppingList?.items ?? []).filter(i => i.bought).length
-    const totalCount = shoppingList?.items.length ?? 0
+        .filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name))
 
     return {
         shoppingList,
         loading, refreshing, onRefresh,
         message,
         search, setSearch,
-        selectedCategory, setSelectedCategory,
-        sortAZ, setSortAZ,
         categories,
         filteredItems,
-        boughtCount,
-        totalCount,
         handleToggleBought,
+        handleOpenAdd, handleOpenEdit, handleDeleteItem,
     }
 }

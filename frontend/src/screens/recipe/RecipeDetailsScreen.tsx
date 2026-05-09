@@ -16,6 +16,7 @@ import { CommentCard } from './components/ReviewComponents/CommentCard'
 import { ReportModal } from './components/ReviewComponents/ReportModal'
 import { useRecipeRating } from '@/src/hooks/recipe/useRecipeRating'
 import { useRecipeComments } from '@/src/hooks/recipe/useRecipeComments'
+import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -178,14 +179,15 @@ export default function RecipeDetailScreen() {
                         </>
                     )}
 
+                    <Text style={styles.sectionTitle}>Ingredientes</Text>
                     {recipe.ingredients.map((ingredient, index) => (
                         <View key={index} style={styles.ingredientRow}>
                             <View style={styles.ingredientBullet} />
                             <Text style={styles.ingredientText}>
                                 <Text style={styles.ingredientQty}>
-                                    {ingredient.quantity} {ingredient.unit}
+                                    {ingredient.quantity} {pluralizeUnit(Number(ingredient.quantity), ingredient.unit)}
                                 </Text>
-                                {' — '}{ingredient.name}
+                                {' - '}{ingredient.name}
                             </Text>
                         </View>
                     ))}

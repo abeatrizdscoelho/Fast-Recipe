@@ -10,7 +10,7 @@ export const CATEGORIES = [
 ]
 
 export const DIETARY_RESTRICTIONS = [
-    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico',
+    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico'
 ]
 
 export const DIFFICULTIES = [
@@ -18,12 +18,11 @@ export const DIFFICULTIES = [
 ]
 
 export const INGREDIENT_CATEGORIES = [
-    'Frutas e Verduras', 'Carnes', 'Laticínios', 'Grãos', 'Temperos', 'Outros',
+    'Bebidas', 'Carnes e Ovos', 'Congelados', 'Doces', 'Enlatados', 'Frutas e Verduras', 'Hortifruti', 'Laticínios', 'Padaria', 'Grãos e Cereais', 'Massas', 'Temperos', 'Outros'
 ] as const
 
 export const INGREDIENT_UNITS = [
-    'g', 'kg', 'ml', 'l', 'xícara', 'colher de sopa',
-    'colher de chá', 'unidade', 'dente', 'pitada', 'fatia', 'litro',
+    'grama', 'quilograma', 'mililitro', 'litro', 'unidade'
 ]
 
 type IngredientInput = {

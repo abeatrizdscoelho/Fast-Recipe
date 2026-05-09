@@ -2,21 +2,9 @@ import { mealPlanService } from '@/src/services/mealPlanService'
 import { recipeService } from '@/src/services/recipeService'
 import { DAY_LABELS, MEAL_TYPES, MealPlan, MealPlanEntry, MealType } from '@/src/types/mealPlan'
 import { FeedRecipe } from '@/src/types/recipe'
+import { formatWeekStart, getWeekStart } from '@/src/utils/formatWeekUtil'
 import { useState, useCallback, useEffect } from 'react'
 import { Alert } from 'react-native'
-
-function getWeekStart(date: Date): Date {
-    const d = new Date(date)
-    const day = d.getDay()
-    const diff = day === 0 ? -6 : 1 - day
-    d.setDate(d.getDate() + diff)
-    d.setHours(0, 0, 0, 0)
-    return d
-}
-
-function formatWeekStart(date: Date): string {
-    return date.toISOString().split('T')[0]
-}
 
 export function useMealPlan() {
     const today = new Date()
@@ -28,9 +16,7 @@ export function useMealPlan() {
     const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [selectingSlot, setSelectingSlot] = useState<{
-        dayOfWeek: number; mealType: MealType; replaceEntryId?: string
-    } | null>(null)
+    const [selectingSlot, setSelectingSlot] = useState<{ dayOfWeek: number; mealType: MealType; replaceEntryId?: string } | null>(null)
     const [recipes, setRecipes] = useState<FeedRecipe[]>([])
     const [recipeSearch, setRecipeSearch] = useState('')
     const [recipeModalVisible, setRecipeModalVisible] = useState(false)

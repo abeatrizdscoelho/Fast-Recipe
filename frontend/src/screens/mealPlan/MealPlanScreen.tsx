@@ -99,23 +99,81 @@ export default function MealPlanScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.primary },
+    container: { 
+        flex: 1, 
+        backgroundColor: colors.primary 
+    },
+
     header: {
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-        paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16,
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        paddingHorizontal: 20, 
+        paddingTop: 8, 
+        paddingBottom: 16,
     },
-    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    headerTitle: { fontSize: 22, fontWeight: 'bold', color: colors.white },
-    headerSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
-    pickerWrapper: { backgroundColor: colors.primary, paddingBottom: 8 },
-    scroll: { flex: 1, backgroundColor: '#f5f5f5', borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-    scrollContent: { padding: 16, paddingTop: 20 },
-    loadingWrapper: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f5f5' },
-    dayTitle: { fontSize: 13, fontWeight: '700', color: '#999', letterSpacing: 0.5, marginBottom: 14 },
+    headerLeft: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        gap: 12 
+    },
+    headerTitle: { 
+        fontSize: 22, 
+        fontWeight: 'bold', 
+        color: colors.white 
+    },
+    headerSub: { 
+        fontSize: 12, 
+        color: 'rgba(255,255,255,0.75)', 
+        marginTop: 2 
+    },
+
+    pickerWrapper: { 
+        backgroundColor: colors.primary, 
+        paddingBottom: 8 
+    },
+
+    scroll: { 
+        flex: 1, 
+        backgroundColor: '#f5f5f5', 
+        borderTopLeftRadius: 20, 
+        borderTopRightRadius: 20 
+    },
+    scrollContent: { 
+        padding: 16, 
+        paddingTop: 20 
+    },
+
+    loadingWrapper: { 
+        flex: 1, 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        backgroundColor: '#f5f5f5' 
+    },
+    dayTitle: { 
+        fontSize: 13, 
+        fontWeight: '700',
+        color: '#999', 
+        letterSpacing: 0.5, 
+        marginBottom: 14 
+    },
+
     emptyBanner: {
-        alignItems: 'center', backgroundColor: colors.white,
-        borderRadius: 16, padding: 28, marginBottom: 16, gap: 4,
+        alignItems: 'center', 
+        backgroundColor: colors.white,
+        borderRadius: 16, 
+        padding: 28, 
+        marginBottom: 16, 
+        gap: 4,
     },
-    emptyText: { fontSize: 14, fontWeight: '600', color: '#555', marginTop: 8 },
-    emptySubText: { fontSize: 13, color: '#aaa' },
+    emptyText: { 
+        fontSize: 14, 
+        fontWeight: '600', 
+        color: '#555', 
+        marginTop: 8 
+    },
+    emptySubText: { 
+        fontSize: 13, 
+        color: '#aaa' 
+    },
 })

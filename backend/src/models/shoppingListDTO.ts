@@ -23,3 +23,22 @@ export interface ToggleBoughtDTO {
     ingredientIds: string[]
     bought: boolean
 }
+
+export interface AddItemDTO {
+    name: string
+    quantity: number
+    unit: string
+    category: string
+}
+
+export interface UpdateItemDTO {
+    ingredientIds: string[]
+    name: string
+    quantity: number
+    unit: string
+    category: string
+}
+
+export interface DeleteItemDTO {
+    ingredientIds: string[]
+}

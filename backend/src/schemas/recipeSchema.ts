@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 
 export const INGREDIENT_CATEGORIES = [
-  'Frutas e Verduras', 'Carnes', 'Laticínios', 'Grãos', 'Temperos', 'Outros',
+  'Bebidas', 'Carnes e Ovos', 'Congelados', 'Doces', 'Enlatados', 'Frutas e Verduras', 'Hortifruti', 'Laticínios', 'Padaria', 'Grãos e Cereais', 'Massas', 'Temperos', 'Outros',
 ] as const
 
 const ingredientSchema = yup.object({
