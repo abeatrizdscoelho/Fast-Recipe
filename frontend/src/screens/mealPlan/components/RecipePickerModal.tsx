@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Modal, View, Text, FlatList,
     TouchableOpacity, Image, StyleSheet, SafeAreaView
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { FeedRecipe } from '@/src/types/recipe'
 import { colors } from '@/src/theme/color'
 import { SearchBar } from '@/src/components/SearchBar'
+import { ActiveFilters, FilterModal } from '@/src/components/FilterModal'
 
 interface Props {
     visible: boolean
@@ -15,9 +16,14 @@ interface Props {
     onSearchChange: (text: string) => void
     onSelect: (recipeId: string) => void
     onClose: () => void
+    filters: ActiveFilters
+    onApplyFilters: (filters: ActiveFilters) => void
 }
 
-export function RecipePickerModal({ visible, recipes, search, onSearchChange, onSelect, onClose }: Props) {
+export function RecipePickerModal({ visible, recipes, search, onSearchChange, onSelect, onClose, filters, onApplyFilters }: Props) {
+    const [filterVisible, setFilterVisible] = useState(false)
+    const activeFilterCount = filters.categories.length + filters.dietaryRestrictions.length
+
     return (
         <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
             <SafeAreaView style={styles.container}>
@@ -29,13 +35,37 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
                 </View>
 
                 <View style={styles.searchRow}>
-                    <SearchBar
-                        value={search}
-                        onChangeText={onSearchChange}
-                        placeholder="Pesquisar receitas..."
-                        autoFocus
-                    />
+                    <View style={styles.searchBarWrapper}>
+                        <SearchBar
+                            value={search}
+                            onChangeText={onSearchChange}
+                            placeholder="Pesquisar receitas..."
+                            autoFocus
+                        />
+                    </View>
+
+                    <TouchableOpacity
+                        style={[styles.filterBtn]}
+                        onPress={() => setFilterVisible(true)}
+                    >
+                        <Ionicons name="options-outline" size={22} color="#999" />
+                        {activeFilterCount > 0 && (
+                            <View style={styles.filterBadge}>
+                                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
                 </View>
+
+                <FilterModal
+                    visible={filterVisible}
+                    filters={filters}
+                    onClose={() => setFilterVisible(false)}
+                    onApply={(newFilters) => {
+                        onApplyFilters(newFilters)
+                        setFilterVisible(false)
+                    }}
+                />
 
                 <FlatList
                     data={recipes}
@@ -86,22 +116,56 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
     },
-    title: { 
-        fontSize: 18, 
-        fontWeight: 'bold', 
-        color: colors.primary 
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: colors.primary
     },
     searchRow: {
         flexDirection: 'row',
+        alignItems: 'center',
         marginHorizontal: 16,
         marginTop: 12,
         marginBottom: 8,
+        gap: 8,
+    },
+    searchBarWrapper: {
+        flex: 1,
         borderRadius: 50,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: '#e0e0e0',
     },
-    list: { padding: 16, gap: 10 },
+
+    filterBtn: {
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    filterBadge: {
+        position: 'absolute',
+        top: -2,
+        right: -2,
+        backgroundColor: '#e74c3c',
+        borderRadius: 8,
+        minWidth: 16,
+        height: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 3,
+    },
+    filterBadgeText: {
+        color: colors.white,
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+
+    list: {
+        padding: 16,
+        gap: 10
+    },
+
     recipeItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -114,43 +178,47 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 1,
     },
-    recipeThumb: { 
-        width: 60, 
-        height: 60, 
-        borderRadius: 10, 
-        backgroundColor: '#f0f0f0' 
+    recipeThumb: {
+        width: 60,
+        height: 60,
+        borderRadius: 10,
+        backgroundColor: '#f0f0f0'
     },
-    noPhoto: { 
-        alignItems: 'center', 
-        justifyContent: 'center' 
+
+    noPhoto: {
+        alignItems: 'center',
+        justifyContent: 'center'
     },
+
     recipeInfo: { flex: 1 },
-    recipeName: { 
-        fontSize: 14, 
-        fontWeight: '600', 
-        color: colors.primary, 
-        marginBottom: 4 
+    recipeName: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: colors.primary,
+        marginBottom: 4
     },
-    recipeMeta: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 4 
+    recipeMeta: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4
     },
-    metaText: { 
-        fontSize: 12, 
-        color: '#999' 
+
+    metaText: {
+        fontSize: 12,
+        color: '#999'
     },
-    metaDot: { 
-        fontSize: 12, 
-        color: '#ccc' 
+    metaDot: {
+        fontSize: 12,
+        color: '#ccc'
     },
-    empty: { 
-        alignItems: 'center', 
-        paddingTop: 60, 
-        gap: 12 
+
+    empty: {
+        alignItems: 'center',
+        paddingTop: 60,
+        gap: 12
     },
-    emptyText: { 
-        fontSize: 14, 
-        color: '#bbb' 
+    emptyText: {
+        fontSize: 14,
+        color: '#bbb'
     },
 })

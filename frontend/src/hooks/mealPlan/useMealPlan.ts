@@ -1,3 +1,4 @@
+import { ActiveFilters } from '@/src/components/FilterModal'
 import { mealPlanService } from '@/src/services/mealPlanService'
 import { recipeService } from '@/src/services/recipeService'
 import { DAY_LABELS, MEAL_TYPES, MealPlan, MealPlanEntry, MealType } from '@/src/types/mealPlan'
@@ -20,6 +21,7 @@ export function useMealPlan() {
     const [recipes, setRecipes] = useState<FeedRecipe[]>([])
     const [recipeSearch, setRecipeSearch] = useState('')
     const [recipeModalVisible, setRecipeModalVisible] = useState(false)
+    const [recipeFilters, setRecipeFilters] = useState<ActiveFilters>({ categories: [], dietaryRestrictions: [] })
 
     const weekStartStr = formatWeekStart(currentWeekStart)
 
@@ -76,11 +78,20 @@ export function useMealPlan() {
     async function openRecipeSelector(dayOfWeek: number, mealType: MealType, replaceEntryId?: string) {
         setSelectingSlot({ dayOfWeek, mealType, replaceEntryId })
         setRecipeSearch('')
+        setRecipeFilters({ categories: [], dietaryRestrictions: [] })
         try {
             const data = await recipeService.getAll(1, 100)
             setRecipes(data.recipes)
         } catch { setRecipes([]) }
         setRecipeModalVisible(true)
+    }
+
+    async function handleRecipeFilter(newFilters: ActiveFilters) {
+        setRecipeFilters(newFilters)
+        try {
+            const data = await recipeService.getAll(1, 100, recipeSearch.trim() || undefined, newFilters)
+            setRecipes(data.recipes)
+        } catch { setRecipes([]) }
     }
 
     async function handleSelectRecipe(recipeId: string) {
@@ -188,7 +199,7 @@ export function useMealPlan() {
         recipeModalVisible, setRecipeModalVisible,
         recipeSearch, setRecipeSearch,
         filteredRecipes,
-        openRecipeSelector, handleSelectRecipe,
+        openRecipeSelector, recipeFilters, handleRecipeFilter, handleSelectRecipe,
         handleRemoveEntry, handleToggleCompleted,
         dayLabel, dayIsEmpty,
     }

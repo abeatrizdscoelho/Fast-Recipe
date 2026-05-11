@@ -19,7 +19,7 @@ export default function MealPlanScreen() {
         recipeModalVisible, setRecipeModalVisible,
         recipeSearch, setRecipeSearch,
         filteredRecipes,
-        openRecipeSelector, handleSelectRecipe,
+        openRecipeSelector, recipeFilters, handleRecipeFilter, handleSelectRecipe,
         handleRemoveEntry, handleToggleCompleted,
         dayLabel, dayIsEmpty, weekDates,
     } = useMealPlan()
@@ -91,6 +91,8 @@ export default function MealPlanScreen() {
                 onSearchChange={setRecipeSearch}
                 onSelect={handleSelectRecipe}
                 onClose={() => setRecipeModalVisible(false)}
+                filters={recipeFilters}         
+                onApplyFilters={handleRecipeFilter} 
             />
 
             <BottomNav />
