@@ -7,11 +7,11 @@ import { colors } from '@/src/theme/color'
 import { INGREDIENT_UNITS } from '@/src/hooks/recipe/useRecipeForm'
 import { SelectDropdown } from '@/src/components/SelectDropdown'
 import FieldError from '@/src/components/FieldError'
-import { useIngredientForm } from '@/src/hooks/shoppingList/useIngredientForm'
+import { useShoppingItemForm } from '@/src/hooks/shoppingList/useShoppingItemForm'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
 
-export default function IngredientFormScreen() {
+export default function ShoppingItemFormScreen() {
     const {
         isEdit,
         name, setName,
@@ -23,7 +23,7 @@ export default function IngredientFormScreen() {
         loading,
         errors,
         handleSave,
-    } = useIngredientForm()
+    } = useShoppingItemForm()
 
     return (
         <View style={styles.container}>

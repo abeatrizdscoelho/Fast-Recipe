@@ -1,11 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
     View, Text, ScrollView, StyleSheet,
     ActivityIndicator, RefreshControl, TouchableOpacity
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { useFocusEffect } from 'expo-router'
-import { useCallback } from 'react'
 import { colors } from '@/src/theme/color'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
@@ -25,24 +23,15 @@ export default function ShoppingListScreen() {
         filteredItems,
         handleToggleBought,
         handleOpenAdd, handleOpenEdit, handleDeleteItem,
+        isEmpty,
+        pendingCount,
+        boughtCount,
+        grouped,
     } = useShoppingList()
 
-    useFocusEffect(
-        useCallback(() => {
-            onRefresh()
-        }, [])
-    )
-
-    const isEmpty = !shoppingList || shoppingList.items.length === 0
-    const pendingCount = shoppingList?.items.filter(i => !i.bought).length ?? 0
-    const boughtCount = shoppingList?.items.filter(i => i.bought).length ?? 0
-
-    const grouped = filteredItems.reduce<Record<string, typeof filteredItems>>((acc, item) => {
-        const cat = item.category ?? 'Outros'
-        if (!acc[cat]) acc[cat] = []
-        acc[cat].push(item)
-        return acc
-    }, {})
+    useEffect(() => {
+        onRefresh()
+    }, [])
 
     return (
         <View style={styles.container}>

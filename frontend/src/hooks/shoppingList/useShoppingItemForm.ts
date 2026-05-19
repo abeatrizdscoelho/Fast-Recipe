@@ -5,7 +5,7 @@ import { INGREDIENT_CATEGORIES } from '@/src/hooks/recipe/useRecipeForm'
 import { shoppingListService } from '@/src/services/shoppingListService'
 import { ShoppingListItem } from '@/src/types/shoppingList'
 
-export function useIngredientForm() {
+export function useShoppingItemForm() {
     const params = useLocalSearchParams<{
         mode: 'add' | 'edit'
         item?: string

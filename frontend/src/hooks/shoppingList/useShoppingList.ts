@@ -116,6 +116,17 @@ export function useShoppingList(weekStart?: string) {
         .filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => a.name.localeCompare(b.name))
 
+    const isEmpty = !shoppingList || shoppingList.items.length === 0
+    const pendingCount = shoppingList?.items.filter(i => !i.bought).length ?? 0
+    const boughtCount = shoppingList?.items.filter(i => i.bought).length ?? 0
+
+    const grouped = filteredItems.reduce<Record<string, typeof filteredItems>>((acc, item) => {
+        const cat = item.category ?? 'Outros'
+        if (!acc[cat]) acc[cat] = []
+        acc[cat].push(item)
+        return acc
+    }, {})
+
     return {
         shoppingList,
         loading, refreshing, onRefresh,
@@ -125,5 +136,9 @@ export function useShoppingList(weekStart?: string) {
         filteredItems,
         handleToggleBought,
         handleOpenAdd, handleOpenEdit, handleDeleteItem,
+        isEmpty,
+        pendingCount,
+        boughtCount,
+        grouped,
     }
 }

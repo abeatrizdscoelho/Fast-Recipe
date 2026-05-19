@@ -1,2 +1,2 @@
-import IngredientFormScreen from "@/src/screens/shoppingList/components/IngredientForm";
-export default IngredientFormScreen;
+import ShoppingItemFormScreen from "@/src/screens/shoppingList/ShoppingItemFormScreen";
+export default ShoppingItemFormScreen;

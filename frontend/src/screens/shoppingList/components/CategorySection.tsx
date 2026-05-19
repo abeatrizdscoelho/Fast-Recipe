@@ -5,7 +5,7 @@ import { colors } from '@/src/theme/color'
 import { ShoppingListItem } from '@/src/types/shoppingList'
 import { ShoppingItem } from './ShoppingItem'
 
-const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+export const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
     'Frutas e Verduras':  'nutrition-outline',
     'Laticínios':         'water-outline',
     'Temperos':           'flower-outline',
