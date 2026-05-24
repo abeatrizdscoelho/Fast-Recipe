@@ -18,6 +18,9 @@ import { useRecipeRating } from '@/src/hooks/recipe/useRecipeRating'
 import { useRecipeComments } from '@/src/hooks/recipe/useRecipeComments'
 import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
 import { NutritionCard } from './components/RecipeNutritionCard'
+import { usePortionScale } from '@/src/hooks/recipe/useRecipePortionScale'
+import { PortionSelector } from './components/RecipePortionSelector'
+import { scaleIngredient } from '@/src/utils/scaleIngredientUtil'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -26,7 +29,7 @@ export default function RecipeDetailScreen() {
     const insets = useSafeAreaInsets()
 
     const {
-        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor
+        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions
     } = useRecipeDetail(id)
 
     const {
@@ -40,6 +43,8 @@ export default function RecipeDetailScreen() {
         confirmDeleteComment,
         reportingCommentId, setReportingCommentId, confirmReport
     } = useRecipeComments(id)
+
+    const { portions, scale, increment, decrement } = usePortionScale(originalPortions)
 
     if (loading) {
         return (
@@ -180,18 +185,30 @@ export default function RecipeDetailScreen() {
                         </>
                     )}
 
+                    <PortionSelector
+                        portions={portions}
+                        originalPortions={originalPortions}
+                        onIncrement={increment}
+                        onDecrement={decrement}
+                    />
+
+                    <View style={styles.divider} />
+
                     <Text style={styles.sectionTitle}>Ingredientes</Text>
-                    {recipe.ingredients.map((ingredient, index) => (
-                        <View key={index} style={styles.ingredientRow}>
-                            <View style={styles.ingredientBullet} />
-                            <Text style={styles.ingredientText}>
-                                <Text style={styles.ingredientQty}>
-                                    {ingredient.quantity} {pluralizeUnit(Number(ingredient.quantity), ingredient.unit)}
+                    {recipe.ingredients.map((ingredient, index) => {
+                        const scaledQty = scaleIngredient(Number(ingredient.quantity), scale, ingredient.unit) 
+                        return (
+                            <View key={index} style={styles.ingredientRow}>
+                                <View style={styles.ingredientBullet} />
+                                <Text style={styles.ingredientText}>
+                                    <Text style={styles.ingredientQty}>
+                                        {scaledQty} {pluralizeUnit(scaledQty, ingredient.unit)} 
+                                    </Text>
+                                    {' - '}{ingredient.name}
                                 </Text>
-                                {' - '}{ingredient.name}
-                            </Text>
-                        </View>
-                    ))}
+                            </View>
+                        )
+                    })}
 
                     <View style={styles.divider} />
 
@@ -209,7 +226,7 @@ export default function RecipeDetailScreen() {
 
                     {recipe.nutrition && (
                         <>
-                            <NutritionCard nutrition={recipe.nutrition} portions={recipe.portions} />
+                            <NutritionCard nutrition={recipe.nutrition} portions={String(portions)} />
                             <View style={styles.divider} />
                         </>
                     )}

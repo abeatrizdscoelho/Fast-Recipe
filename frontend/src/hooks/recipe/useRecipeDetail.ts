@@ -53,5 +53,6 @@ export function useRecipeDetail(id: string) {
     recipe, loading, activePhoto, setActivePhoto,
     photos, authorInitials, toggleFavorite, isAuthor,
     userInitials, userAvatarUrl,
+    originalPortions: Number(recipe?.portions) || 1,
   }
 }
