@@ -66,3 +66,20 @@ export interface FeedResponseDTO {
   totalPages: number
   hasNextPage: boolean
 }
+
+export interface NutritionDTO {
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  fiber: number
+  sodium: number
+}
+
+export interface RecipeWithNutritionDTO extends RecipeDTO {
+  nutrition: NutritionDTO | null
+}
+
+export interface RecipeWithNutritionResponseDTO {
+  recipe: RecipeWithNutritionDTO
+}

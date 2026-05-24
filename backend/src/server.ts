@@ -10,8 +10,9 @@ import reviewRoutes from './routes/reviewRoutes';
 import mealPlanRoutes from './routes/mealPlanRoutes';
 import shoppingListRoutes from './routes/shoppingListRoutes';
 import pantryRoutes from './routes/pantryRoutes';
+import 'dotenv/config'
 
-dotenv.config()
+// dotenv.config()
 
 const app = express()
 

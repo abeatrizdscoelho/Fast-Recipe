@@ -17,6 +17,7 @@ import { ReportModal } from './components/ReviewComponents/ReportModal'
 import { useRecipeRating } from '@/src/hooks/recipe/useRecipeRating'
 import { useRecipeComments } from '@/src/hooks/recipe/useRecipeComments'
 import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
+import { NutritionCard } from './components/RecipeNutritionCard'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -205,6 +206,13 @@ export default function RecipeDetailScreen() {
                     ))}
 
                     <View style={styles.divider} />
+
+                    {recipe.nutrition && (
+                        <>
+                            <NutritionCard nutrition={recipe.nutrition} portions={recipe.portions} />
+                            <View style={styles.divider} />
+                        </>
+                    )}
 
                     <Text style={styles.sectionTitle}>Avaliações</Text>
 

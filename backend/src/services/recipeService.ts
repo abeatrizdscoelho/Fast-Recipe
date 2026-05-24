@@ -1,5 +1,6 @@
-import { CreateRecipeDTO, FeedRecipe, FeedResponseDTO, IngredientDTO, RecipeListResponseDTO, RecipeResponseDTO } from '../models/recipeDTO'
+import { CreateRecipeDTO, FeedRecipe, FeedResponseDTO, IngredientDTO, NutritionDTO, RecipeListResponseDTO, RecipeResponseDTO, RecipeWithNutritionResponseDTO } from '../models/recipeDTO'
 import { recipeRepository } from '../repositories/recipeRepository'
+import { getNutritionForIngredients } from './nutritionService'
 import { uploadService } from './uploadService'
 
 function formatIngredient(ingredient: {
@@ -74,9 +75,11 @@ export const recipeService = {
         return { recipe: { ...formatRecipe(recipe), favorite: false } }
     },
 
-    async getById(id: string, userId: string): Promise<RecipeResponseDTO> {
+    async getById(id: string, userId: string): Promise<RecipeWithNutritionResponseDTO> {
         const recipe = await recipeRepository.findById(id, userId)
         if (!recipe) throw new Error('Receita não encontrada')
+
+        const nutrition = await getNutritionForIngredients(recipe.ingredients).catch(() => null)
 
         return {
             recipe: {
@@ -87,7 +90,8 @@ export const recipeService = {
                     name: recipe.author.name,
                     avatarUrl: recipe.author.avatarUrl ?? null,
                 },
-            } as FeedRecipe,
+                nutrition,
+            } as FeedRecipe & { nutrition: NutritionDTO | null },
         }
     },
 

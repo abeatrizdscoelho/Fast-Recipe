@@ -1,3 +1,5 @@
+import { NutritionInfo } from "./nutrition"
+
 export type IngredientDTO = {
   name: string
   quantity: number
@@ -35,6 +37,7 @@ export type Recipe = {
   description: string | null
   authorId: string
   createdAt: string
+  nutrition: NutritionInfo | null
 }
 
 export type FeedRecipe = {
@@ -57,6 +60,7 @@ export type FeedRecipe = {
     name: string
     avatarUrl: string | null
   }
+  nutrition: NutritionInfo | null
 }
 
 export type FeedResponse = {
