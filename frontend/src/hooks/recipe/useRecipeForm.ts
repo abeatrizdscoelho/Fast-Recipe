@@ -22,7 +22,7 @@ export const INGREDIENT_CATEGORIES = [
 ] as const
 
 export const INGREDIENT_UNITS = [
-    'grama', 'quilograma', 'mililitro', 'litro', 'unidade'
+    'grama', 'quilograma', 'mililitro', 'litro', 'unidade', 'xícara', 'colher de chá', 'colher de sopa', 
 ]
 
 type IngredientInput = {

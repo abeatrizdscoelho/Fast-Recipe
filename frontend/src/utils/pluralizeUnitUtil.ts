@@ -7,6 +7,9 @@ export function pluralizeUnit(quantity: number, unit: string): string {
         'mililitro': 'mililitros',
         'litro': 'litros',
         'unidade': 'unidades',
+        'xícara': 'xícaras',
+        'colher de chá': 'colheres de chá',
+        'colher de sopa': 'colheres de sopa',
     }
 
     return pluralMap[unit.toLowerCase()] ?? unit
