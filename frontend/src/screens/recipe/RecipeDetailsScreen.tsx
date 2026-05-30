@@ -21,6 +21,7 @@ import { NutritionCard } from './components/RecipeNutritionCard'
 import { usePortionScale } from '@/src/hooks/recipe/useRecipePortionScale'
 import { PortionSelector } from './components/RecipePortionSelector'
 import { scaleIngredient } from '@/src/utils/scaleIngredientUtil'
+import { RecipeTimer } from './components/RecipeTimer'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
@@ -221,6 +222,8 @@ export default function RecipeDetailScreen() {
                             <Text style={styles.stepText}>{step.trim()}</Text>
                         </View>
                     ))}
+
+                    <RecipeTimer time={recipe.time} recipeTitle={recipe.title} />
 
                     <View style={styles.divider} />
 
