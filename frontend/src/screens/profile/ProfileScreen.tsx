@@ -54,10 +54,10 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.actionOutline]}
-                  onPress={() => router.push('/profile/edit')}
+                  onPress={() => router.push('/profile/settings')}
                 >
-                  <Ionicons name="create-outline" size={18} color="#DDBC9B" />
-                  <Text style={[styles.actionText, { color: colors.cream }]}>Editar Perfil</Text>
+                  <Ionicons name="settings-outline" size={18} color={colors.cream} />
+                  <Text style={[styles.actionText, { color: colors.cream }]}>Configurações</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 16,
   },
-
   userCard: {
     backgroundColor: colors.white,
     marginHorizontal: 20,
@@ -191,7 +190,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
   },
-
   tabsContainer: {
     paddingHorizontal: 20,
     marginBottom: 16,
@@ -225,7 +223,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
   },
-
   empty: {
     alignItems: 'center',
     paddingTop: 60,

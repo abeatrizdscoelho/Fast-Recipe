@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import { FeedRecipe } from '@/src/types/recipe'
 import { recipeService } from '@/src/services/recipeService'
 import { favoriteService } from '@/src/services/favoriteService'
+import { recentRecipesService } from '@/src/services/recentRecipesService'
 import { useAuth } from '@/src/context/AuthContext'
 
 export function useRecipeDetail(id: string) {
@@ -18,7 +19,9 @@ export function useRecipeDetail(id: string) {
     async function load() {
       try {
         const recipeData = await recipeService.getById(id)
-        setRecipe(recipeData.recipe as unknown as FeedRecipe)
+        const loaded = recipeData.recipe as unknown as FeedRecipe
+        setRecipe(loaded)
+        recentRecipesService.add(loaded) 
       } catch {
         Alert.alert('Erro', 'Não foi possível carregar a receita.')
         router.back()

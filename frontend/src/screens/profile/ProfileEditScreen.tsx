@@ -1,25 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet,
+import { Image, Platform, StyleSheet,
     Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
+import { Header } from '../../components/Header';
+import { BottomNav } from '../../components/BottomNav';
 import { colors } from '../../theme/color';
 import { DIETARY_OPTIONS, useEditProfile } from '../../hooks/profile/useProfileEdit';
 
 export default function EditProfileScreen() {
     const {
-    user, name, setName, email, setEmail, password, setPassword,
-    confirmPassword, setConfirmPassword, showPassword, setShowPassword,
-    showConfirmPassword, setShowConfirmPassword, editingField, setEditingField,
-    loading, avatarUri, dietaryPreferences, errors, apiError,
-    togglePreference, handlePickAvatar, handleSave
-  } = useEditProfile()
+        user, name, setName, email, setEmail, password, setPassword,
+        confirmPassword, setConfirmPassword, showPassword, setShowPassword,
+        showConfirmPassword, setShowConfirmPassword, editingField, setEditingField,
+        loading, avatarUri, dietaryPreferences, errors, apiError,
+        togglePreference, handlePickAvatar, handleSave
+    } = useEditProfile()
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
+            <Header />
+
             <KeyboardAwareScrollView
                 enableOnAndroid
                 enableAutomaticScroll
@@ -196,7 +200,9 @@ export default function EditProfileScreen() {
                     </TouchableOpacity>
                 </View>
             </KeyboardAwareScrollView>
-        </SafeAreaView>
+
+            <BottomNav />
+        </View>
     )
 }
 
@@ -208,9 +214,8 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 20,
-        justifyContent: 'center',
+        paddingVertical: 20,
     },
-
     card: {
         backgroundColor: colors.white,
         borderRadius: 24,
@@ -243,7 +248,6 @@ const styles = StyleSheet.create({
     backBtn: {
         padding: 4,
     },
-
     avatar: {
         width: 88,
         height: 88,
@@ -267,7 +271,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 4,
     },
-
     inputGroup: {
         marginBottom: 24,
     },
@@ -299,7 +302,6 @@ const styles = StyleSheet.create({
     inputActive: {
         color: colors.primary,
     },
-
     chipsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -327,7 +329,6 @@ const styles = StyleSheet.create({
     chipTextActive: {
         color: colors.white,
     },
-
     button: {
         backgroundColor: colors.primary,
         borderRadius: 50,
