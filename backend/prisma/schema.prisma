@@ -27,6 +27,7 @@ model User {
   shoppingListItems    ShoppingListItem[]
   manualShoppingItems  ManualShoppingItem[]
   pantryItems          PantryItem[]
+  cookedRecipes        CookedRecipe[]
 
   @@map("users")
 }
@@ -52,6 +53,7 @@ model Recipe {
   comments              Comment[]
   mealPlanEntries       MealPlanEntry[]
   ingredients           Ingredient[]
+  cookedRecipes         CookedRecipe[]
 
   @@map("recipes")
 }
@@ -201,4 +203,16 @@ model PantryItem {
 
   @@index([userId])
   @@map("pantry_items")
+}
+
+model CookedRecipe {
+  id        String   @id @default(uuid())
+  userId    String
+  recipeId  String
+  cookedAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@map("cooked_recipes")
 }

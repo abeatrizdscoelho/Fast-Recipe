@@ -86,7 +86,7 @@ export default function ProfileSettingsScreen() {
             <SettingItem
               icon="bar-chart-outline"
               label="Relatório de Estatísticas"
-              onPress={() => {}} 
+              onPress={() => router.push('/profile/stats')}
             />
           </View>
 

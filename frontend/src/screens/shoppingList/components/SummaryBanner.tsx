@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, DimensionValue } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
 
@@ -38,7 +38,7 @@ export function SummaryBanner({ pending, bought }: Props) {
             {total > 0 && (
                 <View style={styles.progressWrapper}>
                     <View style={styles.progressTrack}>
-                        <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
+                        <View style={[styles.progressFill, { width: `${progress * 100}%` as DimensionValue }]} />
                     </View>
                     <Text style={styles.progressLabel}>
                         {Math.round(progress * 100)}% concluído

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Alert } from 'react-native'
 import { router } from 'expo-router'
 import { FeedRecipe } from '@/src/types/recipe'
 import { recipeService } from '@/src/services/recipeService'
 import { favoriteService } from '@/src/services/favoriteService'
 import { recentRecipesService } from '@/src/services/recentRecipesService'
+import { statsService } from '@/src/services/statsService'
 import { useAuth } from '@/src/context/AuthContext'
 
 export function useRecipeDetail(id: string) {
@@ -21,7 +22,7 @@ export function useRecipeDetail(id: string) {
         const recipeData = await recipeService.getById(id)
         const loaded = recipeData.recipe as unknown as FeedRecipe
         setRecipe(loaded)
-        recentRecipesService.add(loaded) 
+        recentRecipesService.add(loaded)
       } catch {
         Alert.alert('Erro', 'Não foi possível carregar a receita.')
         router.back()
@@ -46,6 +47,13 @@ export function useRecipeDetail(id: string) {
     }
   }
 
+  const onTimerFinished = useCallback(async () => {
+    if (!id) return
+    try {
+      await statsService.registerCooked(id)
+    } catch { }
+  }, [id])
+
   const photos = recipe?.photos ?? []
   const authorInitials = recipe?.author?.name?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() ?? '?'
   const userInitials = user?.name?.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase() ?? ''
@@ -57,5 +65,6 @@ export function useRecipeDetail(id: string) {
     photos, authorInitials, toggleFavorite, isAuthor,
     userInitials, userAvatarUrl,
     originalPortions: Number(recipe?.portions) || 1,
+    onTimerFinished,
   }
 }

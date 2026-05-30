@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import 'dotenv/config'
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import recipeRoutes from './routes/recipeRoutes';
@@ -10,9 +10,7 @@ import reviewRoutes from './routes/reviewRoutes';
 import mealPlanRoutes from './routes/mealPlanRoutes';
 import shoppingListRoutes from './routes/shoppingListRoutes';
 import pantryRoutes from './routes/pantryRoutes';
-import 'dotenv/config'
-
-// dotenv.config()
+import statsRoutes from './routes/statsRoutes';
 
 const app = express()
 
@@ -27,6 +25,7 @@ app.use('/recipes', reviewRoutes)
 app.use('/meal-plan', mealPlanRoutes)
 app.use('/shopping-list', shoppingListRoutes)
 app.use('/pantry', pantryRoutes)
+app.use('/stats', statsRoutes)
 
 app.get('/health', (req, res) => {res.json({ status: 'ok' })})
 

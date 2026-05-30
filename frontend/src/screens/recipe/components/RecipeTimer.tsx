@@ -7,9 +7,10 @@ import { useRecipeTimer } from '../../../hooks/recipe/useRecipeTimer'
 interface Props {
     time: string
     recipeTitle: string
+    onFinished?: () => void
 }
 
-export function RecipeTimer({ time, recipeTitle }: Props) {
+export function RecipeTimer({ time, recipeTitle, onFinished }: Props) {
     const {
         formatted, progress, isRunning, isFinished, totalSeconds, start, pause, reset
     } = useRecipeTimer(time, recipeTitle)
@@ -17,6 +18,7 @@ export function RecipeTimer({ time, recipeTitle }: Props) {
     useEffect(() => {
         if (isFinished) {
             Vibration.vibrate([0, 400, 200, 400])
+            onFinished?.()  
         }
     }, [isFinished])
 

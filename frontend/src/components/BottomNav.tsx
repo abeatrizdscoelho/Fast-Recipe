@@ -1,22 +1,23 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter, usePathname } from 'expo-router';
+import { useRouter, usePathname, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/color';
 
 type Tab = {
   icon: keyof typeof Ionicons.glyphMap
   iconActive: keyof typeof Ionicons.glyphMap
-  route: string
+  key: string
+  route: Href
   matchSegment: string 
 }
 
 const tabs: Tab[] = [
-  { icon: 'home-outline', iconActive: 'home', route: '/(tabs)', matchSegment: 'index' },
-  { icon: 'archive-outline', iconActive: 'archive', route: '/pantry', matchSegment: 'pantry' },
-  { icon: 'calendar-outline', iconActive: 'calendar', route: '/planning', matchSegment: 'planning' },
-  { icon: 'list-outline', iconActive: 'list', route: '/list', matchSegment: 'list' },
-  { icon: 'person-outline', iconActive: 'person', route: '/profile', matchSegment: 'profile' },
+  { key: 'index',    icon: 'home-outline',    iconActive: 'home',     route: '/(tabs)',   matchSegment: 'index' },
+  { key: 'pantry',   icon: 'archive-outline', iconActive: 'archive',  route: '/pantry',   matchSegment: 'pantry' },
+  { key: 'planning', icon: 'calendar-outline',iconActive: 'calendar', route: '/planning', matchSegment: 'planning' },
+  { key: 'list',     icon: 'list-outline',    iconActive: 'list',     route: '/list',     matchSegment: 'list' },
+  { key: 'profile',  icon: 'person-outline',  iconActive: 'person',   route: '/profile',  matchSegment: 'profile' },
 ]
 
 export function BottomNav() {
@@ -36,9 +37,9 @@ export function BottomNav() {
         const isActive = isTabActive(tab)
         return (
           <TouchableOpacity
-            key={tab.route}
+            key={tab.key}
             style={styles.tab}
-            onPress={() => router.push(tab.route as any)}
+            onPress={() => router.push(tab.route)}
           >
             <Ionicons
               name={isActive ? tab.iconActive : tab.icon}

@@ -3,6 +3,12 @@ import { api } from './api'
 import { RecipeFormData, Recipe, FeedResponse, FeedRecipe } from '../types/recipe'
 import { ActiveFilters } from '../components/FilterModal'
 
+interface ReactNativeFile {
+  uri: string
+  name: string
+  type: string
+}
+
 export const recipeService = {
     async create(data: RecipeFormData): Promise<{ recipe: Recipe }> {
         try {
@@ -25,7 +31,8 @@ export const recipeService = {
                     const filename = uri.split('/').pop() ?? `photo_${index}.jpg`
                     const match = /\.(\w+)$/.exec(filename)
                     const type = match ? `image/${match[1]}` : 'image/jpeg'
-                    formData.append('photos', { uri, name: filename, type } as any)
+                    const file: ReactNativeFile = { uri, name: filename, type }
+                    formData.append('photos', file as unknown as Blob)
                 })
             }
 
@@ -107,7 +114,8 @@ export const recipeService = {
                     const filename = uri.split('/').pop() ?? `photo_${index}.jpg`
                     const match = /\.(\w+)$/.exec(filename)
                     const type = match ? `image/${match[1]}` : 'image/jpeg'
-                    formData.append('photos', { uri, name: filename, type } as any)
+                    const file: ReactNativeFile = { uri, name: filename, type }
+                    formData.append('photos', file as unknown as Blob)
                 })
             }
 

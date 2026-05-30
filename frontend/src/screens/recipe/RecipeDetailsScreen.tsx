@@ -30,7 +30,7 @@ export default function RecipeDetailScreen() {
     const insets = useSafeAreaInsets()
 
     const {
-        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions
+        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions, onTimerFinished
     } = useRecipeDetail(id)
 
     const {
@@ -223,7 +223,7 @@ export default function RecipeDetailScreen() {
                         </View>
                     ))}
 
-                    <RecipeTimer time={recipe.time} recipeTitle={recipe.title} />
+                    <RecipeTimer time={recipe.time} recipeTitle={recipe.title} onFinished={onTimerFinished} />
 
                     <View style={styles.divider} />
 
