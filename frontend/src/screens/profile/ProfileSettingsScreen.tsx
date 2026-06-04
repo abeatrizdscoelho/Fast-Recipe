@@ -95,7 +95,7 @@ export default function ProfileSettingsScreen() {
 
           <SectionTitle label={t('profileSettings.sectionPreferences')} />
           <View style={styles.section}>
-            <SettingItem
+            {/* <SettingItem
               icon="moon-outline"
               label={t('profileSettings.darkMode')}
               right={
@@ -106,7 +106,7 @@ export default function ProfileSettingsScreen() {
                   thumbColor={colors.white}
                 />
               }
-            />
+            /> */}
             <Divider />
             <SettingItem
               icon="language-outline"

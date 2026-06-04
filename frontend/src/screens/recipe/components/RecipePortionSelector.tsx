@@ -24,7 +24,7 @@ export function PortionSelector({ portions, originalPortions, onIncrement, onDec
                 )}
                 {!isOriginal && (
                     <Text style={styles.originalHint}>
-                        {t('portionSelector.originalHint', { count: originalPortions })}
+                        {t('recipePortionSelector.originalHint', { count: originalPortions })}
                     </Text>
                 )}
             </View>
