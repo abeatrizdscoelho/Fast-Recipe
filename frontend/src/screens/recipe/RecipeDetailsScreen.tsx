@@ -32,7 +32,7 @@ export default function RecipeDetailScreen() {
     const insets = useSafeAreaInsets()
 
     const {
-        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions, onTimerFinished, isSaved, isOffline, toggleSaveOffline,
+        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions, onTimerFinished, isSaved, isOffline, toggleSaveOffline, shareRecipe,
     } = useRecipeDetail(id)
 
     const {
@@ -76,7 +76,7 @@ export default function RecipeDetailScreen() {
                             />
                         </TouchableOpacity>
                     )}
-                    <TouchableOpacity style={styles.headerBtn}>
+                    <TouchableOpacity onPress={shareRecipe} style={styles.headerBtn}>
                         <Ionicons name="share-outline" size={22} color={colors.white} />
                     </TouchableOpacity>
                 </View>

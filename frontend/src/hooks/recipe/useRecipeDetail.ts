@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Alert } from 'react-native'
+import { Alert, Share } from 'react-native'
 import { router } from 'expo-router'
 import NetInfo from '@react-native-community/netinfo'
 import { FeedRecipe } from '@/src/types/recipe'
@@ -83,6 +83,19 @@ export function useRecipeDetail(id: string) {
     }
   }
 
+  async function shareRecipe() {
+    if (!recipe) return
+    try {
+      const deepLink = `fastrecipe://recipe/${recipe.id}`
+      await Share.share({
+        title: recipe.title,
+        message: `🍽️ ${recipe.title}\n\n${recipe.description ?? ''}\n\nAbrir no app: ${deepLink}`,
+      })
+    } catch {
+      Alert.alert(t('common.errorTitle'), t('recipeDetail.shareError'))
+    }
+  }
+
   const onTimerFinished = useCallback(async () => {
     if (!id) return
     try { 
@@ -103,5 +116,6 @@ export function useRecipeDetail(id: string) {
     originalPortions: Number(recipe?.portions) || 1,
     onTimerFinished,
     isSaved, isOffline, toggleSaveOffline, 
+    shareRecipe,
   }
 }

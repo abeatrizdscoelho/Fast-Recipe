@@ -99,6 +99,7 @@ export default {
         savedOfflineMessage: 'Você pode acessar esta receita sem internet.',
         removedOfflineTitle: 'Receita removida',
         removedOfflineMessage: 'Esta receita não estará mais disponível offline.',
+        shareError: 'Não foi possível compartilhar a receita.',
     },
     recipeFeed: {
         searchPlaceholder: 'Pesquisar receitas...',
