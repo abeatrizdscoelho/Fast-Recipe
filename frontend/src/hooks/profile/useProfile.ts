@@ -5,6 +5,7 @@ import { Recipe } from '../../types/recipe';
 import { recipeService } from '../../services/recipeService';
 import { favoriteService } from '../../services/favoriteService';
 import { useTranslation } from 'react-i18next';
+import NetInfo from '@react-native-community/netinfo';
 
 export type Tab = 'minhas' | 'favoritas'
 
@@ -15,16 +16,27 @@ export function useProfile() {
   const [fetching, setFetching] = useState(true)
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [favorites, setFavorites] = useState<Recipe[]>([])
+  const [isOffline, setIsOffline] = useState(false)
 
   const loadRecipes = useCallback(async () => {
     try {
       setFetching(true)
-      const [myData, favData] = await Promise.all([
-        recipeService.getMyRecipes(),
-        favoriteService.getFavorites(),
-      ])
-      setRecipes(myData.recipes)
-      setFavorites(favData.recipes)
+      const net = await NetInfo.fetch()
+      const offline = !net.isConnected
+      setIsOffline(offline)
+
+      if (offline) {
+        const favData = await favoriteService.getFavorites()
+        setFavorites(favData.recipes)
+        setRecipes([])
+      } else {
+        const [myData, favData] = await Promise.all([
+          recipeService.getMyRecipes(),
+          favoriteService.getFavorites(),
+        ])
+        setRecipes(myData.recipes)
+        setFavorites(favData.recipes)
+      }
     } catch (err) {
       Alert.alert(t('common.errorTitle'), t('profile.loadError'))
     } finally {
@@ -67,6 +79,6 @@ export function useProfile() {
 
   return {
     user, activeTab, setActiveTab, recipes, fetching,
-    displayed, initials, loadRecipes, toggleFavorite, favorites, handleDelete,
+    displayed, initials, loadRecipes, toggleFavorite, favorites, handleDelete, isOffline,
   }
 }

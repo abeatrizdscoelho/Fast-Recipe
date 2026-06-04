@@ -5,7 +5,7 @@ import { reviewService } from '@/src/services/reviewService'
 import { reportService } from '@/src/services/reportService'
 import { useTranslation } from 'react-i18next'
 
-export function useRecipeComments(id: string) {
+export function useRecipeComments(id: string, isOffline: boolean | null) {
     const { t } = useTranslation()
     const [comments, setComments] = useState<CommentDTO[]>([])
     const [commentText, setCommentText] = useState('')
@@ -16,7 +16,7 @@ export function useRecipeComments(id: string) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (!id) return
+        if (!id || isOffline !== false) return
         async function load() {
             try {
                 const commentsData = await reviewService.getComments(id)
@@ -28,7 +28,7 @@ export function useRecipeComments(id: string) {
             }
         }
         load()
-    }, [id])
+    }, [id, isOffline])
 
     const submitComment = useCallback(async () => {
         const text = commentText.trim()

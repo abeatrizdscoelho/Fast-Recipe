@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Alert } from 'react-native'
 import { router } from 'expo-router'
+import NetInfo from '@react-native-community/netinfo'
 import { FeedRecipe } from '@/src/types/recipe'
 import { recipeService } from '@/src/services/recipeService'
 import { favoriteService } from '@/src/services/favoriteService'
+import { savedRecipesStorage } from '@/src/storage/savedRecipesStorage'
 import { recentRecipesService } from '@/src/services/recentRecipesService'
 import { statsService } from '@/src/services/statsService'
 import { useAuth } from '@/src/context/AuthContext'
@@ -16,15 +18,34 @@ export function useRecipeDetail(id: string) {
   const [loading, setLoading] = useState(true)
   const [activePhoto, setActivePhoto] = useState(0)
   const [togglingFavorite, setTogglingFavorite] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)        
+  const [isOffline, setIsOffline] = useState<boolean | null>(null) 
 
   useEffect(() => {
     if (!id) return
     async function load() {
       try {
-        const recipeData = await recipeService.getById(id)
-        const loaded = recipeData.recipe as unknown as FeedRecipe
-        setRecipe(loaded)
-        recentRecipesService.add(loaded)
+        const net = await NetInfo.fetch()
+        const offline = !net.isConnected
+        setIsOffline(offline)
+
+        if (offline) {
+          const local = await savedRecipesStorage.getById(id)
+          if (local) {
+            setRecipe(local)
+            setIsSaved(true)
+          } else {
+            Alert.alert(t('common.errorTitle'), t('recipeDetail.offlineNotAvailable'))
+            router.back()
+          }
+        } else {
+          const recipeData = await recipeService.getById(id)
+          const loaded = recipeData.recipe as unknown as FeedRecipe
+          setRecipe(loaded)
+          recentRecipesService.add(loaded)
+          const saved = await savedRecipesStorage.isSaved(id)
+          setIsSaved(saved)
+        }
       } catch {
         Alert.alert(t('common.errorTitle'), t('recipeDetail.loadError'))
         router.back()
@@ -49,10 +70,23 @@ export function useRecipeDetail(id: string) {
     }
   }
 
+  async function toggleSaveOffline() {
+    if (!recipe) return
+    if (isSaved) {
+      await savedRecipesStorage.remove(recipe.id)
+      setIsSaved(false)
+      Alert.alert(t('recipeDetail.removedOfflineTitle'), t('recipeDetail.removedOfflineMessage'))
+    } else {
+      await savedRecipesStorage.save(recipe)
+      setIsSaved(true)
+      Alert.alert(t('recipeDetail.savedOfflineTitle'), t('recipeDetail.savedOfflineMessage'))
+    }
+  }
+
   const onTimerFinished = useCallback(async () => {
     if (!id) return
-    try {
-      await statsService.registerCooked(id)
+    try { 
+      await statsService.registerCooked(id) 
     } catch { }
   }, [id])
 
@@ -68,5 +102,6 @@ export function useRecipeDetail(id: string) {
     userInitials, userAvatarUrl,
     originalPortions: Number(recipe?.portions) || 1,
     onTimerFinished,
+    isSaved, isOffline, toggleSaveOffline, 
   }
 }

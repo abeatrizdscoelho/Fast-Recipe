@@ -94,6 +94,11 @@ export default {
         emptyComments: 'No comments yet.',
         loadError: 'Could not load the recipe.',
         favoriteError: 'Could not save the favorite.',
+        offlineNotAvailable: 'This recipe is not available offline. Save it first while connected.',
+        savedOfflineTitle: 'Recipe saved!',
+        savedOfflineMessage: 'You can access this recipe without internet.',
+        removedOfflineTitle: 'Recipe removed',
+        removedOfflineMessage: 'This recipe will no longer be available offline.',
     },
     recipeFeed: {
         searchPlaceholder: 'Search recipes...',

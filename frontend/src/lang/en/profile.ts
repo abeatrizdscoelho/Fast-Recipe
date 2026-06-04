@@ -14,6 +14,7 @@ export default {
         deleteMessage: 'Are you sure you want to delete this recipe?',
         deleteAction: 'Delete',
         deleteError: 'Could not delete the recipe.',
+        offlineWarning: 'You are offline. Showing saved favorites.',
     },
     editProfile: {
         fallbackName: 'User',

@@ -3,7 +3,7 @@ import { Alert } from 'react-native'
 import { reviewService } from '@/src/services/reviewService'
 import { useTranslation } from 'react-i18next'
 
-export function useRecipeRating(id: string) {
+export function useRecipeRating(id: string, isOffline: boolean | null) {
   const { t } = useTranslation()
   const [ratingAverage, setRatingAverage] = useState(0)
   const [ratingCount, setRatingCount] = useState(0)
@@ -12,7 +12,7 @@ export function useRecipeRating(id: string) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!id) return
+    if (!id || isOffline !== false) return
     async function load() {
       try {
         const ratingData = await reviewService.getRating(id)
@@ -26,7 +26,7 @@ export function useRecipeRating(id: string) {
       }
     }
     load()
-  }, [id])
+  }, [id, isOffline])
 
   const submitRating = useCallback(async (rating: number) => {
     if (submittingRating) return

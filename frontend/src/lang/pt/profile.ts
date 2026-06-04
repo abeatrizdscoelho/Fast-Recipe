@@ -14,6 +14,7 @@ export default {
         deleteMessage: 'Tem certeza que deseja excluir esta receita?',
         deleteAction: 'Excluir',
         deleteError: 'Não foi possível excluir a receita.',
+        offlineWarning: 'Você está offline. Exibindo favoritos salvos.',
     },
     editProfile: {
         fallbackName: 'Usuário',

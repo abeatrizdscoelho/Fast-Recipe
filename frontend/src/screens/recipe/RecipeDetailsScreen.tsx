@@ -32,12 +32,12 @@ export default function RecipeDetailScreen() {
     const insets = useSafeAreaInsets()
 
     const {
-        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions, onTimerFinished
+        recipe, loading, activePhoto, setActivePhoto, photos, authorInitials, toggleFavorite, userAvatarUrl, userInitials, isAuthor, originalPortions, onTimerFinished, isSaved, isOffline, toggleSaveOffline,
     } = useRecipeDetail(id)
 
     const {
         ratingAverage, ratingCount, userRating, submittingRating, submitRating
-    } = useRecipeRating(id)
+    } = useRecipeRating(id, isOffline)
 
     const { comments, commentText, setCommentText,
         submitComment, submittingComment,
@@ -45,7 +45,7 @@ export default function RecipeDetailScreen() {
         startEditComment, cancelEditComment, saveEditComment,
         confirmDeleteComment,
         reportingCommentId, setReportingCommentId, confirmReport
-    } = useRecipeComments(id)
+    } = useRecipeComments(id, isOffline)
 
     const { portions, scale, increment, decrement } = usePortionScale(originalPortions)
 
@@ -65,9 +65,21 @@ export default function RecipeDetailScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
                     <Ionicons name="arrow-back-outline" size={24} color={colors.white} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.headerBtn}>
-                    <Ionicons name="share-outline" size={22} color={colors.white} />
-                </TouchableOpacity>
+
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                    {!isOffline && (
+                        <TouchableOpacity onPress={toggleSaveOffline} style={styles.headerBtn}>
+                            <Ionicons
+                                name={isSaved ? 'download' : 'download-outline'}
+                                size={22}
+                                color={isSaved ? colors.cream : colors.white}
+                            />
+                        </TouchableOpacity>
+                    )}
+                    <TouchableOpacity style={styles.headerBtn}>
+                        <Ionicons name="share-outline" size={22} color={colors.white} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <KeyboardAwareScrollView
@@ -117,7 +129,10 @@ export default function RecipeDetailScreen() {
 
                     <View style={styles.titleRow}>
                         <Text style={styles.title}>{recipe.title}</Text>
-                        <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteBtn}>
+                        <TouchableOpacity
+                            onPress={isOffline ? undefined : toggleFavorite}
+                            style={[styles.favoriteBtn, isOffline && { opacity: 0.4 }]}
+                        >
                             <Ionicons
                                 name={recipe.favorite ? 'heart' : 'heart-outline'}
                                 size={22}
@@ -209,13 +224,13 @@ export default function RecipeDetailScreen() {
 
                     <Text style={styles.sectionTitle}>{t('recipeDetail.ingredientsTitle')}</Text>
                     {recipe.ingredients.map((ingredient, index) => {
-                        const scaledQty = scaleIngredient(Number(ingredient.quantity), scale, ingredient.unit) 
+                        const scaledQty = scaleIngredient(Number(ingredient.quantity), scale, ingredient.unit)
                         return (
                             <View key={index} style={styles.ingredientRow}>
                                 <View style={styles.ingredientBullet} />
                                 <Text style={styles.ingredientText}>
                                     <Text style={styles.ingredientQty}>
-                                        {scaledQty} {pluralizeUnit(scaledQty, ingredient.unit)} 
+                                        {scaledQty} {pluralizeUnit(scaledQty, ingredient.unit)}
                                     </Text>
                                     {' - '}{ingredient.name}
                                 </Text>
@@ -239,50 +254,52 @@ export default function RecipeDetailScreen() {
 
                     <View style={styles.divider} />
 
-                    {recipe.nutrition && (
+                    {!isOffline && recipe.nutrition && (
                         <>
                             <NutritionCard nutrition={recipe.nutrition} portions={String(portions)} />
                             <View style={styles.divider} />
                         </>
                     )}
 
-                    <Text style={styles.sectionTitle}>{t('recipeDetail.reviewsTitle')}</Text>
+                    {!isOffline && (
+                        <>
+                            <Text style={styles.sectionTitle}>{t('recipeDetail.reviewsTitle')}</Text>
+                            <RatingAverage average={ratingAverage} count={ratingCount} />
 
-                    <RatingAverage average={ratingAverage} count={ratingCount} />
+                            {!isAuthor && (
+                                <RatingBox
+                                    userRating={userRating}
+                                    submitting={submittingRating}
+                                    onRate={submitRating}
+                                    commentValue={commentText}
+                                    onCommentChange={setCommentText}
+                                    onCommentSubmit={submitComment}
+                                    submittingComment={submittingComment}
+                                    userAvatarUrl={userAvatarUrl}
+                                    userInitials={userInitials}
+                                />
+                            )}
 
-                    {!isAuthor && (
-                        <RatingBox
-                            userRating={userRating}
-                            submitting={submittingRating}
-                            onRate={submitRating}
-                            commentValue={commentText}
-                            onCommentChange={setCommentText}
-                            onCommentSubmit={submitComment}
-                            submittingComment={submittingComment}
-                            userAvatarUrl={userAvatarUrl}
-                            userInitials={userInitials}
-                        />
+                            {comments.length === 0 ? (
+                                <Text style={styles.emptyComments}>{t('recipeDetail.emptyComments')}</Text>
+                            ) : (
+                                comments.map(comment => (
+                                    <CommentCard
+                                        key={comment.id}
+                                        comment={comment}
+                                        editingCommentId={editingCommentId}
+                                        editingText={editingText}
+                                        setEditingText={setEditingText}
+                                        onStartEdit={startEditComment}
+                                        onSaveEdit={saveEditComment}
+                                        onCancelEdit={cancelEditComment}
+                                        onDelete={confirmDeleteComment}
+                                        onReport={setReportingCommentId}
+                                    />
+                                ))
+                            )}
+                        </>
                     )}
-
-                    {comments.length === 0 ? (
-                        <Text style={styles.emptyComments}>{t('recipeDetail.emptyComments')}</Text>
-                    ) : (
-                        comments.map(comment => (
-                            <CommentCard
-                                key={comment.id}
-                                comment={comment}
-                                editingCommentId={editingCommentId}
-                                editingText={editingText}
-                                setEditingText={setEditingText}
-                                onStartEdit={startEditComment}
-                                onSaveEdit={saveEditComment}
-                                onCancelEdit={cancelEditComment}
-                                onDelete={confirmDeleteComment}
-                                onReport={setReportingCommentId}
-                            />
-                        ))
-                    )}
-
                 </View>
             </KeyboardAwareScrollView>
 
@@ -300,25 +317,25 @@ export default function RecipeDetailScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.primary },
     loadingContainer: {
-        flex: 1, 
+        flex: 1,
         backgroundColor: colors.primary,
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'center',
     },
 
     header: {
-        position: 'absolute', 
+        position: 'absolute',
         top: 0, left: 0, right: 0, zIndex: 20,
-        flexDirection: 'row', 
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 20, 
+        paddingHorizontal: 20,
         paddingBottom: 8,
     },
     headerBtn: {
-        width: 38, height: 38, 
+        width: 38, height: 38,
         borderRadius: 19,
         backgroundColor: 'rgba(0,0,0,0.35)',
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'center',
     },
 
@@ -327,15 +344,15 @@ const styles = StyleSheet.create({
     mainPhoto: { width: SCREEN_WIDTH, height: 320 },
 
     dotsRow: {
-        position: 'absolute', 
+        position: 'absolute',
         bottom: 14, left: 0, right: 0,
-        flexDirection: 'row', 
+        flexDirection: 'row',
         justifyContent: 'center', gap: 6,
     },
     dot: {
-        width: 6, height: 6, 
-        borderRadius: 3, 
-        backgroundColor: 'rgba(255,255,255,0.4)' 
+        width: 6, height: 6,
+        borderRadius: 3,
+        backgroundColor: 'rgba(255,255,255,0.4)'
     },
     dotActive: { backgroundColor: colors.cream, width: 16 },
 
@@ -346,8 +363,8 @@ const styles = StyleSheet.create({
     },
     photoCounterText: { color: colors.white, fontSize: 12, fontWeight: 'bold' },
     photoPlaceholder: {
-        height: 220, 
-        alignItems: 'center', 
+        height: 220,
+        alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(0,0,0,0.15)', gap: 8,
     },
@@ -355,159 +372,164 @@ const styles = StyleSheet.create({
 
     card: {
         backgroundColor: colors.white,
-        borderTopLeftRadius: 28, 
+        borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        paddingHorizontal: 24, 
-        paddingTop: 24, 
+        paddingHorizontal: 24,
+        paddingTop: 24,
         paddingBottom: 16,
         marginTop: -24,
     },
 
-    titleRow: { 
-        flexDirection: 'row', 
-        alignItems: 'flex-start', 
-        gap: 12 
+    titleRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 12
     },
-    title: { 
-        flex: 1, 
-        fontSize: 22, 
-        fontWeight: 'bold', 
-        color: colors.primary, 
-        lineHeight: 28 
+    title: {
+        flex: 1,
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: colors.primary,
+        lineHeight: 28
     },
 
     favoriteBtn: {
-        width: 40, height: 40, 
+        width: 40, height: 40,
         borderRadius: 20,
         backgroundColor: colors.surface,
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'center',
     },
 
-    authorRow: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 10, 
-        marginBottom: 16 
+    authorRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 16
     },
     authorAvatar: {
-        width: 38, height: 38, 
+        width: 38, height: 38,
         borderRadius: 19,
-        backgroundColor: colors.border, 
-        borderWidth: 1.5, 
+        backgroundColor: colors.border,
+        borderWidth: 1.5,
         borderColor: colors.primary,
-        alignItems: 'center', 
-        justifyContent: 'center', 
+        alignItems: 'center',
+        justifyContent: 'center',
         overflow: 'hidden',
     },
-    authorInitials: { 
-        fontSize: 13, 
-        fontWeight: 'bold', 
-        color: colors.primary 
+    authorInitials: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: colors.primary
     },
-    authorName: { 
-        fontSize: 13, 
-        fontWeight: 'bold', 
-        color: colors.primary 
+    authorName: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: colors.primary
     },
     authorDate: { fontSize: 11, color: '#aaa' },
 
     metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
     metaChip: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         alignItems: 'center', gap: 4,
-        backgroundColor: colors.surface, 
+        backgroundColor: colors.surface,
         borderRadius: 50,
-        paddingHorizontal: 12, 
+        paddingHorizontal: 12,
         paddingVertical: 6,
-        borderWidth: 1, 
+        borderWidth: 1,
         borderColor: '#ede8e4',
     },
     metaChipText: { fontSize: 12, color: colors.primary },
 
-    restrictionsRow: { 
-        flexDirection: 'row', 
-        flexWrap: 'wrap', 
-        gap: 6, marginTop: 10 
+    restrictionsRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 6, marginTop: 10
     },
     restrictionChip: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         alignItems: 'center', gap: 4,
-        backgroundColor: '#f0faf0', 
+        backgroundColor: '#f0faf0',
         borderRadius: 50,
         paddingHorizontal: 10, paddingVertical: 5,
         borderWidth: 1, borderColor: '#c8e6c9',
     },
-    restrictionChipText: { 
-        fontSize: 11, 
-        color: colors.greenDark, 
-        fontWeight: '600' 
+    restrictionChipText: {
+        fontSize: 11,
+        color: colors.greenDark,
+        fontWeight: '600'
     },
 
-    divider: { 
-        height: 1, 
-        backgroundColor: colors.border, 
-        marginVertical: 20 
+    divider: {
+        height: 1,
+        backgroundColor: colors.border,
+        marginVertical: 20
     },
-    descriptionText: { 
-        fontSize: 14, 
-        color: '#555', 
-        lineHeight: 22 
+    descriptionText: {
+        fontSize: 14,
+        color: '#555',
+        lineHeight: 22
     },
-    sectionTitle: { 
-        fontSize: 17, 
-        fontWeight: 'bold', 
-        color: colors.primary, 
-        marginBottom: 14 
-    },
-
-    ingredientRow: { 
-        flexDirection: 'row', 
-        alignItems: 'flex-start', 
-        gap: 10, marginBottom: 8 
-    },
-    ingredientBullet: { 
-        width: 7, height: 7, 
-        borderRadius: 4, 
-        backgroundColor: colors.primary, 
-        marginTop: 6 
-    },
-    ingredientText: { 
-        flex: 1, 
-        fontSize: 14, 
-        color: '#444', 
-        lineHeight: 20 
-    },
-    ingredientQty: { 
-        fontWeight: 'bold', 
-        color: colors.primary 
+    sectionTitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: colors.primary,
+        marginBottom: 14
     },
 
-    stepRow: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 12, 
-        marginBottom: 14 
+    ingredientRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 10, marginBottom: 8
+    },
+    ingredientBullet: {
+        width: 7, height: 7,
+        borderRadius: 4,
+        backgroundColor: colors.primary,
+        marginTop: 6
+    },
+    ingredientText: {
+        flex: 1,
+        fontSize: 14,
+        color: '#444',
+        lineHeight: 20
+    },
+    ingredientQty: {
+        fontWeight: 'bold',
+        color: colors.primary
+    },
+
+    stepRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 14
     },
     stepNumber: {
-        width: 26, height: 26, 
-        borderRadius: 13, 
+        width: 26, height: 26,
+        borderRadius: 13,
         backgroundColor: colors.primary,
-        alignItems: 'center', 
-        justifyContent: 'center', 
+        alignItems: 'center',
+        justifyContent: 'center',
         marginTop: 1,
     },
-    stepNumberText: { 
-        color: colors.cream, 
-        fontSize: 12, 
-        fontWeight: 'bold' 
+    stepNumberText: {
+        color: colors.cream,
+        fontSize: 12,
+        fontWeight: 'bold'
     },
-    stepText: { 
-        flex: 1, 
-        fontSize: 14, 
-        color: '#444', 
-        lineHeight: 22 
+    stepText: {
+        flex: 1,
+        fontSize: 14,
+        color: '#444',
+        lineHeight: 22
     },
 
-    emptyComments: { fontSize: 13, color: '#aaa', textAlign: 'center', paddingVertical: 16 },
+    emptyComments: { 
+        fontSize: 13, 
+        color: '#aaa', 
+        textAlign: 'center', 
+        paddingVertical: 16 
+    },
 })

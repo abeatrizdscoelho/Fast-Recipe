@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 export default function ProfileScreen() {
   const { t } = useTranslation()
   const {
-    user, activeTab, setActiveTab, fetching, displayed, initials, loadRecipes, toggleFavorite, handleDelete
+    user, activeTab, setActiveTab, fetching, displayed, initials, loadRecipes, toggleFavorite, handleDelete, isOffline,
   } = useProfile()
 
   useFocusEffect(
@@ -84,6 +84,12 @@ export default function ProfileScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
+              {isOffline && activeTab === 'favoritas' && (
+                <View style={styles.offlineBanner}>
+                  <Ionicons name="cloud-offline-outline" size={14} color={colors.cream} />
+                  <Text style={styles.offlineText}>{t('profile.offlineWarning')}</Text>
+                </View>
+              )}
             </View>
           </>
         }
@@ -224,6 +230,20 @@ const styles = StyleSheet.create({
   tabTextActive: {
     color: colors.primary,
     fontWeight: 'bold',
+  },
+  offlineBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+  },
+  offlineText: {
+    color: colors.cream,
+    fontSize: 12,
   },
   empty: {
     alignItems: 'center',
