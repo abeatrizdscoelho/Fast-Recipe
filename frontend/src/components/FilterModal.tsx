@@ -2,11 +2,7 @@ import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform }
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { colors } from '../theme/color'
-
-const CATEGORIES = ['Café da manhã', 'Almoço', 'Jantar', 'Lanche', 'Sobremesa', 'Bebida']
-const DIETARY_RESTRICTIONS = [
-    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico'
-]
+import { useTranslation } from 'react-i18next'
 
 export type ActiveFilters = {
     categories: string[]
@@ -18,9 +14,12 @@ type Props = {
     filters: ActiveFilters
     onClose: () => void
     onApply: (filters: ActiveFilters) => void
+    categories: { key: string; label: string }[]
+    dietaryRestrictions: { key: string; label: string }[]
 }
 
-export function FilterModal({ visible, filters, onClose, onApply }: Props) {
+export function FilterModal({ visible, filters, onClose, onApply, categories, dietaryRestrictions }: Props) {
+    const { t } = useTranslation()
     const [local, setLocal] = React.useState<ActiveFilters>(filters)
 
     React.useEffect(() => {
@@ -52,47 +51,47 @@ export function FilterModal({ visible, filters, onClose, onApply }: Props) {
 
                 <View style={styles.sheet}>
                     <View style={styles.header}>
-                        <Text style={styles.title}>Filtrar receitas</Text>
+                        <Text style={styles.title}>{t('filterModal.title')}</Text>
                         <TouchableOpacity onPress={onClose}>
                             <Ionicons name="close" size={22} color={colors.primary} />
                         </TouchableOpacity>
                     </View>
 
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
-                        <Text style={styles.sectionLabel}>Categoria</Text>
-                        <Text style={styles.sectionHint}>Toque para selecionar ou remover</Text>
+                        <Text style={styles.sectionLabel}>{t('filterModal.categoryLabel')}</Text>
+                        <Text style={styles.sectionHint}>{t('filterModal.selectionHint')}</Text>
                         <View style={styles.chipsContainer}>
-                            {CATEGORIES.map(cat => {
-                                const isSelected = local.categories.includes(cat)
+                            {categories.map(({ key, label }) => {
+                                const isSelected = local.categories.includes(key)
                                 return (
                                     <TouchableOpacity
-                                        key={cat}
+                                        key={key}
                                         style={[styles.chip, isSelected && styles.chipActive]}
-                                        onPress={() => toggle('categories', cat)}
+                                        onPress={() => toggle('categories', key)}
                                     >
                                         {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
                                         <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                                            {cat}
+                                            {label}
                                         </Text>
                                     </TouchableOpacity>
                                 )
                             })}
                         </View>
 
-                        <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Restrição alimentar</Text>
-                        <Text style={styles.sectionHint}>Toque para selecionar ou remover</Text>
+                        <Text style={[styles.sectionLabel, { marginTop: 24 }]}>{t('filterModal.dietaryLabel')}</Text>
+                        <Text style={styles.sectionHint}>{t('filterModal.selectionHint')}</Text>
                         <View style={styles.chipsContainer}>
-                            {DIETARY_RESTRICTIONS.map(opt => {
-                                const isSelected = local.dietaryRestrictions.includes(opt)
+                            {dietaryRestrictions.map(({ key, label }) => {
+                                const isSelected = local.dietaryRestrictions.includes(key)
                                 return (
                                     <TouchableOpacity
-                                        key={opt}
+                                        key={key}
                                         style={[styles.chip, isSelected && styles.chipActive]}
-                                        onPress={() => toggle('dietaryRestrictions', opt)}
+                                        onPress={() => toggle('dietaryRestrictions', key)}
                                     >
                                         {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
                                         <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                                            {opt}
+                                            {label}
                                         </Text>
                                     </TouchableOpacity>
                                 )
@@ -107,13 +106,15 @@ export function FilterModal({ visible, filters, onClose, onApply }: Props) {
                             disabled={totalSelected === 0}
                         >
                             <Text style={[styles.clearText, totalSelected === 0 && styles.clearTextDisabled]}>
-                                Limpar
+                                {t('filterModal.clearBtn')}
                             </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
                             <Text style={styles.applyText}>
-                                {totalSelected > 0 ? `Aplicar (${totalSelected})` : 'Aplicar'}
+                                {totalSelected > 0
+                                    ? t('filterModal.applyBtnCount', { count: totalSelected })
+                                    : t('filterModal.applyBtn')}
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -189,13 +190,18 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#e0d6d0',
     },
-    chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    chipActive: { 
+        backgroundColor: colors.primary, 
+        borderColor: colors.primary 
+    },
     chipText: {
         fontSize: 13,
         color: colors.primary,
         fontWeight: '600',
     },
-    chipTextActive: { color: colors.white },
+    chipTextActive: { 
+        color: colors.white 
+    },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -206,13 +212,18 @@ const styles = StyleSheet.create({
         borderTopColor: '#f0ebe8',
         gap: 12,
     },
-    clearBtn: { paddingVertical: 14, paddingHorizontal: 20 },
+    clearBtn: { 
+        paddingVertical: 14, 
+        paddingHorizontal: 20 
+    },
     clearText: {
         fontSize: 14,
         fontWeight: '600',
         color: colors.primary,
     },
-    clearTextDisabled: { color: colors.gray },
+    clearTextDisabled: { 
+        color: colors.gray 
+    },
     applyBtn: {
         flex: 1,
         backgroundColor: colors.primary,

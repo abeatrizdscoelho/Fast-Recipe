@@ -1,14 +1,9 @@
 export type MealType = 'breakfast' | 'lunch' | 'dinner'
 
-export const MEAL_TYPE_LABELS: Record<MealType, string> = {
-  breakfast: 'Café da Manhã',
-  lunch: 'Almoço',
-  dinner: 'Jantar',
-}
-
 export const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner']
 
-export const DAY_LABELS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM']
+export const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
+export type DayKey = typeof DAY_KEYS[number]
 
 export interface MealPlanRecipe {
   id: string

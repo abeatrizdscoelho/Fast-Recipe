@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { api } from './api';
+import i18next from 'i18next'
 
 export const userService = {
   async getProfile() {
@@ -8,9 +9,9 @@ export const userService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao buscar perfil')
+        throw new Error(err.response?.data?.error ?? i18next.t('userService.fetchError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -29,9 +30,9 @@ export const userService = {
       if (data.password) formData.append('password', data.password)
       if (data.confirmPassword) formData.append('confirmPassword', data.confirmPassword)
       if (data.avatar) {
-        formData.append('avatar', {uri: data.avatar.uri, name: data.avatar.name, type: data.avatar.type} as any)
+        formData.append('avatar', { uri: data.avatar.uri, name: data.avatar.name, type: data.avatar.type } as any)
       }
-      if (data.dietaryPreferences) formData.append('dietaryPreferences', JSON.stringify(data.dietaryPreferences))  
+      if (data.dietaryPreferences) formData.append('dietaryPreferences', JSON.stringify(data.dietaryPreferences))
 
       const response = await api.put('/profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -39,9 +40,9 @@ export const userService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao atualizar perfil')
+        throw new Error(err.response?.data?.error ?? i18next.t('userService.updateError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 }

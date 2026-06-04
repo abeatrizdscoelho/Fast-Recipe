@@ -8,6 +8,8 @@ import { FeedRecipe } from '@/src/types/recipe'
 import { colors } from '@/src/theme/color'
 import { SearchBar } from '@/src/components/SearchBar'
 import { ActiveFilters, FilterModal } from '@/src/components/FilterModal'
+import { useTranslation } from 'react-i18next'
+import { useAppConstants } from '@/src/hooks/useAppConstants'
 
 interface Props {
     visible: boolean
@@ -21,6 +23,8 @@ interface Props {
 }
 
 export function RecipePickerModal({ visible, recipes, search, onSearchChange, onSelect, onClose, filters, onApplyFilters }: Props) {
+    const { t } = useTranslation()
+    const { CATEGORIES, DIETARY_RESTRICTIONS } = useAppConstants()
     const [filterVisible, setFilterVisible] = useState(false)
     const activeFilterCount = filters.categories.length + filters.dietaryRestrictions.length
 
@@ -28,7 +32,7 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
         <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
             <SafeAreaView style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={styles.title}>Escolher Receita</Text>
+                    <Text style={styles.title}>{t('recipePicker.title')}</Text>
                     <TouchableOpacity onPress={onClose}>
                         <Ionicons name="close" size={26} color="#333" />
                     </TouchableOpacity>
@@ -39,7 +43,7 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
                         <SearchBar
                             value={search}
                             onChangeText={onSearchChange}
-                            placeholder="Pesquisar receitas..."
+                            placeholder={t('recipePicker.searchPlaceholder')}
                             autoFocus
                         />
                     </View>
@@ -65,6 +69,8 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
                         onApplyFilters(newFilters)
                         setFilterVisible(false)
                     }}
+                    categories={CATEGORIES}
+                    dietaryRestrictions={DIETARY_RESTRICTIONS}
                 />
 
                 <FlatList
@@ -74,7 +80,7 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
                     ListEmptyComponent={
                         <View style={styles.empty}>
                             <Ionicons name="restaurant-outline" size={48} color="#ddd" />
-                            <Text style={styles.emptyText}>Nenhuma receita encontrada.</Text>
+                            <Text style={styles.emptyText}>{t('recipePicker.empty')}</Text>
                         </View>
                     }
                     renderItem={({ item }) => (
@@ -92,7 +98,9 @@ export function RecipePickerModal({ visible, recipes, search, onSearchChange, on
                                     <Ionicons name="time-outline" size={12} color="#999" />
                                     <Text style={styles.metaText}>{item.time}min</Text>
                                     <Text style={styles.metaDot}>·</Text>
-                                    <Text style={styles.metaText}>{item.category}</Text>
+                                    <Text style={styles.metaText}>
+                                        {t(`categories.${item.category}`, item.category)}
+                                    </Text>
                                 </View>
                             </View>
                             <Ionicons name="add-circle-outline" size={24} color={colors.primary} />
@@ -136,7 +144,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#e0e0e0',
     },
-
     filterBtn: {
         width: 40,
         height: 40,
@@ -160,12 +167,10 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold',
     },
-
     list: {
         padding: 16,
         gap: 10
     },
-
     recipeItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -184,12 +189,10 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#f0f0f0'
     },
-
     noPhoto: {
         alignItems: 'center',
         justifyContent: 'center'
     },
-
     recipeInfo: { flex: 1 },
     recipeName: {
         fontSize: 14,
@@ -202,7 +205,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4
     },
-
     metaText: {
         fontSize: 12,
         color: '#999'
@@ -211,7 +213,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#ccc'
     },
-
     empty: {
         alignItems: 'center',
         paddingTop: 60,

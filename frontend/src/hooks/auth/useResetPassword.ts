@@ -3,8 +3,10 @@ import { useLocalSearchParams } from 'expo-router';
 import { ValidationError } from 'yup';
 import { resetPasswordValidation } from '../../validations/authValidation';
 import { authService } from '../../services/authService';
+import { useTranslation } from 'react-i18next';
 
 export function useResetPassword() {
+  const { t } = useTranslation()
   const { token } = useLocalSearchParams<{ token: string }>()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -32,7 +34,7 @@ export function useResetPassword() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao redefinir senha')
+        setApiError(err instanceof Error ? err.message : t('auth.errors.resetPasswordError'))
       }
     } finally {
       setLoading(false)

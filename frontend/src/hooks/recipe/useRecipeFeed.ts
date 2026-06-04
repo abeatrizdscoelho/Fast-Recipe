@@ -4,6 +4,7 @@ import { recipeService } from '../../services/recipeService'
 import { FeedRecipe, SavedFilters } from '../../types/recipe'
 import { favoriteService } from '../../services/favoriteService'
 import { ActiveFilters } from '@/src/components/FilterModal'
+import { useTranslation } from 'react-i18next'
 
 let _search = ''
 let _filters: SavedFilters = { categories: [], dietaryRestrictions: [] }
@@ -15,6 +16,7 @@ export const feedStore = {
 }
 
 export function useFeed() {
+    const { t } = useTranslation()
     const [page, setPage] = useState(1)
     const [hasNextPage, setHasNextPage] = useState(true)
     const [loading, setLoading] = useState(false)
@@ -44,13 +46,13 @@ export function useFeed() {
             setHasNextPage(data.hasNextPage)
             setPage(pageToLoad)
         } catch {
-            Alert.alert('Erro', 'Não foi possível carregar o feed.')
+            Alert.alert(t('common.errorTitle'), t('recipeFeed.loadError'))
         } finally {
             loadingRef.current = false
             setLoading(false)
             setRefreshing(false)
         }
-    }, [])
+    }, [t])
 
     function handleSearch(text: string) {
         setSearch(text)
@@ -81,7 +83,7 @@ export function useFeed() {
             await favoriteService.toggle(id)
         } catch {
             setRecipes(prev => prev.map(r => r.id === id ? { ...r, favorite: !r.favorite } : r))
-            Alert.alert('Erro', 'Não foi possível salvar o favorito.')
+            Alert.alert(t('common.errorTitle'), t('recipeDetail.favoriteError'))
         }
     }
 

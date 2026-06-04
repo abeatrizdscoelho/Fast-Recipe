@@ -2,6 +2,7 @@ import React from 'react'
 import { View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
     value: string
@@ -11,13 +12,14 @@ type Props = {
 }
 
 export function CommentInput({ value, onChangeText, onSubmit, submitting }: Props) {
+    const { t } = useTranslation()
     const disabled = submitting || !value.trim()
 
     return (
         <View style={styles.commentInputBox}>
             <TextInput
                 style={styles.commentInput}
-                placeholder="Escreva um comentário..."
+                placeholder={t('commentInput.placeholder')}
                 placeholderTextColor="#bbb"
                 value={value}
                 onChangeText={onChangeText}

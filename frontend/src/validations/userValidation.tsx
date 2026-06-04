@@ -1,23 +1,26 @@
 import * as yup from 'yup';
+import i18next from 'i18next';
 
 export const editProfileValidation = yup.object({
-  name: yup.string().min(2, 'Nome deve ter pelo menos 2 caracteres').optional(),
-  email: yup.string().email('E-mail inválido').optional(),
-  password: yup
-    .string()
-    .min(6, 'Senha deve ter pelo menos 6 caracteres')
+  name: yup.string()
+    .min(2, () => i18next.t('auth.validation.nameMin'))
+    .optional(),
+  email: yup.string()
+    .email(() => i18next.t('auth.validation.emailInvalid'))
+    .optional(),
+  password: yup.string()
+    .min(6, () => i18next.t('auth.validation.passwordMin'))
     .optional()
     .transform(val => val === '' ? undefined : val),
-  confirmPassword: yup
-    .string()
+  confirmPassword: yup.string()
     .optional()
     .transform(val => val === '' ? undefined : val)
     .when('password', {
       is: (val: string) => val && val.length > 0,
       then: schema =>
         schema
-          .required('Confirmação de senha obrigatória')
-          .oneOf([yup.ref('password')], 'As senhas não coincidem'),
+          .required(() => i18next.t('auth.validation.confirmPasswordRequired'))
+          .oneOf([yup.ref('password')], () => i18next.t('auth.validation.passwordsMustMatch')),
     }),
   dietaryPreferences: yup.array().of(yup.string()).optional(),
 })

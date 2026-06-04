@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     portions: number
@@ -11,18 +12,19 @@ interface Props {
 }
 
 export function PortionSelector({ portions, originalPortions, onIncrement, onDecrement }: Props) {
+    const { t } = useTranslation()
     const isOriginal = portions === originalPortions
 
     return (
         <View style={styles.container}>
             <View style={styles.left}>
-                <Text style={styles.label}>Porções</Text>
+                <Text style={styles.label}>{t('recipePortionSelector.label')}</Text>
                 {isOriginal && (
-                    <Text style={styles.question}>Quantas porções você vai fazer?</Text>
+                    <Text style={styles.question}>{t('recipePortionSelector.question')}</Text>
                 )}
                 {!isOriginal && (
                     <Text style={styles.originalHint}>
-                        Receita original: {originalPortions}
+                        {t('portionSelector.originalHint', { count: originalPortions })}
                     </Text>
                 )}
             </View>

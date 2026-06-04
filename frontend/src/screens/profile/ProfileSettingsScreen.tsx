@@ -1,10 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Switch } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Switch, Alert } from 'react-native'
 import { Header } from '../../components/Header'
 import { BottomNav } from '../../components/BottomNav'
 import { colors } from '../../theme/color'
+import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/src/hooks/useLanguage'
 
 type SettingItemProps = {
   icon: keyof typeof Ionicons.glyphMap
@@ -52,8 +54,9 @@ function Divider() {
 }
 
 export default function ProfileSettingsScreen() {
+  const { t } = useTranslation()
+  const { currentLanguageLabel, handleLanguagePress } = useLanguage()
   const darkModeEnabled = false
-  const currentLanguage = 'Português'
 
   return (
     <View style={styles.container}>
@@ -64,37 +67,37 @@ export default function ProfileSettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.card}>
-          <Text style={styles.pageTitle}>Configurações</Text>
+          <Text style={styles.pageTitle}>{t('profileSettings.title')}</Text>
 
-          <SectionTitle label="Conta" />
+          <SectionTitle label={t('profileSettings.sectionAccount')} />
           <View style={styles.section}>
             <SettingItem
               icon="create-outline"
-              label="Editar Perfil"
+              label={t('profileSettings.editProfile')}
               onPress={() => router.push('/profile/edit')}
             />
           </View>
 
-          <SectionTitle label="Receitas" />
+          <SectionTitle label={t('profileSettings.sectionRecipes')} />
           <View style={styles.section}>
             <SettingItem
               icon="time-outline"
-              label="Histórico de Visualizações"
+              label={t('profileSettings.viewHistory')}
               onPress={() => router.push('/profile/history')}
             />
             <Divider />
             <SettingItem
               icon="bar-chart-outline"
-              label="Relatório de Estatísticas"
+              label={t('profileSettings.statsReport')}
               onPress={() => router.push('/profile/stats')}
             />
           </View>
 
-          <SectionTitle label="Preferências" />
+          <SectionTitle label={t('profileSettings.sectionPreferences')} />
           <View style={styles.section}>
             <SettingItem
               icon="moon-outline"
-              label="Modo Escuro"
+              label={t('profileSettings.darkMode')}
               right={
                 <Switch
                   value={darkModeEnabled}
@@ -107,14 +110,14 @@ export default function ProfileSettingsScreen() {
             <Divider />
             <SettingItem
               icon="language-outline"
-              label="Idioma"
+              label={t('profileSettings.language')}
               right={
                 <View style={styles.languageBadge}>
-                  <Text style={styles.languageBadgeText}>{currentLanguage}</Text>
+                  <Text style={styles.languageBadgeText}>{currentLanguageLabel}</Text>
                   <Ionicons name="chevron-forward" size={16} color={colors.primary} />
                 </View>
               }
-              onPress={() => {}} 
+              onPress={() => handleLanguagePress()} 
             />
           </View>
         </View>

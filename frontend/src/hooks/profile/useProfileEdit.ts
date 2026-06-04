@@ -6,12 +6,12 @@ import { ValidationError } from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { editProfileValidation } from '../../validations/userValidation';
 import { userService } from '../../services/userService';
-
-export const DIETARY_OPTIONS = [
-    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico'
-]
+import { useTranslation } from 'react-i18next';
+import { useAppConstants } from '../useAppConstants';
 
 export function useEditProfile() {
+    const { t } = useTranslation()
+    const { DIETARY_RESTRICTIONS } = useAppConstants()
     const { user, updateUser } = useAuth()
     const [name, setName] = useState(user?.name ?? '')
     const [email, setEmail] = useState(user?.email ?? '')
@@ -36,13 +36,13 @@ export function useEditProfile() {
         if (type === 'camera') {
             const { status } = await ImagePicker.requestCameraPermissionsAsync()
             if (status !== 'granted') {
-                Alert.alert('Permissão necessária', 'Permita o acesso à câmera nas configurações.')
+                Alert.alert(t('editProfile.permissionTitle'), t('editProfile.permissionCamera'))
                 return false
             }
         } else {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
             if (status !== 'granted') {
-                Alert.alert('Permissão necessária', 'Permita o acesso à galeria nas configurações.')
+                Alert.alert(t('editProfile.permissionTitle'), t('editProfile.permissionGallery'))
                 return false
             }
         }
@@ -54,7 +54,7 @@ export function useEditProfile() {
         if (!ok) return
         const result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true, 
+            allowsEditing: true,
             aspect: [1, 1],
             quality: 0.8,
         })
@@ -81,7 +81,11 @@ export function useEditProfile() {
         if (Platform.OS === 'ios') {
             ActionSheetIOS.showActionSheetWithOptions(
                 {
-                    options: ['Cancelar', 'Tirar foto', 'Escolher da galeria'],
+                    options: [
+                        t('common.cancel'),
+                        t('editProfile.avatarCamera'),
+                        t('editProfile.avatarGallery'),
+                    ],
                     cancelButtonIndex: 0,
                 },
                 (index) => {
@@ -90,10 +94,10 @@ export function useEditProfile() {
                 }
             )
         } else {
-            Alert.alert('Foto de Perfil', 'Escolha uma opção', [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Tirar foto', onPress: openCamera },
-                { text: 'Escolher da galeria', onPress: openGallery },
+            Alert.alert(t('editProfile.avatarTitle'), t('editProfile.avatarSubtitle'), [
+                { text: t('common.cancel'), style: 'cancel' },
+                { text: t('editProfile.avatarCamera'), onPress: openCamera },
+                { text: t('editProfile.avatarGallery'), onPress: openGallery },
             ])
         }
     }
@@ -110,7 +114,7 @@ export function useEditProfile() {
             const preferencesChanged = JSON.stringify(dietaryPreferences) !== JSON.stringify(user?.dietaryPreferences ?? [])
             const hasChanges = name !== user?.name || email !== user?.email || !!password || !!isNewAvatar || preferencesChanged
             if (!hasChanges) {
-                Alert.alert('Aviso', 'Nenhuma alteração foi feita.')
+                Alert.alert(t('editProfile.noChangesTitle'), t('editProfile.noChangesMessage'))
                 setLoading(false)
                 return
             }
@@ -128,7 +132,7 @@ export function useEditProfile() {
                 })() : undefined,
             })
             await updateUser(data.user)
-            Alert.alert('Sucesso', 'Perfil atualizado com sucesso!')
+            Alert.alert(t('common.successTitle'), t('editProfile.successMessage'))
             router.replace('/(tabs)/profile')
         } catch (err) {
             if (err instanceof ValidationError) {
@@ -141,7 +145,7 @@ export function useEditProfile() {
                 })
                 setErrors(fieldErrors)
             } else {
-                setApiError(err instanceof Error ? err.message : 'Não foi possível atualizar o perfil.')
+                setApiError(err instanceof Error ? err.message : t('editProfile.updateError'))
             }
         } finally {
             setLoading(false)
@@ -153,6 +157,7 @@ export function useEditProfile() {
         confirmPassword, setConfirmPassword, showPassword, setShowPassword,
         showConfirmPassword, setShowConfirmPassword, editingField, setEditingField,
         loading, avatarUri, setAvatarUri, dietaryPreferences, errors, apiError,
-        togglePreference, handlePickAvatar, handleSave
+        dietaryOptions: DIETARY_RESTRICTIONS,
+        togglePreference, handlePickAvatar, handleSave,
     }
 }

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { api } from './api'
 import { RecipeRatingDTO, ReviewResponseDTO, CommentResponseDTO, CommentsListDTO } from '../types/review'
+import i18next from 'i18next'
 
 export const reviewService = {
   async upsertReview(recipeId: string, rating: number): Promise<ReviewResponseDTO> {
@@ -9,9 +10,9 @@ export const reviewService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao registrar avaliação')
+        throw new Error(err.response?.data?.error ?? i18next.t('reviewService.upsertError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -21,9 +22,9 @@ export const reviewService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao buscar avaliação')
+        throw new Error(err.response?.data?.error ?? i18next.t('reviewService.fetchRatingError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -33,9 +34,9 @@ export const reviewService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao buscar comentários')
+        throw new Error(err.response?.data?.error ?? i18next.t('reviewService.fetchCommentsError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -45,21 +46,21 @@ export const reviewService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao criar comentário')
+        throw new Error(err.response?.data?.error ?? i18next.t('reviewService.createCommentError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
   async updateComment(commentId: string, text: string): Promise<CommentResponseDTO> {
     try {
-      const response = await api.put(`/recipes/comments/${commentId}`, { text }) 
+      const response = await api.put(`/recipes/comments/${commentId}`, { text })
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao editar comentário')
+        throw new Error(err.response?.data?.error ?? i18next.t('reviewService.updateCommentError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -68,9 +69,9 @@ export const reviewService = {
       await api.delete(`/recipes/comments/${commentId}`)
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao excluir comentário')
+        throw new Error(err.response?.data?.error ?? i18next.t('reviewService.deleteCommentError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 }

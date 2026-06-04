@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { NutritionInfo } from '@/src/types/nutrition'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   nutrition: NutritionInfo
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function NutritionCard({ nutrition, portions }: Props) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const portionCount = Math.max(1, Number(portions) || 1)
 
@@ -24,9 +26,9 @@ export function NutritionCard({ nutrition, portions }: Props) {
   }
 
   const macros = [
-    { label: 'Proteínas', value: perPortion.protein, unit: 'g', color: '#4A90D9' },
-    { label: 'Carboidratos', value: perPortion.carbs, unit: 'g', color: '#F5A623' },
-    { label: 'Gorduras', value: perPortion.fat, unit: 'g', color: '#E05C5C' },
+    { label: t('recipeNutritionCard.protein'), value: perPortion.protein, unit: 'g', color: '#4A90D9' },
+    { label: t('recipeNutritionCard.carbs'), value: perPortion.carbs, unit: 'g', color: '#F5A623' },
+    { label: t('recipeNutritionCard.fat'), value: perPortion.fat, unit: 'g', color: '#E05C5C' },
   ]
 
   // Barras de macro: % do total de macros (exclui calorias)
@@ -43,9 +45,9 @@ export function NutritionCard({ nutrition, portions }: Props) {
       >
         <View style={styles.headerLeft}>
           <Ionicons name="nutrition-outline" size={18} color={colors.primary} />
-          <Text style={styles.headerTitle}>Informação Nutricional</Text>
+          <Text style={styles.headerTitle}>{t('recipeNutritionCard.title')}</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>por porção</Text>
+            <Text style={styles.badgeText}>{t('recipeNutritionCard.perPortion')}</Text>
           </View>
         </View>
         <Ionicons
@@ -58,7 +60,7 @@ export function NutritionCard({ nutrition, portions }: Props) {
       <View style={styles.caloriesRow}>
         <Text style={styles.caloriesValue}>{perPortion.calories}</Text>
         <Text style={styles.caloriesLabel}>kcal</Text>
-        <Text style={styles.caloriesNote}>por porção · {portionCount} {portionCount === 1 ? 'porção' : 'porções'} na receita</Text>
+        <Text style={styles.caloriesNote}>{t('recipeNutritionCard.portionNote', { count: portionCount })}</Text>
       </View>
 
       <View style={styles.barsContainer}>
@@ -77,11 +79,11 @@ export function NutritionCard({ nutrition, portions }: Props) {
         <View style={styles.detailsContainer}>
           <View style={styles.dividerSmall} />
           <View style={styles.detailsGrid}>
-            <DetailRow label="Fibras" value={`${perPortion.fiber}g`} />
-            <DetailRow label="Sódio" value={`${perPortion.sodium}mg`} />
+            <DetailRow label={t('recipeNutritionCard.fiber')} value={`${perPortion.fiber}g`} />
+            <DetailRow label={t('recipeNutritionCard.sodium')} value={`${perPortion.sodium}mg`} />
           </View>
           <Text style={styles.disclaimer}>
-            * Valores aproximados calculados com base nos ingredientes via USDA FoodData Central.
+            {t('recipeNutritionCard.disclaimer')}
           </Text>
         </View>
       )}

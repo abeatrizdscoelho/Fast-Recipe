@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { colors } from '@/src/theme/color'
 import { StarRow } from './StarRow'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
     average: number
@@ -10,6 +11,7 @@ type Props = {
 
 export function RatingAverage({ average, count }: Props) {
     if (count === 0) return null
+    const { t } = useTranslation()
 
     return (
         <View style={styles.ratingAverage}>
@@ -19,7 +21,7 @@ export function RatingAverage({ average, count }: Props) {
             <View style={{ gap: 2 }}>
                 <StarRow rating={Math.round(average)} size={20} />
                 <Text style={styles.ratingAverageCount}>
-                    {count} {count === 1 ? 'avaliação' : 'avaliações'}
+                    {t('ratingAverage.count', { count })}
                 </Text>
             </View>
         </View>

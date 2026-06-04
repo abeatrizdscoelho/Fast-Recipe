@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import * as Notifications from 'expo-notifications'
+import { useTranslation } from 'react-i18next'
 
 interface NotificationPermissionsResult {
   granted: boolean
@@ -44,6 +45,7 @@ async function requestNotificationPermission(): Promise<boolean> {
 }
 
 export function useRecipeTimer(recipeTime: string, recipeTitle: string) {
+  const { t } = useTranslation()
   const totalSeconds = parseTimeToSeconds(recipeTime)
 
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds)
@@ -68,19 +70,19 @@ export function useRecipeTimer(recipeTime: string, recipeTitle: string) {
     }
 
     const id = await Notifications.scheduleNotificationAsync({
-        content: {
-            title: '⏱ Timer finalizado!',
-            body: `A receita "${recipeTitle}" está pronta!`,
-            sound: true,
-        },
-        trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,  
-            seconds,
-            channelId: 'timer',
-        },
+      content: {
+        title: t('recipeTimer.notificationTitle'),
+        body: t('recipeTimer.notificationBody', { title: recipeTitle }),
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds,
+        channelId: 'timer',
+      },
     })
     notificationIdRef.current = id
-  }, [recipeTitle])
+  }, [recipeTitle, t])
 
   const cancelNotification = useCallback(async () => {
     if (notificationIdRef.current) {
@@ -139,8 +141,8 @@ export function useRecipeTimer(recipeTime: string, recipeTitle: string) {
   const progress = totalSeconds > 0 ? secondsLeft / totalSeconds : 0
 
   return {
-    formatted,     
-    progress, 
+    formatted,
+    progress,
     secondsLeft,
     isRunning,
     isFinished,

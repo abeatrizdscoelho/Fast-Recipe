@@ -2,11 +2,14 @@ import React from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
+
+type Option = string | { key: string; label: string }
 
 type Props = {
     value: string
     placeholder?: string
-    options: readonly string[]
+    options: readonly Option[]
     open: boolean
     onToggle: () => void
     onSelect: (value: string) => void
@@ -14,16 +17,15 @@ type Props = {
     maxHeight?: number
 }
 
-export function SelectDropdown({
-    value,
-    placeholder = 'Selecione uma opção',
-    options,
-    open,
-    onToggle,
-    onSelect,
-    error,
-    maxHeight = 180,
-}: Props) {
+export function SelectDropdown({ value, placeholder, options, open, onToggle, onSelect, error, maxHeight = 180 }: Props) {
+    const { t } = useTranslation()
+    const resolvedPlaceholder = placeholder || t('components.selectDropdown.placeholder')
+
+    const normalize = (opt: Option) =>
+        typeof opt === 'string' ? { key: opt, label: opt } : opt
+
+    const selectedLabel = options.map(normalize).find(o => o.key === value)?.label ?? value
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -31,38 +33,39 @@ export function SelectDropdown({
                 onPress={onToggle}
             >
                 <Text style={[styles.selectText, !value && styles.placeholder]}>
-                    {value || placeholder}
+                    {value ? selectedLabel : resolvedPlaceholder}
                 </Text>
-                <Ionicons
-                    name={open ? 'chevron-up' : 'chevron-down'}
-                    size={16}
-                    color="#aaa"
-                />
+                <Ionicons 
+                    name={open ? 'chevron-up' : 'chevron-down'} 
+                    size={16} 
+                    color="#aaa" 
+                    />
             </TouchableOpacity>
 
             {open && (
                 <View style={styles.dropdownWrapper}>
                     <View style={styles.dropdown}>
                         <ScrollView nestedScrollEnabled style={{ maxHeight }}>
-                            {options.map(opt => (
-                                <TouchableOpacity
-                                    key={opt}
-                                    style={[
-                                        styles.dropdownItem,
-                                        value === opt && styles.dropdownItemActive,
-                                    ]}
-                                    onPress={() => onSelect(opt)}
-                                >
-                                    <Text
+                            {options.map(opt => {
+                                const { key, label } = normalize(opt)  
+                                return (
+                                    <TouchableOpacity
+                                        key={key}
                                         style={[
-                                            styles.dropdownText,
-                                            value === opt && styles.dropdownTextActive,
+                                            styles.dropdownItem,
+                                            value === key && styles.dropdownItemActive, 
                                         ]}
+                                        onPress={() => onSelect(key)}  
                                     >
-                                        {opt}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
+                                        <Text style={[
+                                            styles.dropdownText,
+                                            value === key && styles.dropdownTextActive,  
+                                        ]}>
+                                            {label}  
+                                        </Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
                         </ScrollView>
                     </View>
                 </View>

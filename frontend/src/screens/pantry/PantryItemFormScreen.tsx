@@ -9,8 +9,10 @@ import FieldError from '@/src/components/FieldError'
 import { usePantryItemForm } from '@/src/hooks/pantry/usePantryItemForm'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
+import { useTranslation } from 'react-i18next'
 
 export default function PantryItemFormScreen() {
+    const { t } = useTranslation()
     const {
         isEdit,
         name, setName,
@@ -39,7 +41,7 @@ export default function PantryItemFormScreen() {
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardTitle}>
-                            {isEdit ? 'Editar ingrediente' : 'Adicionar ingrediente'}
+                            {isEdit ? t('pantryForm.titleEdit') : t('pantryForm.titleAdd')}
                         </Text>
                         <TouchableOpacity
                             onPress={() => router.back()}
@@ -50,12 +52,12 @@ export default function PantryItemFormScreen() {
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.label}>Nome do ingrediente</Text>
+                    <Text style={styles.label}>{t('pantryForm.labelName')}</Text>
                     <TextInput
                         style={[styles.input, errors.name ? styles.inputError : null]}
                         value={name}
                         onChangeText={setName}
-                        placeholder="Ex: Tomate"
+                        placeholder={t('pantryForm.placeholderName')}
                         placeholderTextColor="#aaa"
                         autoCapitalize="sentences"
                         onFocus={() => setUnitOpen(false)}
@@ -64,12 +66,12 @@ export default function PantryItemFormScreen() {
 
                     <View style={styles.row}>
                         <View style={styles.rowItem}>
-                            <Text style={styles.label}>Quantidade</Text>
+                            <Text style={styles.label}>{t('pantryForm.labelQuantity')}</Text>
                             <TextInput
                                 style={[styles.input, errors.quantity ? styles.inputError : null]}
                                 value={quantity}
                                 onChangeText={setQuantity}
-                                placeholder="Ex: 3"
+                                placeholder={t('pantryForm.placeholderQuantity')}
                                 keyboardType="decimal-pad"
                                 placeholderTextColor="#aaa"
                                 onFocus={() => setUnitOpen(false)}
@@ -77,10 +79,10 @@ export default function PantryItemFormScreen() {
                             <FieldError message={errors.quantity} />
                         </View>
                         <View style={styles.rowItem}>
-                            <Text style={styles.label}>Unidade</Text>
+                            <Text style={styles.label}>{t('pantryForm.labelUnit')}</Text>
                             <SelectDropdown
                                 value={unit}
-                                placeholder="Selecione"
+                                placeholder={t('pantryForm.placeholderUnit')}
                                 options={allUnits}
                                 open={unitOpen}
                                 onToggle={() => setUnitOpen(p => !p)}
@@ -90,7 +92,7 @@ export default function PantryItemFormScreen() {
                         </View>
                     </View>
 
-                    <Text style={styles.label}>Categoria</Text>
+                    <Text style={styles.label}>{t('pantryForm.labelCategory')}</Text>
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -99,25 +101,25 @@ export default function PantryItemFormScreen() {
                     >
                         {allCategories.map(cat => (
                             <TouchableOpacity
-                                key={cat}
-                                style={[styles.chip, category === cat && styles.chipActive]}
-                                onPress={() => { setCategory(cat); setUnitOpen(false) }}
+                                key={cat.key}
+                                style={[styles.chip, category === cat.key && styles.chipActive]}
+                                onPress={() => { setCategory(cat.key); setUnitOpen(false) }}
                             >
-                                <Text style={[styles.chipText, category === cat && styles.chipTextActive]}>
-                                    {cat}
+                                <Text style={[styles.chipText, category === cat.key && styles.chipTextActive]}>
+                                    {cat.label}
                                 </Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
 
                     <Text style={styles.label}>
-                        Data de validade <Text style={styles.labelOptional}>(opcional)</Text>
+                        {t('pantryForm.labelExpiry')} <Text style={styles.labelOptional}>{t('pantryForm.labelOptional')}</Text>
                     </Text>
                     <TextInput
                         style={[styles.input, errors.expiresAt ? styles.inputError : null]}
                         value={expiresAt}
                         onChangeText={handleExpiresAtChange}
-                        placeholder="DD/MM/AAAA"
+                        placeholder={t('pantryForm.placeholderExpiry')}
                         placeholderTextColor="#aaa"
                         keyboardType="numeric"
                         maxLength={10}
@@ -131,7 +133,7 @@ export default function PantryItemFormScreen() {
                         disabled={loading}
                     >
                         <Text style={styles.saveBtnText}>
-                            {loading ? 'Salvando...' : isEdit ? 'Salvar alterações' : 'Adicionar à despensa'}
+                            {loading ? t('pantryForm.saving') : isEdit ? t('pantryForm.saveEdit') : t('pantryForm.saveAdd')}
                         </Text>
                     </TouchableOpacity>
                 </View>

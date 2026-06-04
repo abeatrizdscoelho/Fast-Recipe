@@ -3,8 +3,10 @@ import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import { RecipeFormData } from '../../types/recipe';
 import { recipeService } from '../../services/recipeService';
+import { useTranslation } from 'react-i18next';
 
 export function useEditRecipe(id: string) {
+  const { t } = useTranslation()
   const [initialData, setInitialData] = useState<Partial<RecipeFormData> | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -26,7 +28,7 @@ export function useEditRecipe(id: string) {
           photos: data.recipe.photos ?? (data.recipe.photos ? [data.recipe.photos] : []),
         })
       } catch (err) {
-        Alert.alert('Erro', 'Não foi possível carregar a receita.')
+        Alert.alert(t('common.errorTitle'), t('recipeDetail.loadError'))
         router.replace('/(tabs)/profile')
       } finally {
         setFetching(false)
@@ -39,11 +41,11 @@ export function useEditRecipe(id: string) {
     try {
       setLoading(true)
       await recipeService.update(id, data)
-      Alert.alert('Sucesso!', 'Receita atualizada com sucesso.', [
-        { text: 'OK', onPress: () => router.replace('/(tabs)/profile') },
+      Alert.alert(t('common.successTitle'), t('recipeForm.updateSuccess'), [
+        { text: t('common.ok'), onPress: () => router.replace('/(tabs)/profile') },
       ])
     } catch (err) {
-      Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível atualizar a receita.')
+      Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('recipeForm.updateError'))
     } finally {
       setLoading(false)
     }

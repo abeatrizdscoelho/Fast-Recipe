@@ -10,8 +10,10 @@ import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
 import { PantrySuggestionCard } from './components/PantrySuggestionCard'
 import { usePantrySuggestions } from '@/src/hooks/pantry/usePantrySuggestions'
+import { useTranslation } from 'react-i18next'
 
 export default function PantrySuggestionsScreen() {
+    const { t } = useTranslation()
     const {
         suggestions,
         loading,
@@ -31,10 +33,8 @@ export default function PantrySuggestionsScreen() {
                     <Ionicons name="chevron-back" size={22} color="#fff" />
                 </TouchableOpacity>
                 <View style={styles.headerText}>
-                    <Text style={styles.headerTitle}>Receitas Sugeridas</Text>
-                    <Text style={styles.headerSub}>
-                        Baseadas nos ingredientes da sua despensa!
-                    </Text>
+                    <Text style={styles.headerTitle}>{t('pantrySuggestions.title')}</Text>
+                    <Text style={styles.headerSub}>{t('pantrySuggestions.subtitle')}</Text>
                 </View>
             </View>
 
@@ -52,9 +52,7 @@ export default function PantrySuggestionsScreen() {
                     ListEmptyComponent={
                         <View style={styles.empty}>
                             <Ionicons name="search-outline" size={48} color="rgba(255,255,255,0.2)" />
-                            <Text style={styles.emptyText}>
-                                Nenhuma receita encontrada com os ingredientes da sua despensa.
-                            </Text>
+                            <Text style={styles.emptyText}>{t('pantrySuggestions.empty')}</Text>
                         </View>
                     }
                 />

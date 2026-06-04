@@ -2,8 +2,9 @@ import React from 'react'
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { FilledSlot, EmptySlot } from './RecipeSlot'
-import { MEAL_TYPE_LABELS, MealPlanEntry, MealType } from '@/src/types/mealPlan'
+import { MealPlanEntry, MealType } from '@/src/types/mealPlan'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 const MEAL_ICONS: Record<MealType, keyof typeof Ionicons.glyphMap> = {
     breakfast: 'sunny-outline',
@@ -23,6 +24,7 @@ interface Props {
 const MAX_SLOTS = 3
 
 export function MealSection({ mealType, entries, onAdd, onRemove, onReplace, onToggleCompleted }: Props) {
+    const { t } = useTranslation()
     const emptyCount = Math.max(0, MAX_SLOTS - entries.length)
     const allCompleted = entries.length > 0 && entries.every(e => e.completed)
 
@@ -30,7 +32,7 @@ export function MealSection({ mealType, entries, onAdd, onRemove, onReplace, onT
         <View style={styles.section}>
             <View style={styles.labelCol}>
                 <Ionicons name={MEAL_ICONS[mealType]} size={26} color={colors.primary} />
-                <Text style={styles.mealLabel}>{MEAL_TYPE_LABELS[mealType]}</Text>
+                <Text style={styles.mealLabel}>{t(`mealTypes.${mealType}`)}</Text>
 
                 {entries.length > 0 && (
                     <TouchableOpacity

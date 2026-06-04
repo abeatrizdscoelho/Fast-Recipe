@@ -9,15 +9,17 @@ import EyeIcon from '../../components/icons/EyeIcon';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
 import { colors } from '../../theme/color';
-import { DIETARY_OPTIONS, useEditProfile } from '../../hooks/profile/useProfileEdit';
+import { useEditProfile } from '../../hooks/profile/useProfileEdit';
+import { useTranslation } from 'react-i18next';
 
 export default function EditProfileScreen() {
+    const { t } = useTranslation()
     const {
         user, name, setName, email, setEmail, password, setPassword,
         confirmPassword, setConfirmPassword, showPassword, setShowPassword,
         showConfirmPassword, setShowConfirmPassword, editingField, setEditingField,
         loading, avatarUri, dietaryPreferences, errors, apiError,
-        togglePreference, handlePickAvatar, handleSave
+        togglePreference, handlePickAvatar, handleSave, dietaryOptions
     } = useEditProfile()
 
     return (
@@ -34,7 +36,7 @@ export default function EditProfileScreen() {
             >
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
-                        <Text style={styles.title}>{user?.name ?? 'Usuário'}</Text>
+                        <Text style={styles.title}>{user?.name ?? t('editProfile.fallbackName')}</Text>
                         <TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} style={styles.backBtn}>
                             <Ionicons name="arrow-undo-outline" size={22} color={colors.primary} />
                         </TouchableOpacity>
@@ -57,7 +59,7 @@ export default function EditProfileScreen() {
                     </TouchableOpacity>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Nome</Text>
+                        <Text style={styles.label}>{t('editProfile.labelName')}</Text>
                         <View style={styles.inputRow}>
                             <TextInput
                                 value={name}
@@ -84,7 +86,7 @@ export default function EditProfileScreen() {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Email</Text>
+                        <Text style={styles.label}>{t('editProfile.labelEmail')}</Text>
                         <View style={styles.inputRow}>
                             <TextInput
                                 value={email}
@@ -112,7 +114,7 @@ export default function EditProfileScreen() {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Senha</Text>
+                        <Text style={styles.label}>{t('editProfile.labelPassword')}</Text>
                         <View style={styles.inputRow}>
                             <TextInput
                                 value={password}
@@ -147,7 +149,7 @@ export default function EditProfileScreen() {
 
                     {editingField === 'password' && (
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Confirmar Senha</Text>
+                            <Text style={styles.label}>{t('editProfile.labelConfirmPassword')}</Text>
                             <View style={styles.inputRow}>
                                 <TextInput
                                     value={confirmPassword}
@@ -166,22 +168,20 @@ export default function EditProfileScreen() {
                     )}
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Preferências Alimentares</Text>
-                        <Text style={styles.labelHint}>Toque para selecionar ou remover</Text>
+                        <Text style={styles.label}>{t('editProfile.labelDietary')}</Text>
+                        <Text style={styles.labelHint}>{t('editProfile.dietaryHint')}</Text>
                         <View style={styles.chipsContainer}>
-                            {DIETARY_OPTIONS.map(pref => {
-                                const isSelected = dietaryPreferences.includes(pref)
+                            {dietaryOptions.map((pref: { key: string; label: string }) => {
+                                const isSelected = dietaryPreferences.includes(pref.key)
                                 return (
                                     <TouchableOpacity
-                                        key={pref}
+                                        key={pref.key}
                                         style={[styles.chip, isSelected && styles.chipActive]}
-                                        onPress={() => togglePreference(pref)}
+                                        onPress={() => togglePreference(pref.key)}
                                     >
-                                        {isSelected && (
-                                            <Ionicons name="checkmark" size={13} color={colors.white} />
-                                        )}
+                                        {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
                                         <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                                            {pref}
+                                            {pref.label}
                                         </Text>
                                     </TouchableOpacity>
                                 )
@@ -196,7 +196,9 @@ export default function EditProfileScreen() {
                         onPress={handleSave}
                         disabled={loading}
                     >
-                        <Text style={styles.buttonText}>{loading ? 'SALVANDO...' : 'SALVAR'}</Text>
+                        <Text style={styles.buttonText}>
+                            {loading ? t('editProfile.saving') : t('editProfile.save')}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAwareScrollView>

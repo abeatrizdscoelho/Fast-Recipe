@@ -13,8 +13,10 @@ import { CategorySection } from './components/CategorySection'
 import { SearchBar } from '@/src/components/SearchBar'
 import { router } from 'expo-router'
 import { formatWeekRange } from '@/src/utils/formatWeekUtil'
+import { useTranslation } from 'react-i18next'
 
 export default function ShoppingListScreen() {
+    const { t } = useTranslation()
     const {
         shoppingList,
         loading, refreshing, onRefresh,
@@ -39,17 +41,17 @@ export default function ShoppingListScreen() {
 
             <View style={styles.header}>
                 <View>
-                    <Text style={styles.headerTitle}>Lista de Compras</Text>
-                    <Text style={styles.headerSub}>Gerada automaticamente do seu planejamento!</Text>
+                    <Text style={styles.headerTitle}>{t('shoppingListScreen.title')}</Text>
+                    <Text style={styles.headerSub}>{t('shoppingListScreen.subtitle')}</Text>
                     {shoppingList?.weekStart && (
                         <Text style={styles.headerWeek}>
-                            Semana: {formatWeekRange(shoppingList.weekStart)}
+                            {t('shoppingListScreen.weekPrefix')} {formatWeekRange(shoppingList.weekStart)}
                         </Text>
                     )}
                 </View>
                 <TouchableOpacity style={styles.refreshBadge} onPress={onRefresh}>
                     <Ionicons name="refresh-outline" size={14} color={colors.white} />
-                    <Text style={styles.refreshText}>Atualizar</Text>
+                    <Text style={styles.refreshText}>{t('shoppingListScreen.refreshAction')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -71,7 +73,7 @@ export default function ShoppingListScreen() {
                                 <SearchBar
                                     value={search}
                                     onChangeText={setSearch}
-                                    placeholder="Buscar ingrediente..."
+                                    placeholder={t('shoppingListScreen.searchPlaceholder')}
                                 />
                             </View>
                         )}
@@ -96,13 +98,13 @@ export default function ShoppingListScreen() {
                                 <View style={styles.emptyIllustration}>
                                     <Ionicons name="cart-outline" size={64} color={colors.primary} style={{ opacity: 0.35 }} />
                                 </View>
-                                <Text style={styles.emptyTitle}>Sua lista de compras{'\n'}está vazia</Text>
+                                <Text style={styles.emptyTitle}>{t('shoppingListScreen.emptyTitle')}</Text>
                                 <Text style={styles.emptySubText}>
-                                    {message ?? 'Adicione receitas ao seu planejamento\nsemanal para gerar sua lista\nautomaticamente.'}
+                                    {message ?? t('shoppingListScreen.emptyDefaultMessage')}
                                 </Text>
                                 <TouchableOpacity style={styles.emptyBtn} onPress={() => router.push('/planning')}>
                                     <Ionicons name="calendar-outline" size={16} color={colors.white} />
-                                    <Text style={styles.emptyBtnText}>Ir para o Planejamento Semanal</Text>
+                                    <Text style={styles.emptyBtnText}>{t('shoppingListScreen.emptyAction')}</Text>
                                 </TouchableOpacity>
                             </View>
                         )}

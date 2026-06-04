@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { api } from './api';
+import i18next from 'i18next';
 
 export const authService = {
   async register(name: string, email: string, password: string) {
@@ -8,9 +9,9 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao cadastrar')
+        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.registerError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -20,9 +21,9 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao fazer login')
+        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.loginError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -32,9 +33,9 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao enviar e-mail')
+        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.sendEmailError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -44,9 +45,9 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao redefinir senha')
+        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.resetPasswordError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 }

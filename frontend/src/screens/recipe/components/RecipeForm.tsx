@@ -4,14 +4,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image 
 import { Ionicons } from '@expo/vector-icons'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { RecipeFormData } from '@/src/types/recipe'
-import {
-    CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES,
-    INGREDIENT_CATEGORIES, INGREDIENT_UNITS,
-    useRecipeForm,
-} from '@/src/hooks/recipe/useRecipeForm'
 import { colors } from '@/src/theme/color'
 import FieldError from '@/src/components/FieldError'
 import { SelectDropdown } from '@/src/components/SelectDropdown'
+import { useTranslation } from 'react-i18next'
+import { useRecipeForm } from '@/src/hooks/recipe/useRecipeForm'
 
 type Props = {
     initialData?: Partial<RecipeFormData>
@@ -21,6 +18,7 @@ type Props = {
 }
 
 export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Receita', loading = false }: Props) {
+    const { t } = useTranslation()
     const {
         title, setTitle, time, setTime,
         ingredients, ingredientInput, setIngredientInput, ingredientError,
@@ -30,7 +28,8 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
         difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
         description, setDescription, photos, errors, apiError,
         handlePhotoPress, removePhoto, addIngredient, removeIngredient, handleSubmit,
-        unitOpen, setUnitOpen, catIngOpen, setCatIngOpen, closeAllDropdowns
+        unitOpen, setUnitOpen, catIngOpen, setCatIngOpen, 
+        CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES, INGREDIENT_CATEGORIES, INGREDIENT_UNITS,    
     } = useRecipeForm({ initialData, onSubmit })
 
     return (
@@ -42,20 +41,20 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
         >
             <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle}>Cadastro de Receita</Text>
+                    <Text style={styles.cardTitle}>{t('recipeForm.title')}</Text>
                     <TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} style={styles.backBtn}>
                         <Ionicons name="arrow-undo-outline" size={22} color={colors.primary} />
                     </TouchableOpacity>
                 </View>
 
-                <Text style={styles.label}>Fotos da Receita <Text style={styles.labelHint}>(máx. 5)</Text></Text>
+                <Text style={styles.label}>{t('recipeForm.photosLabel')} <Text style={styles.labelHint}>{t('recipeForm.photosMax')}</Text></Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photosRow}>
                     {photos.map((uri, index) => (
                         <View key={index} style={styles.photoThumb}>
                             <Image source={{ uri }} style={styles.photoThumbImage} />
                             {index === 0 && (
                                 <View style={styles.photoBadge}>
-                                    <Text style={styles.photoBadgeText}>Capa</Text>
+                                    <Text style={styles.photoBadgeText}>{t('recipeForm.coverBadge')}</Text>
                                 </View>
                             )}
                             <TouchableOpacity style={styles.photoRemove} onPress={() => removePhoto(index)}>
@@ -67,28 +66,28 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                         <TouchableOpacity style={styles.photoAddBtn} onPress={handlePhotoPress}>
                             <Ionicons name="camera-outline" size={28} color="rgba(0,0,0,0.3)" />
                             <Text style={styles.photoText}>
-                                {photos.length === 0 ? 'Adicionar foto' : 'Adicionar mais'}
+                                {photos.length === 0 ? t('recipeForm.addPhoto') : t('recipeForm.addMorePhotos')}
                             </Text>
                         </TouchableOpacity>
                     )}
                 </ScrollView>
                 <FieldError message={errors.photos} />
 
-                <Text style={styles.label}>Título</Text>
+                <Text style={styles.label}>{t('recipeForm.titleLabel')}</Text>
                 <TextInput
                     style={[styles.input, errors.title ? styles.inputError : null]}
-                    placeholder="Digite o título da receita"
+                    placeholder={t('recipeForm.titlePlaceholder')}
                     placeholderTextColor="#aaa"
                     value={title}
                     onChangeText={setTitle}
                 />
                 <FieldError message={errors.title} />
 
-                <Text style={styles.label}>Ingredientes</Text>
+                <Text style={styles.label}>{t('recipeForm.ingredientsLabel')}</Text>
                 <View style={styles.ingredientForm}>
                     <TextInput
                         style={[styles.input, ingredientError ? styles.inputError : null]}
-                        placeholder="Nome do ingrediente"
+                        placeholder={t('recipeForm.ingredientNamePlaceholder')}
                         placeholderTextColor="#aaa"
                         value={ingredientInput.name}
                         onChangeText={v => setIngredientInput(prev => ({ ...prev, name: v }))}
@@ -98,7 +97,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     <View style={styles.ingredientRow}>
                         <TextInput
                             style={[styles.input, styles.inputQty, ingredientError ? styles.inputError : null]}
-                            placeholder="Qtd."
+                            placeholder={t('recipeForm.ingredientQtyPlaceholder')}
                             placeholderTextColor="#aaa"
                             value={ingredientInput.quantity}
                             onChangeText={v => setIngredientInput(prev => ({ ...prev, quantity: v }))}
@@ -108,7 +107,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                         <View style={styles.selectUnit}>
                             <SelectDropdown
                                 value={ingredientInput.unit}
-                                placeholder="Selecione a unidade"
+                                placeholder={t('recipeForm.ingredientUnitPlaceholder')}
                                 options={INGREDIENT_UNITS}
                                 open={unitOpen}
                                 onToggle={() => { setUnitOpen(p => !p); setCatIngOpen(false) }}
@@ -120,7 +119,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
 
                     <SelectDropdown
                         value={ingredientInput.category}
-                        placeholder="Categoria do ingrediente"
+                        placeholder={t('recipeForm.ingredientCategoryPlaceholder')}
                         options={INGREDIENT_CATEGORIES}
                         open={catIngOpen}
                         onToggle={() => { setCatIngOpen(p => !p); setUnitOpen(false) }}
@@ -145,13 +144,13 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
 
                 <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
                     <Ionicons name="add" size={18} color={colors.white} />
-                    <Text style={styles.addButtonText}>Adicionar Ingrediente</Text>
+                    <Text style={styles.addButtonText}>{t('recipeForm.addIngredientBtn')}</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.label}>Modo de Preparo</Text>
+                <Text style={styles.label}>{t('recipeForm.preparationLabel')}</Text>
                 <TextInput
                     style={[styles.input, styles.textArea, errors.preparation ? styles.inputError : null]}
-                    placeholder="Descreva a etapa de preparo..."
+                    placeholder={t('recipeForm.preparationPlaceholder')}
                     placeholderTextColor="#aaa"
                     value={preparation}
                     onChangeText={setPreparation}
@@ -159,28 +158,28 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 />
                 <FieldError message={errors.preparation} />
 
-                <Text style={styles.label}>Tempo de Preparo</Text>
+                <Text style={styles.label}>{t('recipeForm.timeLabel')}</Text>
                 <TextInput
                     style={[styles.input, errors.time ? styles.inputError : null]}
-                    placeholder="Ex: 45min"
+                    placeholder={t('recipeForm.timePlaceholder')}
                     placeholderTextColor="#aaa"
                     value={time} onChangeText={setTime} keyboardType="numeric"
                 />
                 <FieldError message={errors.time} />
 
-                <Text style={styles.label}>Porções</Text>
+                <Text style={styles.label}>{t('recipeForm.portionsLabel')}</Text>
                 <TextInput
                     style={[styles.input, errors.portions ? styles.inputError : null]}
-                    placeholder="Ex: 4 porções"
+                    placeholder={t('recipeForm.portionsPlaceholder')}
                     placeholderTextColor="#aaa"
                     value={portions} onChangeText={setPortions} keyboardType="numeric"
                 />
                 <FieldError message={errors.portions} />
 
-                <Text style={styles.label}>Categoria</Text>
+                <Text style={styles.label}>{t('recipeForm.categoryLabel')}</Text>
                 <SelectDropdown
                     value={category}
-                    placeholder="Selecione uma categoria"
+                    placeholder={t('recipeForm.categoryPlaceholder')}
                     options={CATEGORIES}
                     open={categoryOpen}
                     onToggle={() => { setCategoryOpen(p => !p)}}
@@ -189,10 +188,10 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 />
                 <FieldError message={errors.category} />
 
-                <Text style={styles.label}>Dificuldade</Text>
+                <Text style={styles.label}>{t('recipeForm.difficultyLabel')}</Text>
                 <SelectDropdown
                     value={difficulty}
-                    placeholder="Selecione a dificuldade"
+                    placeholder={t('recipeForm.difficultyPlaceholder')}
                     options={DIFFICULTIES}
                     open={difficultyOpen}
                     onToggle={() => setDifficultyOpen(p => !p)}
@@ -202,29 +201,29 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 <FieldError message={errors.difficulty} />
 
                 <Text style={styles.label}>
-                    Restrições Alimentares <Text style={styles.labelHint}>(opcional)</Text>
+                    {t('recipeForm.dietaryLabel')} <Text style={styles.labelHint}>{t('recipeForm.optional')}</Text>
                 </Text>
-                <Text style={styles.dietaryHint}>Toque para selecionar ou remover</Text>
+                <Text style={styles.dietaryHint}>{t('recipeForm.dietaryHint')}</Text>
                 <View style={styles.chipsContainer}>
                     {DIETARY_RESTRICTIONS.map(opt => {
-                        const isSelected = dietaryRestrictions.includes(opt)
+                        const isSelected = dietaryRestrictions.includes(opt.key)
                         return (
                             <TouchableOpacity
-                                key={opt}
+                                key={opt.key}
                                 style={[styles.chip, isSelected && styles.chipActive]}
-                                onPress={() => toggleDietaryRestrictions(opt)}
+                                onPress={() => toggleDietaryRestrictions(opt.key)}
                             >
                                 {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
-                                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>{opt}</Text>
+                                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>{opt.label}</Text>
                             </TouchableOpacity>
                         )
                     })}
                 </View>
 
-                <Text style={styles.label}>Descrição</Text>
+                <Text style={styles.label}>{t('recipeForm.descriptionLabel')}</Text>
                 <TextInput
                     style={[styles.input, styles.textArea, errors.description ? styles.inputError : null]}
-                    placeholder="Uma breve descrição da receita..."
+                    placeholder={t('recipeForm.descriptionPlaceholder')}
                     placeholderTextColor="#aaa"
                     value={description} onChangeText={setDescription}
                     multiline numberOfLines={3} textAlignVertical="top"
@@ -238,7 +237,9 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                     onPress={handleSubmit}
                     disabled={loading}
                 >
-                    <Text style={styles.submitText}>{loading ? 'PUBLICANDO...' : submitLabel}</Text>
+                    <Text style={styles.submitText}>
+                        {loading ? t('recipeForm.submitting') : (submitLabel || t('recipeForm.title'))}
+                    </Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAwareScrollView>

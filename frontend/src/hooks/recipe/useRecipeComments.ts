@@ -3,8 +3,10 @@ import { Alert } from 'react-native'
 import { CommentDTO } from '@/src/types/review'
 import { reviewService } from '@/src/services/reviewService'
 import { reportService } from '@/src/services/reportService'
+import { useTranslation } from 'react-i18next'
 
 export function useRecipeComments(id: string) {
+    const { t } = useTranslation()
     const [comments, setComments] = useState<CommentDTO[]>([])
     const [commentText, setCommentText] = useState('')
     const [submittingComment, setSubmittingComment] = useState(false)
@@ -20,7 +22,7 @@ export function useRecipeComments(id: string) {
                 const commentsData = await reviewService.getComments(id)
                 setComments(commentsData.comments)
             } catch {
-                Alert.alert('Erro', 'Não foi possível carregar os comentários.')
+                Alert.alert(t('common.errorTitle'), t('recipeComments.loadError'))
             } finally {
                 setLoading(false)
             }
@@ -37,11 +39,11 @@ export function useRecipeComments(id: string) {
             setComments(prev => [result.comment, ...prev])
             setCommentText('')
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível enviar o comentário.')
+            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('recipeComments.submitError'))
         } finally {
             setSubmittingComment(false)
         }
-    }, [id, commentText, submittingComment])
+    }, [id, commentText, submittingComment, t])
 
     const startEditComment = useCallback((comment: CommentDTO) => {
         setEditingCommentId(comment.id)
@@ -63,41 +65,41 @@ export function useRecipeComments(id: string) {
             setEditingCommentId(null)
             setEditingText('')
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível editar o comentário.')
+            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('recipeComments.editError'))
         }
-    }, [editingCommentId, editingText])
+    }, [editingCommentId, editingText, t])
 
     const confirmDeleteComment = useCallback((commentId: string) => {
         Alert.alert(
-            'Excluir comentário',
-            'Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita.',
+            t('recipeComments.deleteTitle'),
+            t('recipeComments.deleteMessage'),
             [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Excluir', style: 'destructive',
+                { text: t('common.cancel'), style: 'cancel' },
+                { text: t('recipeComments.deleteAction'), style: 'destructive',
                     onPress: async () => {
                         try {
                             await reviewService.deleteComment(commentId)
                             setComments(prev => prev.filter(c => c.id !== commentId))
                         } catch (err) {
-                            Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível excluir o comentário.')
+                            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('recipeComments.deleteError'))
                         }
                     },
                 },
             ]
         )
-    }, [])
+    }, [t])
 
     const confirmReport = useCallback(async () => {
         if (!reportingCommentId) return
         try {
             await reportService.reportComment(reportingCommentId)
-            Alert.alert('Sucesso', 'Sua denúncia foi registrada!')
+            Alert.alert(t('common.successTitle'), t('recipeComments.reportSuccessMessage'))
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível enviar a denúncia.')
+            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('recipeComments.reportError'))
         } finally {
             setReportingCommentId(null)
         }
-    }, [reportingCommentId])
+    }, [reportingCommentId, t])
 
     return {
         comments, commentText, setCommentText,

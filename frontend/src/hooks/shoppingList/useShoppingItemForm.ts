@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
-import { INGREDIENT_CATEGORIES } from '@/src/hooks/recipe/useRecipeForm'
 import { shoppingListService } from '@/src/services/shoppingListService'
 import { ShoppingListItem } from '@/src/types/shoppingList'
+import { useTranslation } from 'react-i18next'
+import { useAppConstants } from '../useAppConstants'
 
 export function useShoppingItemForm() {
+    const { t } = useTranslation()
+    const { INGREDIENT_CATEGORIES, INGREDIENT_UNITS } = useAppConstants()
+
     const params = useLocalSearchParams<{
         mode: 'add' | 'edit'
         item?: string
@@ -25,17 +29,17 @@ export function useShoppingItemForm() {
     const [errors, setErrors] = useState<{ name?: string; quantity?: string }>({})
 
     const allCategories: string[] = [
-        ...INGREDIENT_CATEGORIES,
+        ...INGREDIENT_CATEGORIES.map(c => c.key),
         ...extraCategories.filter(
-            c => c !== 'Todos' && !(INGREDIENT_CATEGORIES as unknown as string[]).includes(c)
+            c => c !== 'all' && !INGREDIENT_CATEGORIES.some(ic => ic.key === c)
         ),
     ]
 
     function validate() {
         const next: typeof errors = {}
-        if (!name.trim()) next.name = 'Informe o nome do ingrediente.'
+        if (!name.trim()) next.name = t('shoppingItemForm.errorName')
         const qty = parseFloat(quantity.replace(',', '.'))
-        if (isNaN(qty) || qty <= 0) next.quantity = 'Informe uma quantidade válida.'
+        if (isNaN(qty) || qty <= 0) next.quantity = t('shoppingItemForm.errorQuantity')
         setErrors(next)
         return Object.keys(next).length === 0
     }
@@ -51,19 +55,19 @@ export function useShoppingItemForm() {
                     name: name.trim(),
                     quantity: qty,
                     unit: unit.trim(),
-                    category: category.trim() || 'Outros',
+                    category: category.trim() || 'others',
                 })
             } else {
                 await shoppingListService.addItem({
                     name: name.trim(),
                     quantity: qty,
                     unit: unit.trim(),
-                    category: category.trim() || 'Outros',
+                    category: category.trim() || 'others',
                 })
             }
             router.back()
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao salvar item')
+            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingItemForm.saveError'))
         } finally {
             setLoading(false)
         }
@@ -80,5 +84,6 @@ export function useShoppingItemForm() {
         loading,
         errors,
         handleSave,
+        INGREDIENT_UNITS,
     }
 }

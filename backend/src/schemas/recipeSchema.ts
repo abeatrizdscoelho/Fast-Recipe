@@ -1,7 +1,8 @@
 import * as yup from 'yup'
 
 export const INGREDIENT_CATEGORIES = [
-  'Bebidas', 'Carnes e Ovos', 'Congelados', 'Doces', 'Enlatados', 'Frutas e Verduras', 'Hortifruti', 'Laticínios', 'Padaria', 'Grãos e Cereais', 'Massas', 'Temperos', 'Outros',
+  'drinks', 'meatAndEggs', 'frozen', 'sweets', 'canned', 'fruitsAndVegetables', 
+  'produce', 'dairy', 'bakery', 'grainsAndCereals', 'pasta', 'spices', 'others',
 ] as const
 
 const ingredientSchema = yup.object({
@@ -20,7 +21,7 @@ const ingredientSchema = yup.object({
   category: yup
     .string()
     .oneOf([...INGREDIENT_CATEGORIES], 'Categoria inválida')
-    .default('Outros'),
+    .default('others'),
 })
 
 export const createRecipeSchema = yup.object({

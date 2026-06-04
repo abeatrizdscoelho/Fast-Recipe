@@ -10,8 +10,12 @@ import { SearchBar } from '../../components/SearchBar';
 import { FeedRecipe } from '../../types/recipe';
 import { RecipeCard } from './components/RecipeCard';
 import { FilterModal } from '@/src/components/FilterModal';
+import { useTranslation } from 'react-i18next';
+import { useAppConstants } from '@/src/hooks/useAppConstants';
 
 export default function RecipeFeedScreen() {
+    const { t } = useTranslation()
+    const { CATEGORIES, DIETARY_RESTRICTIONS } = useAppConstants()
     const [filterVisible, setFilterVisible] = useState(false)
 
     const {
@@ -67,7 +71,7 @@ export default function RecipeFeedScreen() {
                 <SearchBar
                     value={search}
                     onChangeText={handleSearch}
-                    placeholder="Pesquisar receitas..."
+                    placeholder={t('recipeFeed.searchPlaceholder')}
                 />
 
                 <TouchableOpacity
@@ -88,6 +92,8 @@ export default function RecipeFeedScreen() {
                 filters={filters}
                 onClose={() => setFilterVisible(false)}
                 onApply={handleApplyFilters}
+                categories={CATEGORIES}
+                dietaryRestrictions={DIETARY_RESTRICTIONS}
             />
 
             <FlatList
@@ -105,10 +111,10 @@ export default function RecipeFeedScreen() {
                         <Ionicons name="restaurant-outline" size={48} color="rgba(255,255,255,0.2)" />
                         <Text style={styles.emptyText}>
                             {search
-                                ? `Nenhuma receita encontrada para "${search}".`
+                                ? t('recipeFeed.emptySearch', { search })
                                 : activeFilterCount > 0
-                                    ? 'Nenhuma receita encontrada com os filtros selecionados.'
-                                    : 'Nenhuma receita publicada ainda.'
+                                    ? t('recipeFeed.emptyFilters')
+                                    : t('recipeFeed.emptyDefault')
                             }
                         </Text>
                     </View>
@@ -130,15 +136,15 @@ export default function RecipeFeedScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        backgroundColor: colors.primary 
+    container: {
+        flex: 1,
+        backgroundColor: colors.primary
     },
     listContent: { paddingBottom: 16 },
-    loadingContainer: { 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center' 
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     searchRow: {
         flexDirection: 'row',
@@ -147,7 +153,6 @@ const styles = StyleSheet.create({
         marginVertical: 16,
         gap: 5,
     },
-
     filterBtn: {
         width: 40,
         height: 40,
@@ -174,7 +179,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold',
     },
-
     empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
     emptyText: { color: 'rgba(255,255,255,0.4)', fontSize: 14 },
 })

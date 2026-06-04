@@ -1,9 +1,12 @@
+import i18next from "i18next"
+
 export function formatWeekRange(weekStart: string): string {
     const start = new Date(weekStart)
     const end = new Date(start)
     end.setDate(start.getDate() + 6)
+    const locale = i18next.language ?? 'pt-BR'
     const format = (d: Date) =>
-        d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
+        d.toLocaleDateString(locale, { day: '2-digit', month: 'long' })
     return `${format(start)} – ${format(end)}`
 }
 

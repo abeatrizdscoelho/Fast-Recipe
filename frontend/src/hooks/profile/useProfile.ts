@@ -4,10 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import { Recipe } from '../../types/recipe';
 import { recipeService } from '../../services/recipeService';
 import { favoriteService } from '../../services/favoriteService';
+import { useTranslation } from 'react-i18next';
 
 export type Tab = 'minhas' | 'favoritas'
 
 export function useProfile() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<Tab>('minhas')
   const [fetching, setFetching] = useState(true)
@@ -24,11 +26,11 @@ export function useProfile() {
       setRecipes(myData.recipes)
       setFavorites(favData.recipes)
     } catch (err) {
-      Alert.alert('Erro', 'Não foi possível carregar suas receitas.')
+      Alert.alert(t('common.errorTitle'), t('profile.loadError'))
     } finally {
       setFetching(false)
     }
-  }, [])
+  }, [t])
 
   async function toggleFavorite(id: string) {
     setRecipes(prev =>
@@ -40,20 +42,20 @@ export function useProfile() {
       setRecipes(prev =>
         prev.map(r => r.id === id ? { ...r, favorite: !r.favorite } : r)
       )
-      Alert.alert('Erro', 'Não foi possível salvar o favorito.')
+      Alert.alert(t('common.errorTitle'), t('profile.favoriteError'))
     }
   }
 
   async function handleDelete(id: string) {
-    Alert.alert('Excluir receita', 'Tem certeza que deseja excluir esta receita?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive',
+    Alert.alert(t('profile.deleteTitle'), t('profile.deleteMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('profile.deleteAction'), style: 'destructive',
         onPress: async () => {
           try {
             await recipeService.delete(id)
             setRecipes(prev => prev.filter(r => r.id !== id))
           } catch (err) {
-            Alert.alert('Erro', 'Não foi possível excluir a receita.')
+            Alert.alert(t('common.errorTitle'), t('profile.deleteError'))
           }
         }
       }

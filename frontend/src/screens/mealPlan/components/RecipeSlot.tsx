@@ -5,6 +5,7 @@ import { MealPlanEntry } from '@/src/types/mealPlan'
 import { colors } from '@/src/theme/color'
 import { router } from 'expo-router'
 import { DotsMenu } from '@/src/components/DotsMenu'
+import { useTranslation } from 'react-i18next'
 
 interface FilledSlotProps {
     entry: MealPlanEntry
@@ -13,6 +14,7 @@ interface FilledSlotProps {
 }
 
 export function FilledSlot({ entry, onRemove, onReplace }: FilledSlotProps) {
+    const { t } = useTranslation()
     const photo = entry.recipe.photos?.[0]
 
     return (
@@ -40,8 +42,8 @@ export function FilledSlot({ entry, onRemove, onReplace }: FilledSlotProps) {
                         <Text style={styles.recipeTitle} numberOfLines={2}>{entry.recipe.title}</Text>
                         <DotsMenu
                             options={[
-                                { label: 'Substituir receita', icon: 'repeat-outline', onPress: () => onReplace(entry.id) },
-                                { label: 'Remover', icon: 'trash-outline', onPress: () => onRemove(entry.id), destructive: true },
+                                { label: t('recipeSlot.replace'), icon: 'repeat-outline', onPress: () => onReplace(entry.id) },
+                                { label: t('recipeSlot.remove'), icon: 'trash-outline', onPress: () => onRemove(entry.id), destructive: true },
                             ]}
                         />
                     </View>
@@ -56,10 +58,11 @@ interface EmptySlotProps {
 }
 
 export function EmptySlot({ onPress }: EmptySlotProps) {
+    const { t } = useTranslation()
     return (
         <TouchableOpacity style={styles.emptySlot} onPress={onPress} activeOpacity={0.7}>
             <Ionicons name="add-circle-outline" size={26} color="#bbb" />
-            <Text style={styles.emptyText}>Adicionar{'\n'}receita</Text>
+            <Text style={styles.emptyText}>{t('recipeSlot.add')}</Text>
         </TouchableOpacity>
     )
 }

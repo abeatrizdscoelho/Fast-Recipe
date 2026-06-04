@@ -7,8 +7,10 @@ import { favoriteService } from '@/src/services/favoriteService'
 import { recentRecipesService } from '@/src/services/recentRecipesService'
 import { statsService } from '@/src/services/statsService'
 import { useAuth } from '@/src/context/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 export function useRecipeDetail(id: string) {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [recipe, setRecipe] = useState<FeedRecipe | null>(null)
   const [loading, setLoading] = useState(true)
@@ -24,7 +26,7 @@ export function useRecipeDetail(id: string) {
         setRecipe(loaded)
         recentRecipesService.add(loaded)
       } catch {
-        Alert.alert('Erro', 'Não foi possível carregar a receita.')
+        Alert.alert(t('common.errorTitle'), t('recipeDetail.loadError'))
         router.back()
       } finally {
         setLoading(false)
@@ -41,7 +43,7 @@ export function useRecipeDetail(id: string) {
       await favoriteService.toggle(recipe.id)
     } catch {
       setRecipe(prev => prev ? { ...prev, favorite: !prev.favorite } : prev)
-      Alert.alert('Erro', 'Não foi possível salvar o favorito.')
+      Alert.alert(t('common.errorTitle'), t('recipeDetail.favoriteError'))
     } finally {
       setTogglingFavorite(false)
     }

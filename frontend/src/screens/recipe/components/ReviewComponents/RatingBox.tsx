@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
 import { StarRow } from './StarRow'
 import { CommentInput } from './CommentInput'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
     userRating: number | null
@@ -22,6 +23,9 @@ export function RatingBox({
     commentValue, onCommentChange, onCommentSubmit, submittingComment,
     userAvatarUrl, userInitials,
 }: Props) {
+
+    const { t } = useTranslation()
+
     return (
         <View style={styles.ratingBox}>
             <View style={styles.ratingBoxHeader}>
@@ -38,12 +42,10 @@ export function RatingBox({
                 )}
                 <View style={styles.ratingBoxContent}>
                     <Text style={styles.ratingBoxPrompt}>
-                        {userRating ? 'Sua avaliação' : 'Gostou da receita?'}
+                        {userRating ? t('ratingBox.promptRated') : t('ratingBox.promptUnrated')}
                     </Text>
                     <Text style={styles.ratingBoxSub}>
-                        {userRating
-                            ? 'Toque nas estrelas para alterar.'
-                            : 'Avalie ou deixe seu comentário.'}
+                        {userRating ? t('ratingBox.subRated') : t('ratingBox.subUnrated')}
                     </Text>
                     {submitting ? (
                         <ActivityIndicator size="small" color={colors.primary} />
@@ -65,18 +67,41 @@ export function RatingBox({
 
 const styles = StyleSheet.create({
     ratingBox: {
-        gap: 12, backgroundColor: '#faf8f6',
-        borderRadius: 16, padding: 14, marginBottom: 20,
+        gap: 12, 
+        backgroundColor: '#faf8f6',
+        borderRadius: 16, 
+        padding: 14, 
+        marginBottom: 20,
     },
-    ratingBoxHeader: { flexDirection: 'row', gap: 12 },
+    ratingBoxHeader: { 
+        flexDirection: 'row', 
+        gap: 12 
+    },
     ratingBoxAvatar: {
-        width: 40, height: 40, borderRadius: 20,
+        width: 40, 
+        height: 40, 
+        borderRadius: 20,
         backgroundColor: '#e8e0da',
-        alignItems: 'center', justifyContent: 'center',
+        alignItems: 'center', 
+        justifyContent: 'center',
         overflow: 'hidden',
     },
-    ratingBoxInitials: { fontSize: 13, fontWeight: 'bold', color: colors.primary },
-    ratingBoxContent: { flex: 1, gap: 6 },
-    ratingBoxPrompt: { fontSize: 13, fontWeight: 'bold', color: colors.primary },
-    ratingBoxSub: { fontSize: 12, color: '#888' },
+    ratingBoxInitials: { 
+        fontSize: 13, 
+        fontWeight: 'bold', 
+        color: colors.primary 
+    },
+    ratingBoxContent: { 
+        flex: 1, 
+        gap: 6 
+    },
+    ratingBoxPrompt: { 
+        fontSize: 13, 
+        fontWeight: 'bold', 
+        color: colors.primary 
+    },
+    ratingBoxSub: { 
+        fontSize: 12, 
+        color: '#888' 
+    },
 })

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { api } from './api'
 import { StatsData } from '../types/stats'
+import i18next from 'i18next'
 
 export const statsService = {
   async getStats(): Promise<StatsData> {
@@ -9,9 +10,9 @@ export const statsService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao buscar estatísticas')
+        throw new Error(err.response?.data?.error ?? i18next.t('statsService.fetchError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -20,9 +21,9 @@ export const statsService = {
       await api.post(`/stats/cooked/${recipeId}`)
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? 'Erro ao registrar receita cozinhada')
+        throw new Error(err.response?.data?.error ?? i18next.t('statsService.registerCookedError'))
       }
-      throw new Error('Erro inesperado')
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 }

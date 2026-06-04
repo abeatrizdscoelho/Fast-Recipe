@@ -4,8 +4,10 @@ import { router } from 'expo-router'
 import { shoppingListService } from '@/src/services/shoppingListService'
 import { ShoppingList, ShoppingListItem } from '@/src/types/shoppingList'
 import { consolidateShoppingList } from '@/src/utils/consolidateShoppingListUtil'
+import { useTranslation } from 'react-i18next'
 
 export function useShoppingList(weekStart?: string) {
+    const { t } = useTranslation()
     const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
@@ -22,12 +24,12 @@ export function useShoppingList(weekStart?: string) {
             setShoppingList({ ...list, items: consolidatedItems })
             setMessage(data.message)
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao carregar lista de compras')
+            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingListScreen.loadError'))
         } finally {
             setLoading(false)
             setRefreshing(false)
         }
-    }, [weekStart])
+    }, [weekStart, t])
 
     useEffect(() => { loadList() }, [loadList])
 
@@ -58,7 +60,7 @@ export function useShoppingList(weekStart?: string) {
                     ),
                 }
             })
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao atualizar item')
+            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingListScreen.toggleError'))
         }
     }
 
@@ -85,11 +87,11 @@ export function useShoppingList(weekStart?: string) {
 
     function handleDeleteItem(item: ShoppingListItem) {
         Alert.alert(
-            'Remover item',
-            `Deseja remover "${item.name}" da lista?`,
+            t('shoppingListScreen.removeTitle'),
+            t('shoppingListScreen.removeMessage', { name: item.name }),
             [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Remover', style: 'destructive',
+                { text: t('common.cancel'), style: 'cancel' },
+                { text: t('common.remove'), style: 'destructive',
                     onPress: async () => {
                         setShoppingList(prev => {
                             if (!prev) return prev
@@ -102,7 +104,7 @@ export function useShoppingList(weekStart?: string) {
                             await shoppingListService.deleteItem({ ingredientIds: item.ingredientIds })
                         } catch (err) {
                             loadList(true)
-                            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao remover item')
+                            Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingListScreen.removeError'))
                         }
                     },
                 },
@@ -110,7 +112,7 @@ export function useShoppingList(weekStart?: string) {
         )
     }
 
-    const categories = ['Todos', ...(shoppingList?.categories ?? [])]
+    const categories = ['all', ...(shoppingList?.categories ?? [])]
 
     const filteredItems = (shoppingList?.items ?? [])
         .filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
@@ -121,7 +123,7 @@ export function useShoppingList(weekStart?: string) {
     const boughtCount = shoppingList?.items.filter(i => i.bought).length ?? 0
 
     const grouped = filteredItems.reduce<Record<string, typeof filteredItems>>((acc, item) => {
-        const cat = item.category ?? 'Outros'
+        const cat = item.category ?? 'others'
         if (!acc[cat]) acc[cat] = []
         acc[cat].push(item)
         return acc

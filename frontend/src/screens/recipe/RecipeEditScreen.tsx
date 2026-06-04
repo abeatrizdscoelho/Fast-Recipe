@@ -6,8 +6,10 @@ import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
 import { colors } from '../../theme/color';
 import { useEditRecipe } from '../../hooks/recipe/useRecipeEdit';
+import { useTranslation } from 'react-i18next';
 
 export default function EditRecipeScreen() {
+  const { t } = useTranslation()
   const { id } = useLocalSearchParams<{ id: string }>()
   const { initialData, loading, fetching, handleSubmit } = useEditRecipe(id)
 
@@ -17,7 +19,7 @@ export default function EditRecipeScreen() {
         <Header />
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.white} />
-          <Text style={styles.loadingText}>Carregando receita...</Text>
+          <Text style={styles.loadingText}>{t('recipeForm.loadingRecipe')}</Text>
         </View>
         <BottomNav />
       </View>
@@ -30,7 +32,7 @@ export default function EditRecipeScreen() {
       <RecipeForm
         initialData={initialData ?? {}}
         onSubmit={handleSubmit}
-        submitLabel="Salvar Alterações"
+        submitLabel={loading ? t('recipeForm.savingBtn') : t('recipeForm.saveBtn')}
         loading={loading}
       />
       <BottomNav />

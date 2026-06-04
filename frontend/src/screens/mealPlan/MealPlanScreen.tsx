@@ -9,8 +9,10 @@ import { RecipePickerModal } from './components/RecipePickerModal'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
 import { MEAL_TYPES } from '@/src/types/mealPlan'
+import { useTranslation } from 'react-i18next'
 
 export default function MealPlanScreen() {
+    const { t } = useTranslation()
     const {
         loading, refreshing, onRefresh,
         selectedDay, setSelectedDay,
@@ -31,8 +33,8 @@ export default function MealPlanScreen() {
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
                     <View>
-                        <Text style={styles.headerTitle}>Planejamento</Text>
-                        <Text style={styles.headerSub}>Organize suas refeições da semana!</Text>
+                        <Text style={styles.headerTitle}>{t('mealPlan.screenTitle')}</Text>
+                        <Text style={styles.headerSub}>{t('mealPlan.screenSubtitle')}</Text>
                     </View>
                 </View>
             </View>
@@ -63,8 +65,8 @@ export default function MealPlanScreen() {
                     {dayIsEmpty && (
                         <View style={styles.emptyBanner}>
                             <Ionicons name="restaurant-outline" size={36} color={colors.primary} style={{ opacity: 0.5 }} />
-                            <Text style={styles.emptyText}>Nenhuma receita adicionada.</Text>
-                            <Text style={styles.emptySubText}>Planeje sua semana agora!</Text>
+                            <Text style={styles.emptyText}>{t('mealPlan.emptyDay')}</Text>
+                            <Text style={styles.emptySubText}>{t('mealPlan.emptyDaySub')}</Text>
                         </View>
                     )}
 

@@ -4,26 +4,8 @@ import * as ImagePicker from 'expo-image-picker'
 import { ValidationError } from 'yup'
 import { IngredientDTO, RecipeFormData } from '@/src/types/recipe'
 import { recipeValidation } from '@/src/validations/recipeValidation'
-
-export const CATEGORIES = [
-    'Café da manhã', 'Almoço', 'Jantar', 'Lanche', 'Sobremesa', 'Bebida'
-]
-
-export const DIETARY_RESTRICTIONS = [
-    'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose', 'Sem açúcar', 'Low carb', 'Cetogênico'
-]
-
-export const DIFFICULTIES = [
-    'Fácil', 'Médio', 'Difícil'
-]
-
-export const INGREDIENT_CATEGORIES = [
-    'Bebidas', 'Carnes e Ovos', 'Congelados', 'Doces', 'Enlatados', 'Frutas e Verduras', 'Hortifruti', 'Laticínios', 'Padaria', 'Grãos e Cereais', 'Massas', 'Temperos', 'Outros'
-] as const
-
-export const INGREDIENT_UNITS = [
-    'grama', 'quilograma', 'mililitro', 'litro', 'unidade', 'xícara', 'colher de chá', 'colher de sopa', 
-]
+import { useAppConstants } from '../useAppConstants'
+import { useTranslation } from 'react-i18next'
 
 type IngredientInput = {
     name: string
@@ -40,6 +22,7 @@ type UseRecipeFormProps = {
 }
 
 export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
+    const { t } = useTranslation()
     const [title, setTitle] = useState(initialData?.title ?? '')
     const [time, setTime] = useState(initialData?.time ?? '')
     const [preparation, setPreparation] = useState(initialData?.preparation ?? '')
@@ -62,6 +45,11 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [apiError, setApiError] = useState('')
 
+    const {
+        CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES,
+        INGREDIENT_CATEGORIES, INGREDIENT_UNITS,
+    } = useAppConstants()
+
     function closeAllDropdowns() {
         setCategoryOpen(false)
         setDifficultyOpen(false)
@@ -73,13 +61,13 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
         if (type === 'camera') {
             const { status } = await ImagePicker.requestCameraPermissionsAsync()
             if (status !== 'granted') {
-                Alert.alert('Permissão necessária', 'Permita o acesso à câmera nas configurações.')
+                Alert.alert(t('editProfile.permissionTitle'), t('editProfile.permissionCamera'))
                 return false
             }
         } else {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
             if (status !== 'granted') {
-                Alert.alert('Permissão necessária', 'Permita o acesso à galeria nas configurações.')
+                Alert.alert(t('editProfile.permissionTitle'), t('editProfile.permissionGallery'))
                 return false
             }
         }
@@ -101,7 +89,10 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
         const ok = await requestPermission('gallery')
         if (!ok) return
         const remaining = 5 - photos.length
-        if (remaining <= 0) { Alert.alert('Limite atingido', 'Você pode adicionar no máximo 5 fotos.'); return }
+        if (remaining <= 0) {
+            Alert.alert(t('recipeForm.photoLimitTitle'), t('recipeForm.photoLimitMessage'))
+            return
+        }
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: false, allowsMultipleSelection: true,
@@ -119,24 +110,27 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
     function handlePhotoPress() {
         if (Platform.OS === 'ios') {
             ActionSheetIOS.showActionSheetWithOptions(
-                { options: ['Cancelar', 'Tirar foto', 'Escolher da galeria'], cancelButtonIndex: 0 },
+                {
+                    options: [t('common.cancel'), t('editProfile.avatarCamera'), t('editProfile.avatarGallery')],
+                    cancelButtonIndex: 0,
+                },
                 (index) => { if (index === 1) openCamera(); if (index === 2) openGallery() }
             )
         } else {
-            Alert.alert('Foto da Receita', 'Escolha uma opção', [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Tirar foto', onPress: openCamera },
-                { text: 'Escolher da galeria', onPress: openGallery },
+            Alert.alert(t('recipeForm.photoPickerTitle'), t('recipeForm.photoPickerSubtitle'), [
+                { text: t('common.cancel'), style: 'cancel' },
+                { text: t('editProfile.avatarCamera'), onPress: openCamera },
+                { text: t('editProfile.avatarGallery'), onPress: openGallery },
             ])
         }
     }
 
     function addIngredient() {
         const { name, quantity, unit, category: cat } = ingredientInput
-        if (!name.trim()) { setIngredientError('Informe o nome do ingrediente'); return }
+        if (!name.trim()) { setIngredientError(t('recipeForm.ingredientErrorName')); return }
         const qty = parseFloat(quantity.replace(',', '.'))
-        if (isNaN(qty) || qty <= 0) { setIngredientError('Informe uma quantidade válida'); return }
-        if (!unit.trim()) { setIngredientError('Informe a unidade'); return }
+        if (isNaN(qty) || qty <= 0) { setIngredientError(t('recipeForm.ingredientErrorQuantity')); return }
+        if (!unit.trim()) { setIngredientError(t('recipeForm.ingredientErrorUnit')); return }
         setIngredientError('')
         setIngredients(prev => [...prev, { name: name.trim(), quantity: qty, unit: unit.trim(), category: cat }])
         setIngredientInput(EMPTY_INGREDIENT)
@@ -168,7 +162,7 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
                 err.inner.forEach(e => { if (e.path) fieldErrors[e.path] = e.message })
                 setErrors(fieldErrors)
             } else {
-                setApiError(err instanceof Error ? err.message : 'Erro ao publicar receita')
+                setApiError(err instanceof Error ? err.message : t('recipeForm.submitError'))
             }
         }
     }
@@ -196,5 +190,11 @@ export function useRecipeForm({ initialData, onSubmit }: UseRecipeFormProps) {
 
         errors, apiError,
         handleSubmit,
+
+        CATEGORIES,
+        DIETARY_RESTRICTIONS,
+        DIFFICULTIES,
+        INGREDIENT_CATEGORIES,
+        INGREDIENT_UNITS,
     }
 }

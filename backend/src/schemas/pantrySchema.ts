@@ -1,7 +1,8 @@
 import * as yup from 'yup'
 
 export const PANTRY_CATEGORIES = [
-  'Bebidas', 'Carnes e Ovos', 'Congelados', 'Doces', 'Enlatados', 'Frutas e Verduras', 'Hortifruti', 'Laticínios', 'Padaria', 'Grãos e Cereais', 'Massas', 'Temperos', 'Outros',
+  'drinks', 'meatAndEggs', 'frozen', 'sweets', 'canned', 'fruitsAndVegetables', 
+  'produce', 'dairy', 'bakery', 'grainsAndCereals', 'pasta', 'spices', 'others',
 ] as const
 
 export const createPantryItemSchema = yup.object({
@@ -20,7 +21,7 @@ export const createPantryItemSchema = yup.object({
   category: yup
     .string()
     .oneOf([...PANTRY_CATEGORIES], 'Categoria inválida')
-    .default('Outros'),
+    .default('others'),
   expiresAt: yup
     .string()
     .nullable()

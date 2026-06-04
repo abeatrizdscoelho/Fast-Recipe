@@ -1,3 +1,5 @@
+import i18next from "i18next"
+
 export function isExpiringSoon(expiresAt: string | null): boolean {
     if (!expiresAt) return false
     const diff = new Date(expiresAt).getTime() - Date.now()
@@ -10,7 +12,8 @@ export function isExpired(expiresAt: string | null): boolean {
 }
 
 export function formatExpiry(expiresAt: string): string {
-    return new Date(expiresAt).toLocaleDateString('pt-BR', {
+    const locale = i18next.language ?? 'pt-BR'
+    return new Date(expiresAt).toLocaleDateString(locale, {
         day: '2-digit',
         month: '2-digit',
         year: '2-digit',

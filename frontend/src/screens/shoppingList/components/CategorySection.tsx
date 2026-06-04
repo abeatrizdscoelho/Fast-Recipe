@@ -4,21 +4,23 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
 import { ShoppingListItem } from '@/src/types/shoppingList'
 import { ShoppingItem } from './ShoppingItem'
+import { useTranslation } from 'react-i18next'
+import { useAppConstants } from '@/src/hooks/useAppConstants'
 
 export const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-    'Frutas e Verduras':  'nutrition-outline',
-    'Laticínios':         'water-outline',
-    'Temperos':           'flower-outline',
-    'Carnes e Ovos':      'restaurant-outline',
-    'Grãos e Cereais':    'leaf-outline',
-    'Padaria':            'cafe-outline',
-    'Bebidas':            'wine-outline',
-    'Congelados':         'snow-outline',
-    'Enlatados':          'archive-outline',
-    'Massas':             'pizza-outline',
-    'Doces':              'ice-cream-outline',
-    'Hortifruti':         'nutrition-outline',
-    'Outros':             'basket-outline',
+    drinks: 'wine-outline',
+    meatAndEggs: 'restaurant-outline',
+    frozen: 'snow-outline',
+    sweets: 'ice-cream-outline',
+    canned: 'archive-outline',
+    fruitsAndVegetables: 'nutrition-outline',
+    produce: 'nutrition-outline',
+    dairy: 'water-outline',
+    bakery: 'cafe-outline',
+    grainsAndCereals: 'leaf-outline',
+    pasta: 'pizza-outline',
+    spices: 'flower-outline',
+    others: 'basket-outline',
 }
 
 interface Props {
@@ -30,8 +32,11 @@ interface Props {
 }
 
 export function CategorySection({ category, items, onToggle, onEdit, onDelete }: Props) {
+    const { t } = useTranslation()
+    const { INGREDIENT_CATEGORIES } = useAppConstants()
     const [expanded, setExpanded] = useState(true)
     const icon = CATEGORY_ICONS[category] ?? 'basket-outline'
+    const label = INGREDIENT_CATEGORIES.find(c => c.key === category)?.label ?? category
 
     return (
         <View style={styles.container}>
@@ -39,10 +44,15 @@ export function CategorySection({ category, items, onToggle, onEdit, onDelete }:
                 <View style={styles.iconBox}>
                     <Ionicons name={icon} size={18} color={colors.primary} />
                 </View>
-                <Text style={styles.title}>{category}</Text>
+
+                <Text style={styles.title}>{label}</Text>
+
                 <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{items.length} {items.length === 1 ? 'item' : 'itens'}</Text>
+                    <Text style={styles.badgeText}>
+                        {items.length} {t('shoppingList.item', { count: items.length })}
+                    </Text>
                 </View>
+
                 <Ionicons
                     name={expanded ? 'chevron-up' : 'chevron-down'}
                     size={18}

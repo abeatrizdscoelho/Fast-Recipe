@@ -3,9 +3,11 @@ import { router } from 'expo-router';
 import { ValidationError } from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { loginValidation } from '../../validations/authValidation';
+import { useTranslation } from 'react-i18next';
 
 export function useLogin() {
   const { login } = useAuth()
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -30,7 +32,7 @@ export function useLogin() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao fazer login')
+        setApiError(err instanceof Error ? err.message : t('auth.errors.loginError'))
       }
     } finally {
       setLoading(false)

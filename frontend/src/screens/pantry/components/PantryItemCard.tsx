@@ -7,6 +7,7 @@ import { DotsMenu } from '@/src/components/DotsMenu'
 import { CATEGORY_ICONS } from '../../shoppingList/components/CategorySection'
 import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
 import { formatExpiry, isExpired, isExpiringSoon } from '@/src/utils/expiryUtil'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     item: PantryItem
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function PantryItemCard({ item, onEdit, onDelete }: Props) {
+    const { t } = useTranslation()
     const icon = CATEGORY_ICONS[item.category] ?? 'basket-outline'
     const expiring = isExpiringSoon(item.expiresAt)
     const expired = isExpired(item.expiresAt)
@@ -48,7 +50,7 @@ export function PantryItemCard({ item, onEdit, onDelete }: Props) {
                             expired && styles.expiryExpired,
                             expiring && !expired && styles.expirySoon,
                         ]}>
-                            {expired ? 'Vencido' : `Validade: ${formatExpiry(item.expiresAt)}`}
+                            {expired ? t('pantryItem.expired') : t('pantryItem.expiry', { date: formatExpiry(item.expiresAt) })}
                         </Text>
                     </View>
                 )}
@@ -66,8 +68,8 @@ export function PantryItemCard({ item, onEdit, onDelete }: Props) {
 
             <DotsMenu
                 options={[
-                    { label: 'Editar', icon: 'pencil-outline', onPress: () => onEdit(item) },
-                    { label: 'Remover', icon: 'trash-outline', onPress: () => onDelete(item), destructive: true },
+                    { label: t('pantryItem.edit'), icon: 'pencil-outline', onPress: () => onEdit(item) },
+                    { label: t('pantryItem.remove'), icon: 'trash-outline', onPress: () => onDelete(item), destructive: true },
                 ]}
             />
         </View>

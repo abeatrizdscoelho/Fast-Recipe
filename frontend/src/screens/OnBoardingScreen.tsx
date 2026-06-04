@@ -5,32 +5,31 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { colors } from '../theme/color';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const { height } = Dimensions.get('window')
 
 const features = [
   {
     id: '1',
-    title: 'Explore Novas Receitas',
-    description: 'Explore uma variedade de receitas deliciosas para preparar em casa.',
+    key: 'explore',
     icon: require('../assets/images/icon-explore.png'),
   },
   {
     id: '2',
-    title: 'Crie e Compartilhe',
-    description: 'Crie e publique suas próprias receitas e compartilhe com a comunidade.',
+    key: 'create',
     icon: require('../assets/images/icon-idea.png'),
   },
   {
     id: '3',
-    title: 'Salve suas Favoritas',
-    description: 'Guarde suas receitas preferidas e acesse facilmente a qualquer momento.',
+    key: 'save',
     icon: require('../assets/images/icon-bookmark.png'),
   },
 ]
 
 export default function OnboardingScreen() {
   const { user } = useAuth()
+  const { t } = useTranslation()
 
   async function handleStart() {
     await AsyncStorage.setItem(`@fastrecipe:onboarding:${user?.id}`, 'true')
@@ -49,7 +48,7 @@ export default function OnboardingScreen() {
             style={styles.logo}
             resizeMode="contain"
           /> */}
-          <Text style={styles.welcomeText}>Bem-vindo ao</Text>
+          <Text style={styles.welcomeText}>{t('onboarding.welcome')}</Text>
           <Text style={styles.logoText}>Fast Recipe!</Text>
         </View>
 
@@ -61,8 +60,12 @@ export default function OnboardingScreen() {
                 style={styles.iconImage}
                 resizeMode="contain"
               />
-              <Text style={styles.featureTitle}>{feature.title}</Text>
-              <Text style={styles.featureDescription}>{feature.description}</Text>
+              <Text style={styles.featureTitle}>
+                {t(`onboarding.features.${feature.key}.title`)}
+              </Text>
+              <Text style={styles.featureDescription}>
+                {t(`onboarding.features.${feature.key}.description`)}
+              </Text>
             </View>
           ))}
         </View>
@@ -71,7 +74,7 @@ export default function OnboardingScreen() {
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.button} onPress={handleStart}>
-          <Text style={styles.buttonText}>Vamos Começar</Text>
+          <Text style={styles.buttonText}>{t('onboarding.startAction')}</Text>
         </TouchableOpacity>
       </View>
     </View>

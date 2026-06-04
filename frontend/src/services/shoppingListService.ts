@@ -8,6 +8,7 @@ import {
     DeleteItemPayload,
     ShoppingListItem,
 } from '../types/shoppingList'
+import i18next from 'i18next'
 
 export const shoppingListService = {
     async getList(weekStart?: string): Promise<ShoppingListResponse> {
@@ -17,8 +18,8 @@ export const shoppingListService = {
             })
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao buscar lista de compras')
-            throw new Error('Erro inesperado')
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.fetchError'))
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -27,8 +28,8 @@ export const shoppingListService = {
             const response = await api.patch('/shopping-list/bought', payload)
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao atualizar item')
-            throw new Error('Erro inesperado')
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.toggleError'))
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -37,8 +38,8 @@ export const shoppingListService = {
             const response = await api.post('/shopping-list/items', payload)
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao adicionar item')
-            throw new Error('Erro inesperado')
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.addError'))
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -47,8 +48,8 @@ export const shoppingListService = {
             const response = await api.patch('/shopping-list/items', payload)
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao editar item')
-            throw new Error('Erro inesperado')
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.updateError'))
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -56,8 +57,8 @@ export const shoppingListService = {
         try {
             await api.delete('/shopping-list/items', { data: payload })
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao remover item')
-            throw new Error('Erro inesperado')
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.deleteError'))
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 }

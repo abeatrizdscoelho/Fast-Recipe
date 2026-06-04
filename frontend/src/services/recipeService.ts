@@ -2,6 +2,7 @@ import axios from 'axios'
 import { api } from './api'
 import { RecipeFormData, Recipe, FeedResponse, FeedRecipe } from '../types/recipe'
 import { ActiveFilters } from '../components/FilterModal'
+import i18next from 'i18next'
 
 interface ReactNativeFile {
   uri: string
@@ -42,9 +43,9 @@ export const recipeService = {
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao criar receita')
+                throw new Error(err.response?.data?.error ?? i18next.t('recipeService.createError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -54,9 +55,9 @@ export const recipeService = {
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao buscar receitas')
+                throw new Error(err.response?.data?.error ?? i18next.t('recipeService.fetchError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -68,16 +69,16 @@ export const recipeService = {
                     limit,
                     ...(search ? { search } : {}),
                     ...(filters?.categories.length ? { categories: filters.categories.join(',') } : {}),
-                    ...(filters?.dietaryRestrictions.length 
-                        ? { dietaryRestrictions: filters.dietaryRestrictions.join(',') } 
+                    ...(filters?.dietaryRestrictions.length
+                        ? { dietaryRestrictions: filters.dietaryRestrictions.join(',') }
                         : {}
                     ),
                 },
             })
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao buscar feed')
-            throw new Error('Erro inesperado')
+            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('recipeService.feedError'))
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -87,9 +88,9 @@ export const recipeService = {
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Receita não encontrada')
+                throw new Error(err.response?.data?.error ?? i18next.t('recipeService.notFoundError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -125,9 +126,9 @@ export const recipeService = {
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao atualizar receita')
+                throw new Error(err.response?.data?.error ?? i18next.t('recipeService.updateError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -136,9 +137,9 @@ export const recipeService = {
             await api.delete(`/recipes/${id}`)
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao excluir receita')
+                throw new Error(err.response?.data?.error ?? i18next.t('recipeService.deleteError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 }

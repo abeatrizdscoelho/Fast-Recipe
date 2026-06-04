@@ -4,14 +4,15 @@ import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { colors } from '@/src/theme/color'
-import { INGREDIENT_UNITS } from '@/src/hooks/recipe/useRecipeForm'
 import { SelectDropdown } from '@/src/components/SelectDropdown'
 import FieldError from '@/src/components/FieldError'
 import { useShoppingItemForm } from '@/src/hooks/shoppingList/useShoppingItemForm'
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
+import { useTranslation } from 'react-i18next'
 
 export default function ShoppingItemFormScreen() {
+    const { t } = useTranslation()
     const {
         isEdit,
         name, setName,
@@ -23,6 +24,7 @@ export default function ShoppingItemFormScreen() {
         loading,
         errors,
         handleSave,
+        INGREDIENT_UNITS,
     } = useShoppingItemForm()
 
     return (
@@ -38,7 +40,7 @@ export default function ShoppingItemFormScreen() {
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Text style={styles.cardTitle}>
-                            {isEdit ? 'Editar ingrediente' : 'Adicionar ingrediente'}
+                            {isEdit ? t('shoppingItemForm.editTitle') : t('shoppingItemForm.addTitle')}
                         </Text>
                         <TouchableOpacity
                             onPress={() => router.back()}
@@ -49,12 +51,12 @@ export default function ShoppingItemFormScreen() {
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.label}>Nome do ingrediente</Text>
+                    <Text style={styles.label}>{t('shoppingItemForm.labelIngredientName')}</Text>
                     <TextInput
                         style={[styles.input, errors.name ? styles.inputError : null]}
                         value={name}
                         onChangeText={setName}
-                        placeholder="Ex: Tomate"
+                        placeholder={t('shoppingItemForm.placeholderIngredientName')}
                         placeholderTextColor="#aaa"
                         autoCapitalize="sentences"
                         onFocus={() => setUnitOpen(false)}
@@ -63,12 +65,12 @@ export default function ShoppingItemFormScreen() {
 
                     <View style={styles.row}>
                         <View style={styles.rowItem}>
-                            <Text style={styles.label}>Quantidade</Text>
+                            <Text style={styles.label}>{t('shoppingItemForm.labelQuantity')}</Text>
                             <TextInput
                                 style={[styles.input, errors.quantity ? styles.inputError : null]}
                                 value={quantity}
                                 onChangeText={setQuantity}
-                                placeholder="Ex: 3"
+                                placeholder={t('shoppingItemForm.placeholderQuantity')}
                                 keyboardType="decimal-pad"
                                 placeholderTextColor="#aaa"
                                 onFocus={() => setUnitOpen(false)}
@@ -76,10 +78,10 @@ export default function ShoppingItemFormScreen() {
                             <FieldError message={errors.quantity} />
                         </View>
                         <View style={styles.rowItem}>
-                            <Text style={styles.label}>Unidade</Text>
+                            <Text style={styles.label}>{t('shoppingItemForm.labelUnit')}</Text>
                             <SelectDropdown
                                 value={unit}
-                                placeholder="Selecione"
+                                placeholder={t('shoppingItemForm.placeholderUnit')}
                                 options={INGREDIENT_UNITS}
                                 open={unitOpen}
                                 onToggle={() => setUnitOpen(p => !p)}
@@ -88,7 +90,7 @@ export default function ShoppingItemFormScreen() {
                         </View>
                     </View>
 
-                    <Text style={styles.label}>Categoria</Text>
+                    <Text style={styles.label}>{t('shoppingItemForm.labelCategory')}</Text>
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -102,7 +104,7 @@ export default function ShoppingItemFormScreen() {
                                 onPress={() => { setCategory(cat); setUnitOpen(false) }}
                             >
                                 <Text style={[styles.chipText, category === cat && styles.chipTextActive]}>
-                                    {cat}
+                                    {t(`ingredientCategories.${cat}`, cat)}
                                 </Text>
                             </TouchableOpacity>
                         ))}
@@ -114,7 +116,12 @@ export default function ShoppingItemFormScreen() {
                         disabled={loading}
                     >
                         <Text style={styles.saveBtnText}>
-                            {loading ? 'Salvando...' : isEdit ? 'Salvar alterações' : 'Adicionar item'}
+                            {loading 
+                                ? t('shoppingItemForm.saving') 
+                                : isEdit 
+                                    ? t('shoppingItemForm.editAction') 
+                                    : t('shoppingItemForm.addAction')
+                            }
                         </Text>
                     </TouchableOpacity>
                 </View>

@@ -9,50 +9,27 @@ interface UnitMeta {
 }
 
 const UNIT_TABLE: Record<string, UnitMeta> = {
-    'grama': { canonical: 'grama', dimension: 'mass', toBase: 1 },
-    'gramas': { canonical: 'grama', dimension: 'mass', toBase: 1 },
-    'g': { canonical: 'grama', dimension: 'mass', toBase: 1 },
-    'quilograma': { canonical: 'quilograma', dimension: 'mass', toBase: 1000 },
-    'quilogramas': { canonical: 'quilograma', dimension: 'mass', toBase: 1000 },
-    'kg': { canonical: 'quilograma', dimension: 'mass', toBase: 1000 },
-    'miligrama': { canonical: 'grama', dimension: 'mass', toBase: 0.001 },
-    'miligramas': { canonical: 'grama', dimension: 'mass', toBase: 0.001 },
-    'mg': { canonical: 'grama', dimension: 'mass', toBase: 0.001 },
-
-    'mililitro': { canonical: 'mililitro', dimension: 'volume', toBase: 1 },
-    'mililitros': { canonical: 'mililitro', dimension: 'volume', toBase: 1 },
-    'ml': { canonical: 'mililitro', dimension: 'volume', toBase: 1 },
-    'litro': { canonical: 'litro', dimension: 'volume', toBase: 1000 },
-    'litros': { canonical: 'litro', dimension: 'volume', toBase: 1000 },
-    'l': { canonical: 'litro', dimension: 'volume', toBase: 1000 },
-    'xícara': { canonical: 'mililitro', dimension: 'volume', toBase: 240 },
-    'xicara': { canonical: 'mililitro', dimension: 'volume', toBase: 240 },
-    'xícaras': { canonical: 'mililitro', dimension: 'volume', toBase: 240 },
-    'xicaras': { canonical: 'mililitro', dimension: 'volume', toBase: 240 },
-    'cup': { canonical: 'mililitro', dimension: 'volume', toBase: 240 },
-    'colher de sopa': { canonical: 'mililitro', dimension: 'volume', toBase: 15 },
-    'colheres de sopa': { canonical: 'mililitro', dimension: 'volume', toBase: 15 },
-    'tbsp': { canonical: 'mililitro', dimension: 'volume', toBase: 15 },
-    'colher de chá': { canonical: 'mililitro', dimension: 'volume', toBase: 5 },
-    'colheres de chá': { canonical: 'mililitro', dimension: 'volume', toBase: 5 },
-    'tsp': { canonical: 'mililitro', dimension: 'volume', toBase: 5 },
-    'colher': { canonical: 'mililitro', dimension: 'volume', toBase: 15 },
-    'colheres': { canonical: 'mililitro', dimension: 'volume', toBase: 15 },
-
-    'unidade': { canonical: 'unidade', dimension: 'unit', toBase: 1 },
-    'unidades': { canonical: 'unidade', dimension: 'unit', toBase: 1 },
-    'un': { canonical: 'unidade', dimension: 'unit', toBase: 1 },
-    'und': { canonical: 'unidade', dimension: 'unit', toBase: 1 },
-    'unid': { canonical: 'unidade', dimension: 'unit', toBase: 1 },
-    'dente': { canonical: 'dente', dimension: 'unit', toBase: 1 },
-    'dentes': { canonical: 'dente', dimension: 'unit', toBase: 1 },
-    'fatia': { canonical: 'fatia', dimension: 'unit', toBase: 1 },
-    'fatias': { canonical: 'fatia', dimension: 'unit', toBase: 1 },
-    'pedaço': { canonical: 'pedaço', dimension: 'unit', toBase: 1 },
-    'pedaços': { canonical: 'pedaço', dimension: 'unit', toBase: 1 },
-    'pitada': { canonical: 'pitada', dimension: 'unit', toBase: 1 },
-    'pitadas': { canonical: 'pitada', dimension: 'unit', toBase: 1 },
+    'gram': { canonical: 'gram', dimension: 'mass', toBase: 1 },
+    'g': { canonical: 'gram', dimension: 'mass', toBase: 1 },
+    'kilogram': { canonical: 'kilogram', dimension: 'mass', toBase: 1000 },
+    'kg': { canonical: 'kilogram', dimension: 'mass', toBase: 1000 },
+    'milliliter': { canonical: 'milliliter', dimension: 'volume', toBase: 1 },
+    'ml': { canonical: 'milliliter', dimension: 'volume', toBase: 1 },
+    'liter': { canonical: 'liter', dimension: 'volume', toBase: 1000 },
+    'l': { canonical: 'liter', dimension: 'volume', toBase: 1000 },
+    'cup': { canonical: 'milliliter', dimension: 'volume', toBase: 240 },
+    'teaspoon': { canonical: 'milliliter', dimension: 'volume', toBase: 5 },
+    'tsp': { canonical: 'milliliter', dimension: 'volume', toBase: 5 },
+    'tablespoon': { canonical: 'milliliter', dimension: 'volume', toBase: 15 },
+    'tbsp': { canonical: 'milliliter', dimension: 'volume', toBase: 15 },
+    'unit': { canonical: 'unit', dimension: 'unit', toBase: 1 },
+    'un': { canonical: 'unit', dimension: 'unit', toBase: 1 },
+    'grama': { canonical: 'gram', dimension: 'mass', toBase: 1 },
+    'mililitro': { canonical: 'milliliter', dimension: 'volume', toBase: 1 },
+    'litro': { canonical: 'liter', dimension: 'volume', toBase: 1000 },
+    'unidade': { canonical: 'unit', dimension: 'unit', toBase: 1 },
 }
+
 
 function normalizeIngredientName(name: string): string {
     return name
@@ -65,24 +42,23 @@ function normalizeIngredientName(name: string): string {
 
 function getMeta(unit: string | null | undefined): UnitMeta {
     const key = (unit ?? '').toLowerCase().trim()
-    return UNIT_TABLE[key] ?? { canonical: key || 'unidade', dimension: 'other', toBase: 1 }
+    return UNIT_TABLE[key] ?? { canonical: key || 'unit', dimension: 'other', toBase: 1 }
 }
 
 function toBaseValue(quantity: number, unit: string | null | undefined): number {
     return quantity * getMeta(unit).toBase
 }
 
-function fromBaseValue(baseValue: number, dimension: Dimension, originalCanonical: string): 
-{ quantity: number; unit: string } {
+function fromBaseValue(baseValue: number, dimension: Dimension, originalCanonical: string): { quantity: number; unit: string } {
     if (dimension === 'mass') {
         if (baseValue >= 1000)
-            return { quantity: parseFloat((baseValue / 1000).toFixed(2)), unit: 'quilograma' }
-        return { quantity: parseFloat(baseValue.toFixed(2)), unit: 'grama' }
+            return { quantity: parseFloat((baseValue / 1000).toFixed(2)), unit: 'kilogram' }
+        return { quantity: parseFloat(baseValue.toFixed(2)), unit: 'gram' }
     }
     if (dimension === 'volume') {
         if (baseValue >= 1000)
-            return { quantity: parseFloat((baseValue / 1000).toFixed(2)), unit: 'litro' }
-        return { quantity: parseFloat(baseValue.toFixed(2)), unit: 'mililitro' }
+            return { quantity: parseFloat((baseValue / 1000).toFixed(2)), unit: 'liter' }
+        return { quantity: parseFloat(baseValue.toFixed(2)), unit: 'milliliter' }
     }
     return { quantity: parseFloat(baseValue.toFixed(2)), unit: originalCanonical }
 }

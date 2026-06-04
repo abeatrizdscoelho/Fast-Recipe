@@ -7,8 +7,10 @@ import { useRegister } from '../../hooks/auth/useRegister';
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { colors } from '../../theme/color';
+import { useTranslation } from 'react-i18next';
 
 export default function RegisterScreen() {
+  const { t } = useTranslation()
   const {
     name, setName, email, setEmail,
     password, setPassword, showPassword, setShowPassword,
@@ -34,10 +36,10 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>CADASTRO</Text>
+          <Text style={styles.title}>{t('auth.register.title')}</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nome</Text>
+            <Text style={styles.label}>{t('auth.register.labelName')}</Text>
             <TextInput
               value={name}
               onChangeText={setName}
@@ -48,7 +50,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('auth.register.labelEmail')}</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -60,7 +62,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha</Text>
+            <Text style={styles.label}>{t('auth.register.labelPassword')}</Text>
             <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
               <TextInput
                 value={password}
@@ -81,13 +83,15 @@ export default function RegisterScreen() {
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleRegister}
             disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? 'CADASTRANDO...' : 'CADASTRAR'}</Text>
+            <Text style={styles.buttonText}>
+              {loading ? t('auth.register.loadingBtn') : t('auth.register.submitBtn')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/(auth)/login')} style={styles.loginWrapper}>
             <Text style={styles.loginText}>
-              Já tem uma conta?{' '}
-              <Text style={styles.loginBold}>Entrar</Text>
+              {t('auth.register.loginPrompt')}{' '}
+              <Text style={styles.loginBold}>{t('auth.register.loginAction')}</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -99,7 +103,10 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: colors.primary },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.primary 
+  },
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
@@ -111,7 +118,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { width: 200, height: 200 },
+  logo: { 
+    width: 200, 
+    height: 200 
+  },
   card: {
     width: '100%',
     backgroundColor: colors.white,
@@ -131,9 +141,20 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 32 },
-  inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
+  title: { 
+    color: colors.primary, 
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    marginBottom: 32 
+  },
+  inputGroup: { 
+    marginBottom: 24 
+  },
+  label: { 
+    color: colors.gray, 
+    marginBottom: 4, 
+    fontSize: 14 
+  },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
@@ -141,15 +162,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.black,
   },
-  inputError: { borderBottomColor: colors.error },
-  inputNoBorder: { paddingBottom: 8, fontSize: 16, color: colors.black },
+  inputError: { 
+    borderBottomColor: colors.error 
+  },
+  inputNoBorder: { 
+    paddingBottom: 8, 
+    fontSize: 16, color: 
+    colors.black 
+  },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
   },
-  passwordRowError: { borderBottomColor: colors.error },
+  passwordRowError: { 
+    borderBottomColor: colors.error 
+  },
   button: {
     backgroundColor: colors.primary,
     borderRadius: 50,
@@ -158,9 +187,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 8,
   },
-  buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
-  loginWrapper: { alignItems: 'center' },
-  loginText: { color: colors.primary, fontSize: 13 },
-  loginBold: { fontWeight: 'bold', },
+  buttonDisabled: { 
+    opacity: 0.7 
+  },
+  buttonText: { 
+    color: colors.white, 
+    fontWeight: 'bold', 
+    letterSpacing: 2, 
+    fontSize: 15 
+  },
+  loginWrapper: { 
+    alignItems: 'center' 
+  },
+  loginText: { 
+    color: colors.primary, 
+    fontSize: 13 
+  },
+  loginBold: { 
+    fontWeight: 'bold', 
+  },
 })

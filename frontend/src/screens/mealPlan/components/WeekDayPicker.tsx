@@ -2,7 +2,8 @@ import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
-import { DAY_LABELS } from '@/src/types/mealPlan'
+import { DAY_KEYS } from '@/src/types/mealPlan'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   weekDates: Date[]
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function WeekDayPicker({ weekDates, selectedDay, onSelectDay, onPrevWeek, onNextWeek }: Props) {
+  const { t } = useTranslation()
   return (
     <View style={styles.wrapper}>
       <TouchableOpacity onPress={onPrevWeek} style={styles.navBtn}>
@@ -30,7 +32,7 @@ export function WeekDayPicker({ weekDates, selectedDay, onSelectDay, onPrevWeek,
               onPress={() => onSelectDay(index)}
             >
               <Text style={[styles.dayLabel, isSelected && styles.dayLabelActive]}>
-                {DAY_LABELS[index]}
+                {t(`dayLabels.${DAY_KEYS[index]}`)}
               </Text>
               <Text style={[styles.dayNum, isSelected && styles.dayNumActive, isToday && !isSelected && styles.dayNumToday]}>
                 {date.getDate()}

@@ -3,13 +3,16 @@ import { Alert } from 'react-native'
 import { pantryService } from '@/src/services/pantryService'
 import { PantryItem } from '@/src/types/pantry'
 import { router } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 
 export function usePantry() {
+    const { t } = useTranslation()
     const [items, setItems] = useState<PantryItem[]>([])
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
     const [search, setSearch] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState('Todos')
+    
+    const [selectedCategory, setSelectedCategory] = useState('all')
 
     const loadItems = useCallback(async (silent = false) => {
         if (!silent) setLoading(true)
@@ -17,12 +20,12 @@ export function usePantry() {
             const data = await pantryService.getItems()
             setItems(data.items)
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao carregar despensa')
+            Alert.alert(t('pantry.alerts.errorTitle'), err instanceof Error ? err.message : t('pantry.alerts.loadError'))
         } finally {
             setLoading(false)
             setRefreshing(false)
         }
-    }, [])
+    }, [t])
 
     useEffect(() => { loadItems() }, [loadItems])
 
@@ -44,18 +47,18 @@ export function usePantry() {
 
     function handleDeleteItem(item: PantryItem) {
         Alert.alert(
-            'Remover item',
-            `Deseja remover "${item.name}" da despensa?`,
+            t('pantry.alerts.removeTitle'),
+            t('pantry.alerts.removeMessage', { name: item.name }),
             [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Remover', style: 'destructive',
+                { text: t('pantry.alerts.cancel'), style: 'cancel' },
+                { text: t('pantry.alerts.remove'), style: 'destructive',
                     onPress: async () => {
                         setItems(prev => prev.filter(i => i.id !== item.id))
                         try {
                             await pantryService.deleteItem(item.id)
                         } catch (err) {
                             loadItems(true)
-                            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao remover item')
+                            Alert.alert(t('pantry.alerts.errorTitle'), err instanceof Error ? err.message : t('pantry.alerts.removeError'))
                         }
                     },
                 },
@@ -63,18 +66,23 @@ export function usePantry() {
         )
     }
 
-    const categories = ['Todos', ...Array.from(new Set(items.map(i => i.category))).sort()]
+    const rawCategories = ['all', ...Array.from(new Set(items.map(i => i.category))).sort()]
+
+    const categories = rawCategories.map(cat => ({
+        key: cat,
+        label: cat === 'all' ? t('pantry.categories.all') : t(`ingredientCategories.${cat}`),
+    }))
 
     const filteredItems = items.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase())
-        const matchesCategory = selectedCategory === 'Todos' || item.category === selectedCategory
+        const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
         return matchesSearch && matchesCategory
     })
 
     const categoryCounts = categories.reduce<Record<string, number>>((acc, cat) => {
-        acc[cat] = cat === 'Todos'
+        acc[cat.key] = cat.key === 'all'
             ? items.length
-            : items.filter(i => i.category === cat).length
+            : items.filter(i => i.category === cat.key).length
         return acc
     }, {})
 

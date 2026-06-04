@@ -3,6 +3,7 @@ import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from 'reac
 import { Ionicons } from '@expo/vector-icons'
 import { CommentDTO } from '@/src/types/review'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
     comment: CommentDTO
@@ -20,6 +21,7 @@ export function CommentCard({
     comment, editingCommentId, editingText, setEditingText,
     onStartEdit, onSaveEdit, onCancelEdit, onDelete, onReport
 }: Props) {
+    const { t } = useTranslation()
     const isEditing = editingCommentId === comment.id
     const formattedDate = new Date(comment.createdAt).toLocaleDateString('pt-BR', {
         day: '2-digit', month: 'short', year: 'numeric',
@@ -46,7 +48,7 @@ export function CommentCard({
                         <Text style={styles.reviewTime}>{formattedDate}</Text>
                     </View>
                     {formattedEdit && (
-                        <Text style={styles.reviewEdited}>editado em {formattedEdit}</Text>
+                        <Text style={styles.reviewEdited}>{t('commentCard.editedOn', { date: formattedEdit })}</Text>
                     )}
 
                     {isEditing ? (
@@ -61,10 +63,10 @@ export function CommentCard({
                             />
                             <View style={styles.editActions}>
                                 <TouchableOpacity onPress={onCancelEdit} style={styles.editCancelBtn}>
-                                    <Text style={styles.editCancelText}>Cancelar</Text>
+                                    <Text style={styles.editCancelText}>{t('commentCard.cancel')}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={onSaveEdit} style={styles.editSaveBtn}>
-                                    <Text style={styles.editSaveText}>Salvar</Text>
+                                    <Text style={styles.editSaveText}>{t('commentCard.save')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

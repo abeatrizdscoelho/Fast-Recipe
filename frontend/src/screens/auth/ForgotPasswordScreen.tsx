@@ -5,8 +5,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import FieldError from '../../components/FieldError';
 import { useForgotPassword } from '../../hooks/auth/useForgotPassword';
 import { colors } from '../../theme/color';
+import { useTranslation } from 'react-i18next';
 
 export default function ForgotPasswordScreen() {
+  const { t } = useTranslation()
   const {
     email, setEmail, confirmEmail, setConfirmEmail,
     loading, errors, apiError, success,
@@ -32,17 +34,17 @@ export default function ForgotPasswordScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>RECUPERE SUA SENHA</Text>
-          <Text style={styles.subtitle}>Enviaremos um e-mail para a troca de senha.</Text>
+          <Text style={styles.title}>{t('auth.forgotPassword.title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.forgotPassword.subtitle')}</Text>
 
           {success ? (
             <Text style={styles.successText}>
-              E-mail enviado! Verifique sua caixa de entrada.
+              {t('auth.forgotPassword.successMessage')}
             </Text>
           ) : (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email</Text>
+                <Text style={styles.label}>{t('auth.forgotPassword.labelEmail')}</Text>
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
@@ -54,7 +56,7 @@ export default function ForgotPasswordScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Confirme seu Email</Text>
+                <Text style={styles.label}>{t('auth.forgotPassword.labelConfirmEmail')}</Text>
                 <TextInput
                   value={confirmEmail}
                   onChangeText={setConfirmEmail}
@@ -71,13 +73,15 @@ export default function ForgotPasswordScreen() {
                 style={[styles.button, loading && styles.buttonDisabled]}
                 onPress={handleForgotPassword}
                 disabled={loading}>
-                <Text style={styles.buttonText}>{loading ? 'ENVIANDO...' : 'ENVIAR'}</Text>
+                <Text style={styles.buttonText}>
+                  {loading ? t('auth.forgotPassword.loadingBtn') : t('auth.forgotPassword.submitBtn')}
+                </Text>
               </TouchableOpacity>
             </>
           )}
 
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backWrapper}>
-            <Text style={styles.backText}>Voltar para o login</Text>
+            <Text style={styles.backText}>{t('auth.forgotPassword.backToLogin')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -87,7 +91,10 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.primary },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.primary 
+  },
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
@@ -99,7 +106,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { width: 200, height: 200 },
+  logo: { 
+    width: 200, 
+    height: 200 
+  },
   card: {
     width: '100%',
     backgroundColor: colors.white,
@@ -119,16 +129,31 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
-  subtitle: { color: colors.gray, fontSize: 13, marginBottom: 32 },
+  title: { 
+    color: colors.primary, 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginBottom: 6 
+  },
+  subtitle: { 
+    color: colors.gray, 
+    fontSize: 13, 
+    marginBottom: 32 
+  },
   successText: {
     color: colors.primary,
     fontSize: 15,
     textAlign: 'center',
     marginVertical: 32,
   },
-  inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
+  inputGroup: { 
+    marginBottom: 24 
+  },
+  label: { 
+    color: colors.gray, 
+    marginBottom: 4, 
+    fontSize: 14 
+  },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
@@ -136,7 +161,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.black,
   },
-  inputError: { borderBottomColor: colors.error },
+  inputError: { 
+    borderBottomColor: colors.error 
+  },
   button: {
     backgroundColor: colors.primary,
     borderRadius: 50,
@@ -145,8 +172,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
-  buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
-  backWrapper: { alignItems: 'center' },
-  backText: { color: colors.primary, fontSize: 13 },
+  buttonDisabled: { 
+    opacity: 0.7 
+  },
+  buttonText: { 
+    color: colors.white, 
+    fontWeight: 'bold', 
+    letterSpacing: 2, 
+    fontSize: 15 
+  },
+  backWrapper: { 
+    alignItems: 'center' 
+  },
+  backText: { 
+    color: colors.primary, 
+    fontSize: 13 
+  },
 })

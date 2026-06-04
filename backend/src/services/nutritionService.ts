@@ -24,8 +24,8 @@ interface USDAFood {
   fdcId: number
   description: string
   foodNutrients: USDAFoodNutrient[]
-  servingSize?: number     
-  servingSizeUnit?: string 
+  servingSize?: number
+  servingSizeUnit?: string
 }
 
 // IDs dos nutrientes na USDA
@@ -93,28 +93,32 @@ function extractNutrient(food: USDAFood, nutrientId: number): number {
 function toGrams(quantity: number, unit: string, food?: USDAFood): number {
   const u = unit.toLowerCase().trim()
 
-  const wholeUnitAliases = ['unidade', 'unidades', 'un', 'und', 'unid']
+  const wholeUnitAliases = ['unit', 'units', 'unidade', 'unidades', 'un', 'und', 'unid']
   if (wholeUnitAliases.includes(u)) {
     const servingGrams =
       food?.servingSize && food.servingSizeUnit?.toLowerCase() === 'g'
         ? food.servingSize
-        : 100 
+        : 100
     return servingGrams * quantity
   }
 
   const conversions: Record<string, number> = {
-    'kg': 1000, 'quilograma': 1000, 'quilogramas': 1000,
-    'g': 1, 'grama': 1, 'gramas': 1,
-    'mg': 0.001, 'miligrama': 0.001, 'miligramas': 0.001,
+    'kg': 1000, 'kilogram': 1000, 'kilograms': 1000,
+    'g': 1, 'gram': 1, 'grams': 1,
+    'l': 1000, 'liter': 1000, 'liters': 1000,
+    'ml': 1, 'milliliter': 1, 'milliliters': 1,
+    'cup': 240,
+    'tbsp': 15, 'tablespoon': 15, 'tablespoons': 15,
+    'tsp': 5, 'teaspoon': 5, 'teaspoons': 5,
 
-    'l': 1000, 'litro': 1000, 'litros': 1000,
-    'ml': 1, 'mililitro': 1, 'mililitros': 1,
-
-    'xícara': 240, 'xicara': 240, 'xícaras': 240, 'xicaras': 240, 'cup': 240,
-    'colher de sopa': 15, 'colheres de sopa': 15, 'tbsp': 15,
-    'colher de chá': 5, 'colheres de chá': 5, 'tsp': 5,
+    'quilograma': 1000, 'quilogramas': 1000,
+    'grama': 1, 'gramas': 1,
+    'litro': 1000, 'litros': 1000,
+    'mililitro': 1, 'mililitros': 1,
+    'xícara': 240, 'xicara': 240, 'xícaras': 240,
+    'colher de sopa': 15, 'colheres de sopa': 15,
+    'colher de chá': 5, 'colheres de chá': 5,
     'colher': 15, 'colheres': 15,
-
     'fatia': 30, 'fatias': 30,
     'pedaço': 80, 'pedaços': 80,
     'pitada': 1, 'pitadas': 1,

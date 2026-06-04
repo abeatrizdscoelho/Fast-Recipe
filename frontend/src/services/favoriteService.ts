@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { api } from './api'
 import { Recipe } from '../types/recipe'
+import i18next from 'i18next'
 
 export const favoriteService = {
     async toggle(recipeId: string): Promise<{ favorited: boolean }> {
@@ -9,9 +10,9 @@ export const favoriteService = {
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao favoritar receita')
+                throw new Error(err.response?.data?.error ?? i18next.t('favoriteService.toggleError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 
@@ -21,9 +22,9 @@ export const favoriteService = {
             return response.data
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                throw new Error(err.response?.data?.error ?? 'Erro ao buscar favoritos')
+                throw new Error(err.response?.data?.error ?? i18next.t('favoriteService.fetchError'))
             }
-            throw new Error('Erro inesperado')
+            throw new Error(i18next.t('common.unexpectedError'))
         }
     },
 }

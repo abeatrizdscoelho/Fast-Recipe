@@ -7,6 +7,7 @@ import {
   UpdatePantryItemPayload,
   PantrySuggestionsResponse,
 } from '../types/pantry'
+import i18next from 'i18next'
 
 export const pantryService = {
   async getItems(): Promise<PantryListResponse> {
@@ -14,8 +15,8 @@ export const pantryService = {
       const response = await api.get('/pantry')
       return response.data
     } catch (err) {
-      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao buscar despensa')
-      throw new Error('Erro inesperado')
+      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('pantryService.fetchError'))
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -24,8 +25,8 @@ export const pantryService = {
       const response = await api.post('/pantry', payload)
       return response.data
     } catch (err) {
-      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao adicionar item')
-      throw new Error('Erro inesperado')
+      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('pantryService.addError'))
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -34,8 +35,8 @@ export const pantryService = {
       const response = await api.put(`/pantry/${id}`, payload)
       return response.data
     } catch (err) {
-      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao atualizar item')
-      throw new Error('Erro inesperado')
+      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('pantryService.updateError'))
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -43,8 +44,8 @@ export const pantryService = {
     try {
       await api.delete(`/pantry/${id}`)
     } catch (err) {
-      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao remover item')
-      throw new Error('Erro inesperado')
+      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('pantryService.deleteError'))
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 
@@ -53,8 +54,8 @@ export const pantryService = {
       const response = await api.get('/pantry/suggestions')
       return response.data
     } catch (err) {
-      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? 'Erro ao buscar sugestões')
-      throw new Error('Erro inesperado')
+      if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('pantryService.suggestionsError'))
+      throw new Error(i18next.t('common.unexpectedError'))
     }
   },
 }

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Alert } from 'react-native'
 import { reviewService } from '@/src/services/reviewService'
+import { useTranslation } from 'react-i18next'
 
 export function useRecipeRating(id: string) {
+  const { t } = useTranslation()
   const [ratingAverage, setRatingAverage] = useState(0)
   const [ratingCount, setRatingCount] = useState(0)
   const [userRating, setUserRating] = useState<number | null>(null)
@@ -18,7 +20,7 @@ export function useRecipeRating(id: string) {
         setRatingCount(ratingData.count)
         setUserRating(ratingData.userRating)
       } catch {
-        Alert.alert('Erro', 'Não foi possível carregar as avaliações.')
+        Alert.alert(t('common.errorTitle'), t('recipeRating.loadError'))
       } finally {
         setLoading(false)
       }
@@ -37,7 +39,7 @@ export function useRecipeRating(id: string) {
       setRatingCount(result.count)
     } catch (err) {
       setUserRating(previous)
-      Alert.alert('Erro', err instanceof Error ? err.message : 'Não foi possível registrar a avaliação.')
+      Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('recipeRating.submitError'))
     } finally {
       setSubmittingRating(false)
     }

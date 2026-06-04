@@ -7,8 +7,10 @@ import { useResetPassword } from '../../hooks/auth/useResetPassword';
 import EyeIcon from '../../components/icons/EyeIcon';
 import FieldError from '../../components/FieldError';
 import { colors } from '../../theme/color';
+import { useTranslation } from 'react-i18next';
 
 export default function ResetPasswordScreen() {
+  const { t } = useTranslation()
   const {
     password, setPassword, confirmPassword, setConfirmPassword,
     showPassword, setShowPassword, showConfirmPassword, setShowConfirmPassword,
@@ -34,22 +36,22 @@ export default function ResetPasswordScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>NOVA SENHA</Text>
-          <Text style={styles.subtitle}>Digite e confirme sua nova senha.</Text>
+          <Text style={styles.title}>{t('auth.resetPassword.title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.resetPassword.subtitle')}</Text>
 
           {success ? (
             <>
-              <Text style={styles.successText}>Senha redefinida com sucesso!</Text>
+              <Text style={styles.successText}>{t('auth.resetPassword.successMessage')}</Text>
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => router.replace('/(auth)/login')}>
-                <Text style={styles.buttonText}>IR PARA O LOGIN</Text>
+                <Text style={styles.buttonText}>{t('auth.resetPassword.goToLoginBtn')}</Text>
               </TouchableOpacity>
             </>
           ) : (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Nova senha</Text>
+                <Text style={styles.label}>{t('auth.resetPassword.labelNewPassword')}</Text>
                 <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
                   <TextInput
                     value={password}
@@ -65,7 +67,7 @@ export default function ResetPasswordScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Confirme a nova senha</Text>
+                <Text style={styles.label}>{t('auth.resetPassword.labelConfirmPassword')}</Text>
                 <View style={[styles.passwordRow, errors.confirmPassword ? styles.passwordRowError : null]}>
                   <TextInput
                     value={confirmPassword}
@@ -87,14 +89,14 @@ export default function ResetPasswordScreen() {
                 onPress={handleResetPassword}
                 disabled={loading}>
                 <Text style={styles.buttonText}>
-                  {loading ? 'REDEFININDO...' : 'REDEFINIR SENHA'}
+                  {loading ? t('auth.resetPassword.loadingBtn') : t('auth.resetPassword.submitBtn')}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => router.replace('/(auth)/login')}
                 style={styles.backWrapper}>
-                <Text style={styles.backText}>Voltar para o login</Text>
+                <Text style={styles.backText}>{t('auth.resetPassword.backToLogin')}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -107,7 +109,10 @@ export default function ResetPasswordScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: colors.primary },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.primary 
+  },
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
@@ -119,7 +124,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { width: 200, height: 200 },
+  logo: { 
+    width: 200, 
+    height: 200 
+  },
   card: {
     width: '100%',
     backgroundColor: colors.white,
@@ -139,16 +147,31 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
-  subtitle: { color: colors.gray, fontSize: 13, marginBottom: 32 },
+  title: { 
+    color: colors.primary, 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginBottom: 6 
+  },
+  subtitle: { 
+    color: colors.gray, 
+    fontSize: 13, 
+    marginBottom: 32 
+  },
   successText: {
     color: colors.primary,
     fontSize: 15,
     textAlign: 'center',
     marginVertical: 32,
   },
-  inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
+  inputGroup: { 
+    marginBottom: 24 
+  },
+  label: { 
+    color: colors.gray, 
+    marginBottom: 4, 
+    fontSize: 14 
+  },
   inputNoBorder: {
     paddingBottom: 8,
     fontSize: 16,
@@ -160,7 +183,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
   },
-  passwordRowError: { borderBottomColor: colors.error },
+  passwordRowError: { 
+    borderBottomColor: colors.error 
+  },
   button: {
     backgroundColor: colors.primary,
     borderRadius: 50,
@@ -169,13 +194,20 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
-  buttonDisabled: { opacity: 0.7 },
+  buttonDisabled: { 
+    opacity: 0.7 
+  },
   buttonText: {
     color: colors.white,
     fontWeight: 'bold',
     letterSpacing: 2,
     fontSize: 15,
   },
-  backWrapper: { alignItems: 'center' },
-  backText: { color: colors.primary, fontSize: 13 },
+  backWrapper: { 
+    alignItems: 'center' 
+  },
+  backText: { 
+    color: colors.primary, 
+    fontSize: 13 
+  },
 })

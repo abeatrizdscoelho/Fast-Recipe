@@ -6,6 +6,7 @@ import { ShoppingListItem } from '@/src/types/shoppingList'
 import { ConsolidatedItem } from '@/src/utils/consolidateShoppingListUtil'
 import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
 import { DotsMenu } from '@/src/components/DotsMenu'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     item: ConsolidatedItem
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function ShoppingItem({ item, onToggle, onEdit, onDelete }: Props) {
+    const { t } = useTranslation()
     return (
         <View style={[styles.row, item.bought && styles.rowBought]}>
             <TouchableOpacity
@@ -39,15 +41,15 @@ export function ShoppingItem({ item, onToggle, onEdit, onDelete }: Props) {
                 </Text>
                 {item.hasUnitConflict && (
                     <Text style={styles.conflictHint}>
-                        Verifique: mesmo ingrediente com unidades diferentes
+                        {t('shoppingList.conflictHint')}
                     </Text>
                 )}
             </View>
 
             <DotsMenu
                 options={[
-                    { label: 'Editar', icon: 'pencil-outline', onPress: () => onEdit?.(item) },
-                    { label: 'Remover', icon: 'trash-outline', onPress: () => onDelete?.(item), destructive: true },
+                    { label: t('shoppingList.editLabel'), icon: 'pencil-outline', onPress: () => onEdit?.(item) },
+                    { label: t('shoppingList.removeLabel'), icon: 'trash-outline', onPress: () => onDelete?.(item), destructive: true },
                 ]}
             />
         </View>

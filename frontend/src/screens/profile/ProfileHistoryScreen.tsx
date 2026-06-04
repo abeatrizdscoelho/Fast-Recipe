@@ -8,9 +8,11 @@ import { colors } from '../../theme/color'
 import { useRecentRecipes } from '../../hooks/recipe/useRecentRecipes'
 import { RecipeCard } from '../recipe/components/RecipeCard'
 import { useAuth } from '../../context/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 export default function ProfileHistoryScreen() {
     const { user } = useAuth()
+    const { t } = useTranslation()
     const { recipes, fetching, loadRecipes, handleClear } = useRecentRecipes()
 
     useFocusEffect(
@@ -30,11 +32,11 @@ export default function ProfileHistoryScreen() {
                 contentContainerStyle={styles.listContent}
                 ListHeaderComponent={
                     <View style={styles.headerRow}>
-                        <Text style={styles.sectionTitle}>Visualizadas recentemente</Text>
+                        <Text style={styles.sectionTitle}>{t('profileHistory.title')}</Text>
                         {recipes.length > 0 && (
                             <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
                                 <Ionicons name="trash-outline" size={16} color={colors.cream} />
-                                <Text style={styles.clearText}>Limpar</Text>
+                                <Text style={styles.clearText}>{t('profileHistory.clear')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -47,7 +49,7 @@ export default function ProfileHistoryScreen() {
                     ) : (
                         <View style={styles.empty}>
                             <Ionicons name="time-outline" size={48} color="rgba(255,255,255,0.2)" />
-                            <Text style={styles.emptyText}>Nenhuma receita visualizada ainda.</Text>
+                            <Text style={styles.emptyText}>{t('profileHistory.empty')}</Text>
                         </View>
                     )
                 }

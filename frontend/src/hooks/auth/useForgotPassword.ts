@@ -3,8 +3,10 @@ import { useNavigation } from '@react-navigation/native';
 import { ValidationError } from 'yup';
 import { forgotPasswordValidation } from '../../validations/authValidation';
 import { authService } from '../../services/authService';
+import { useTranslation } from 'react-i18next';
 
 export function useForgotPassword() {
+  const { t } = useTranslation()
   const navigation = useNavigation()
   const [email, setEmail] = useState('')
   const [confirmEmail, setConfirmEmail] = useState('')
@@ -30,7 +32,7 @@ export function useForgotPassword() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao enviar e-mail')
+        setApiError(err instanceof Error ? err.message : t('auth.errors.sendEmailError'))
       }
     } finally {
       setLoading(false)

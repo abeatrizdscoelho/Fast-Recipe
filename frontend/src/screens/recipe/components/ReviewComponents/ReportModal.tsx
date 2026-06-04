@@ -1,6 +1,7 @@
 import React from 'react'
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 type Props = {
   visible: boolean
@@ -9,22 +10,22 @@ type Props = {
 }
 
 export function ReportModal({ visible, onClose, onConfirm }: Props) {
+
+  const { t } = useTranslation()
+  
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.box}>
-          <Text style={styles.title}>Denunciar comentário</Text>
-          <Text style={styles.subtitle}>
-            Deseja denunciar este comentário?
-            Comentários com muitas denúncias são ocultados automaticamente.
-          </Text>
+          <Text style={styles.title}>{t('reportModal.title')}</Text>
+          <Text style={styles.subtitle}>{t('reportModal.subtitle')}</Text>
 
           <View style={styles.actions}>
             <TouchableOpacity onPress={onClose} style={styles.cancelBtn}>
-              <Text style={styles.cancelText}>Cancelar</Text>
+              <Text style={styles.cancelText}>{t('reportModal.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onConfirm} style={styles.confirmBtn}>
-              <Text style={styles.confirmText}>Denunciar</Text>
+              <Text style={styles.confirmText}>{t('reportModal.confirm')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -35,25 +36,55 @@ export function ReportModal({ visible, onClose, onConfirm }: Props) {
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center', justifyContent: 'center',
+    flex: 1, 
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center', 
+    justifyContent: 'center',
     paddingHorizontal: 32,
   },
   box: {
-    backgroundColor: colors.white, borderRadius: 20,
-    padding: 24, width: '100%', gap: 12,
+    backgroundColor: colors.white, 
+    borderRadius: 20,
+    padding: 24, 
+    width: '100%', 
+    gap: 12,
   },
-  title: { fontSize: 16, fontWeight: 'bold', color: colors.primary },
-  subtitle: { fontSize: 13, color: '#888', lineHeight: 18 },
-  actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 4 },
+  title: { 
+    fontSize: 16, 
+    fontWeight: 'bold', 
+    color: colors.primary 
+  },
+  subtitle: { 
+    fontSize: 13, 
+    color: '#888', 
+    lineHeight: 18 
+  },
+  actions: { 
+    flexDirection: 'row', 
+    justifyContent: 'flex-end', 
+    gap: 8, 
+    marginTop: 4 
+  },
   cancelBtn: {
-    paddingHorizontal: 16, paddingVertical: 9,
-    borderRadius: 20, borderWidth: 1, borderColor: '#ddd',
+    paddingHorizontal: 16, 
+    paddingVertical: 9,
+    borderRadius: 20, 
+    borderWidth: 1, 
+    borderColor: '#ddd',
   },
-  cancelText: { fontSize: 13, color: '#888' },
+  cancelText: { 
+    fontSize: 13, 
+    color: '#888' 
+  },
   confirmBtn: {
-    paddingHorizontal: 16, paddingVertical: 9,
-    borderRadius: 20, backgroundColor: '#e05c5c',
+    paddingHorizontal: 16, 
+    paddingVertical: 9,
+    borderRadius: 20, 
+    backgroundColor: '#e05c5c',
   },
-  confirmText: { fontSize: 13, color: colors.white, fontWeight: 'bold' },
+  confirmText: { 
+    fontSize: 13, 
+    color: colors.white, 
+    fontWeight: 'bold' 
+  },
 })

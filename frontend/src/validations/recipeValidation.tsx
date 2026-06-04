@@ -1,33 +1,34 @@
 import * as yup from 'yup'
+import i18next from 'i18next'
 
 export const recipeValidation = yup.object({
   title: yup
     .string()
-    .min(2, 'Título deve ter pelo menos 2 caracteres')
-    .required('Título obrigatório'),
+    .min(2, () => i18next.t('recipeValidation.titleMin'))
+    .required(() => i18next.t('recipeValidation.titleRequired')),
   ingredients: yup
     .array()
     .of(
       yup.object({
-        name: yup.string().required('Nome do ingrediente obrigatório'),
+        name: yup.string().required(() => i18next.t('recipeValidation.ingredientNameRequired')),
         quantity: yup
           .number()
-          .typeError('Quantidade deve ser um número')
-          .positive('Quantidade deve ser maior que zero')
-          .required('Quantidade obrigatória'),
-        unit: yup.string().required('Unidade obrigatória'),
+          .typeError(() => i18next.t('recipeValidation.ingredientQuantityTypeError'))
+          .positive(() => i18next.t('recipeValidation.ingredientQuantityPositive'))
+          .required(() => i18next.t('recipeValidation.ingredientQuantityRequired')),
+        unit: yup.string().required(() => i18next.t('recipeValidation.ingredientUnitRequired')),
         category: yup.string().default('Outros'),
       })
     )
-    .min(1, 'Informe pelo menos um ingrediente')
-    .required('Ingredientes obrigatórios'),
+    .min(1, () => i18next.t('recipeValidation.ingredientsMin'))
+    .required(() => i18next.t('recipeValidation.ingredientsRequired')),
   preparation: yup
     .string()
-    .min(5, 'Modo de preparo muito curto')
-    .required('Modo de preparo obrigatório'),
-  time: yup.string().required('Tempo de preparo obrigatório'),
-  portions: yup.string().required('Porções obrigatórias'),
-  category: yup.string().required('Categoria obrigatória'),
+    .min(5, () => i18next.t('recipeValidation.preparationMin'))
+    .required(() => i18next.t('recipeValidation.preparationRequired')),
+  time: yup.string().required(() => i18next.t('recipeValidation.timeRequired')),
+  portions: yup.string().required(() => i18next.t('recipeValidation.portionsRequired')),
+  category: yup.string().required(() => i18next.t('recipeValidation.categoryRequired')),
   dietaryRestrictions: yup
     .array()
     .of(yup.string().required())
@@ -36,9 +37,9 @@ export const recipeValidation = yup.object({
   photos: yup
     .array()
     .of(yup.string().required())
-    .min(1, 'Adicione pelo menos uma foto')
-    .required('Foto obrigatória'),
-  difficulty: yup.string().required('Dificuldade obrigatória'),
+    .min(1, () => i18next.t('recipeValidation.photosMin'))
+    .required(() => i18next.t('recipeValidation.photosRequired')),
+  difficulty: yup.string().required(() => i18next.t('recipeValidation.difficultyRequired')),
   description: yup.string().optional(),
 })
 

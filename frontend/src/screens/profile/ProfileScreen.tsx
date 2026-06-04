@@ -7,8 +7,10 @@ import { Header } from '../../components/Header';
 import { colors } from '../../theme/color';
 import { useProfile } from '../../hooks/profile/useProfile';
 import { RecipeCard } from '../recipe/components/RecipeCard';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileScreen() {
+  const { t } = useTranslation()
   const {
     user, activeTab, setActiveTab, fetching, displayed, initials, loadRecipes, toggleFavorite, handleDelete
   } = useProfile()
@@ -41,7 +43,7 @@ export default function ProfileScreen() {
                   <Text style={styles.avatarText}>{initials}</Text>
                 </View>
               )}
-              <Text style={styles.userName}>{user?.name ?? 'Usuário'}</Text>
+              <Text style={styles.userName}>{user?.name ?? t('profile.fallbackName')}</Text>
               <Text style={styles.userEmail}>{user?.email ?? ''}</Text>
 
               <View style={styles.actions}>
@@ -50,27 +52,27 @@ export default function ProfileScreen() {
                   onPress={() => router.push('/recipe/create')}
                 >
                   <Ionicons name="add-circle-outline" size={18} color={colors.white} />
-                  <Text style={styles.actionText}>Nova Receita</Text>
+                  <Text style={styles.actionText}>{t('profile.newRecipe')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.actionOutline]}
                   onPress={() => router.push('/profile/settings')}
                 >
                   <Ionicons name="settings-outline" size={18} color={colors.cream} />
-                  <Text style={[styles.actionText, { color: colors.cream }]}>Configurações</Text>
+                  <Text style={[styles.actionText, { color: colors.cream }]}>{t('profile.settings')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
             <View style={styles.tabsContainer}>
-              <Text style={styles.sectionTitle}>Minhas Receitas</Text>
+              <Text style={styles.sectionTitle}>{t('profile.sectionTitle')}</Text>
               <View style={styles.tabs}>
                 <TouchableOpacity
                   style={[styles.tabBtn, activeTab === 'minhas' && styles.tabBtnActive]}
                   onPress={() => setActiveTab('minhas')}
                 >
                   <Text style={[styles.tabText, activeTab === 'minhas' && styles.tabTextActive]}>
-                    Minhas receitas
+                    {t('profile.tabMine')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -78,7 +80,7 @@ export default function ProfileScreen() {
                   onPress={() => setActiveTab('favoritas')}
                 >
                   <Text style={[styles.tabText, activeTab === 'favoritas' && styles.tabTextActive]}>
-                    Favoritas
+                    {t('profile.tabFavorites')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -94,7 +96,7 @@ export default function ProfileScreen() {
             <View style={styles.empty}>
               <Ionicons name="bookmark-outline" size={48} color="rgba(255,255,255,0.2)" />
               <Text style={styles.emptyText}>
-                {activeTab === 'minhas' ? 'Nenhuma receita criada ainda.' : 'Nenhuma receita favorita ainda.'}
+                {activeTab === 'minhas' ? t('profile.emptyMine') : t('profile.emptyFavorites')}
               </Text>
             </View>
           )

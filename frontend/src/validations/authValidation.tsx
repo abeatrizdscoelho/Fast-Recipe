@@ -1,29 +1,44 @@
 import * as yup from 'yup';
+import i18next from 'i18next';
 
 export const loginValidation = yup.object({
-  email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
-  password: yup.string().min(6, 'Senha deve ter pelo menos 6 caracteres').required('Senha obrigatória'),
+  email: yup.string()
+    .email(() => i18next.t('validation.emailInvalid'))
+    .required(() => i18next.t('validation.emailRequired')),
+  password: yup.string()
+    .min(6, () => i18next.t('validation.passwordMin'))
+    .required(() => i18next.t('validation.passwordRequired')),
 })
 
 export const registerValidation = yup.object({
-  name: yup.string().min(2, 'Nome deve ter pelo menos 2 caracteres').required('Nome obrigatório'),
-  email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
-  password: yup.string().min(6, 'Senha deve ter pelo menos 6 caracteres').required('Senha obrigatória'),
+  name: yup.string()
+    .min(2, () => i18next.t('validation.nameMin'))
+    .required(() => i18next.t('validation.nameRequired')),
+  email: yup.string()
+    .email(() => i18next.t('validation.emailInvalid'))
+    .required(() => i18next.t('validation.emailRequired')),
+  password: yup.string()
+    .min(6, () => i18next.t('validation.passwordMin'))
+    .required(() => i18next.t('validation.passwordRequired')),
 })
 
 export const forgotPasswordValidation = yup.object({
-  email: yup.string().email('E-mail inválido').required('E-mail obrigatório'),
+  email: yup.string()
+    .email(() => i18next.t('validation.emailInvalid'))
+    .required(() => i18next.t('validation.emailRequired')),
   confirmEmail: yup.string()
-    .email('E-mail inválido')
-    .oneOf([yup.ref('email')], 'Os e-mails não coincidem')
-    .required('Confirmação de e-mail obrigatória'),
+    .email(() => i18next.t('validation.emailInvalid'))
+    .oneOf([yup.ref('email')], () => i18next.t('validation.emailsMustMatch'))
+    .required(() => i18next.t('validation.confirmEmailRequired')),
 })
 
 export const resetPasswordValidation = yup.object({
-  password: yup.string().min(6, 'Senha deve ter pelo menos 6 caracteres').required('Senha obrigatória'),
+  password: yup.string()
+    .min(6, () => i18next.t('validation.passwordMin'))
+    .required(() => i18next.t('validation.passwordRequired')),
   confirmPassword: yup.string()
-    .oneOf([yup.ref('password')], 'As senhas não coincidem')
-    .required('Confirmação de senha obrigatória'),
+    .oneOf([yup.ref('password')], () => i18next.t('validation.passwordsMustMatch'))
+    .required(() => i18next.t('validation.confirmPasswordRequired')),
 })
 
 export type LoginFormData = yup.InferType<typeof loginValidation>

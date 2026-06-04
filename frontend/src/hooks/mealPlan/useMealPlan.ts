@@ -1,14 +1,18 @@
 import { ActiveFilters } from '@/src/components/FilterModal'
 import { mealPlanService } from '@/src/services/mealPlanService'
 import { recipeService } from '@/src/services/recipeService'
-import { DAY_LABELS, MEAL_TYPES, MealPlan, MealPlanEntry, MealType } from '@/src/types/mealPlan'
+import { MEAL_TYPES, MealPlan, MealPlanEntry, MealType } from '@/src/types/mealPlan'
 import { FeedRecipe } from '@/src/types/recipe'
 import { formatWeekStart, getWeekStart } from '@/src/utils/formatWeekUtil'
 import { useState, useCallback, useEffect } from 'react'
 import { Alert } from 'react-native'
+import { useAppConstants } from '../useAppConstants'
+import { useTranslation } from 'react-i18next'
 
 export function useMealPlan() {
     const today = new Date()
+    const { t } = useTranslation()
+    const { DAY_LABELS, MONTH_NAMES } = useAppConstants()
     const [currentWeekStart, setCurrentWeekStart] = useState<Date>(getWeekStart(today))
     const [selectedDay, setSelectedDay] = useState<number>(() => {
         const day = today.getDay()
@@ -17,7 +21,9 @@ export function useMealPlan() {
     const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [selectingSlot, setSelectingSlot] = useState<{ dayOfWeek: number; mealType: MealType; replaceEntryId?: string } | null>(null)
+    const [selectingSlot, setSelectingSlot] = useState<{ 
+        dayOfWeek: number; mealType: MealType; replaceEntryId?: string 
+    } | null>(null)
     const [recipes, setRecipes] = useState<FeedRecipe[]>([])
     const [recipeSearch, setRecipeSearch] = useState('')
     const [recipeModalVisible, setRecipeModalVisible] = useState(false)
@@ -31,19 +37,22 @@ export function useMealPlan() {
             const data = await mealPlanService.getWeekPlan(weekStart)
             setMealPlan(data.mealPlan)
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao carregar planejamento')
+            Alert.alert(
+                t('mealPlan.alerts.errorTitle'), 
+                err instanceof Error ? err.message : t('mealPlan.alerts.loadError')
+            )
         } finally {
             setLoading(false)
             setRefreshing(false)
         }
-    }, [])
+    }, [t])
 
-    useEffect(() => { loadPlan(weekStartStr) }, [weekStartStr])
+    useEffect(() => { loadPlan(weekStartStr) }, [weekStartStr, loadPlan])
 
     const onRefresh = useCallback(() => {
         setRefreshing(true)
         loadPlan(weekStartStr, true)
-    }, [weekStartStr])
+    }, [weekStartStr, loadPlan])
 
     function goToPrevWeek() {
         setCurrentWeekStart(prev => {
@@ -113,24 +122,34 @@ export function useMealPlan() {
             }
             setMealPlan(updated)
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao adicionar receita')
+            Alert.alert(
+                t('mealPlan.alerts.errorTitle'), 
+                err instanceof Error ? err.message : t('mealPlan.alerts.addRecipeError')
+            )
         } finally { setSelectingSlot(null) }
     }
 
     async function handleRemoveEntry(entryId: string) {
-        Alert.alert('Remover receita', 'Deseja remover esta receita do planejamento?', [
-            { text: 'Cancelar', style: 'cancel' },
-            { text: 'Remover', style: 'destructive',
-                onPress: async () => {
-                    try {
-                        const res = await mealPlanService.removeEntry(entryId)
-                        setMealPlan(res.mealPlan)
-                    } catch (err) {
-                        Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao remover receita')
-                    }
+        Alert.alert(
+            t('mealPlan.alerts.removeTitle'), 
+            t('mealPlan.alerts.removeMessage'), 
+            [
+                { text: t('mealPlan.alerts.cancel'), style: 'cancel' },
+                { text: t('mealPlan.alerts.remove'), style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const res = await mealPlanService.removeEntry(entryId)
+                            setMealPlan(res.mealPlan)
+                        } catch (err) {
+                            Alert.alert(
+                                t('mealPlan.alerts.errorTitle'), 
+                                err instanceof Error ? err.message : t('mealPlan.alerts.removeRecipeError')
+                            )
+                        }
+                    },
                 },
-            },
-        ])
+            ]
+        )
     }
 
     async function handleToggleCompleted(entryId: string) {
@@ -166,7 +185,10 @@ export function useMealPlan() {
                     ),
                 }
             })
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao atualizar receita')
+            Alert.alert(
+                t('mealPlan.alerts.errorTitle'), 
+                err instanceof Error ? err.message : t('mealPlan.alerts.updateRecipeError')
+            )
         }
     }
 
@@ -175,11 +197,6 @@ export function useMealPlan() {
     )
 
     const totalEntries = mealPlan?.entries.length ?? 0
-
-    const MONTH_NAMES = [
-        'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
-        'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO',
-    ]
 
     const weekDates = getWeekDates()
     const selectedDate = weekDates[selectedDay]

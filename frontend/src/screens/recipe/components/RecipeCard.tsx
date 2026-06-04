@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { colors } from '@/src/theme/color';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   id: string
@@ -28,6 +29,7 @@ export function RecipeCard({
   favorite, author, isOwner, onFavorite, onEdit, onDelete,
 }: Props) {
 
+  const { t } = useTranslation()
   const authorInitials = author?.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
 
   function formatDate(dateStr?: string) {
@@ -51,7 +53,7 @@ export function RecipeCard({
           <View>
             <Text style={styles.authorName}>
               <Text style={styles.authorNameBold}>{author.name}</Text>
-              {' '}publicou uma receita
+              {' '}{t('recipeCard.published')}
             </Text>
             {author.createdAt && (
               <Text style={styles.authorDate}>{formatDate(author.createdAt)}</Text>
@@ -93,7 +95,7 @@ export function RecipeCard({
             {difficulty && (
               <>
                 <Text style={styles.recipeDot}>|</Text>
-                <Text style={styles.recipeMetaText}>{difficulty}</Text>
+                <Text style={styles.recipeMetaText}>{t(`difficulties.${difficulty}`, difficulty)}</Text>
               </>
             )}
           </View>
@@ -108,7 +110,7 @@ export function RecipeCard({
               color={favorite ? '#e05c5c' : colors.primary}
             />
             <Text style={[styles.favoriteText, favorite && { color: '#e05c5c' }]}>
-              {favorite ? 'Favoritado' : 'Favoritar'}
+              {favorite ? t('recipeCard.favorited') : t('recipeCard.favorite')}
             </Text>
           </TouchableOpacity>
 
@@ -122,7 +124,7 @@ export function RecipeCard({
             style={styles.seeMoreBtn}
             onPress={() => router.push({ pathname: '/recipe/[id]', params: { id } })}
           >
-            <Text style={styles.seeMoreText}>Ver mais</Text>
+            <Text style={styles.seeMoreText}>{t('recipeCard.seeMore')}</Text>
           </TouchableOpacity>
 
         </View>

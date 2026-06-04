@@ -22,11 +22,13 @@ import { usePortionScale } from '@/src/hooks/recipe/useRecipePortionScale'
 import { PortionSelector } from './components/RecipePortionSelector'
 import { scaleIngredient } from '@/src/utils/scaleIngredientUtil'
 import { RecipeTimer } from './components/RecipeTimer'
+import { useTranslation } from 'react-i18next'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 export default function RecipeDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>()
+    const { t } = useTranslation()
     const insets = useSafeAreaInsets()
 
     const {
@@ -107,7 +109,7 @@ export default function RecipeDetailScreen() {
                 ) : (
                     <View style={styles.photoPlaceholder}>
                         <Ionicons name="image-outline" size={56} color="rgba(255,255,255,0.25)" />
-                        <Text style={styles.photoPlaceholderText}>Sem foto</Text>
+                        <Text style={styles.photoPlaceholderText}>{t('recipeDetail.noPhoto')}</Text>
                     </View>
                 )}
 
@@ -133,7 +135,9 @@ export default function RecipeDetailScreen() {
                             </View>
                         )}
                         <View>
-                            <Text style={styles.authorName}>{recipe.author?.name ?? 'Autor desconhecido'}</Text>
+                            <Text style={styles.authorName}>
+                                {recipe.author?.name ?? t('recipeDetail.unknownAuthor')}
+                            </Text>
                             <Text style={styles.authorDate}>
                                 {new Date(recipe.createdAt).toLocaleDateString('pt-BR', {
                                     day: '2-digit', month: 'long', year: 'numeric',
@@ -145,22 +149,28 @@ export default function RecipeDetailScreen() {
                     <View style={styles.metaRow}>
                         <View style={styles.metaChip}>
                             <Ionicons name="time-outline" size={13} color={colors.primary} />
-                            <Text style={styles.metaChipText}>{recipe.time}min</Text>
+                            <Text style={styles.metaChipText}>
+                                {t('recipeDetail.timeUnit', { count: Number(recipe.time) })}
+                            </Text>
                         </View>
                         {recipe.difficulty && (
                             <View style={styles.metaChip}>
                                 <Ionicons name="flame-outline" size={13} color={colors.primary} />
-                                <Text style={styles.metaChipText}>{recipe.difficulty}</Text>
+                                <Text style={styles.metaChipText}>
+                                    {t(`difficulties.${recipe.difficulty}`, recipe.difficulty)}
+                                </Text>
                             </View>
                         )}
                         <View style={styles.metaChip}>
                             <Ionicons name="pricetag-outline" size={13} color={colors.primary} />
-                            <Text style={styles.metaChipText}>{recipe.category}</Text>
+                            <Text style={styles.metaChipText}>
+                                {t(`categories.${recipe.category}`, recipe.category)}
+                            </Text>
                         </View>
                         <View style={styles.metaChip}>
                             <Ionicons name="people-outline" size={13} color={colors.primary} />
                             <Text style={styles.metaChipText}>
-                                {recipe.portions} {Number(recipe.portions) === 1 ? 'porção' : 'porções'}
+                                {recipe.portions} {t('recipeDetail.portion', { count: Number(recipe.portions) })}
                             </Text>
                         </View>
                     </View>
@@ -170,7 +180,9 @@ export default function RecipeDetailScreen() {
                             {recipe.dietaryRestrictions.map(restriction => (
                                 <View key={restriction} style={styles.restrictionChip}>
                                     <Ionicons name="leaf-outline" size={11} color="#4CAF50" />
-                                    <Text style={styles.restrictionChipText}>{restriction}</Text>
+                                    <Text style={styles.restrictionChipText}>
+                                        {t(`dietaryRestrictions.${restriction}`, restriction)}
+                                    </Text>
                                 </View>
                             ))}
                         </View>
@@ -180,7 +192,7 @@ export default function RecipeDetailScreen() {
 
                     {recipe.description && (
                         <>
-                            <Text style={styles.sectionTitle}>Sobre a receita</Text>
+                            <Text style={styles.sectionTitle}>{t('recipeDetail.aboutTitle')}</Text>
                             <Text style={styles.descriptionText}>{recipe.description}</Text>
                             <View style={styles.divider} />
                         </>
@@ -195,7 +207,7 @@ export default function RecipeDetailScreen() {
 
                     <View style={styles.divider} />
 
-                    <Text style={styles.sectionTitle}>Ingredientes</Text>
+                    <Text style={styles.sectionTitle}>{t('recipeDetail.ingredientsTitle')}</Text>
                     {recipe.ingredients.map((ingredient, index) => {
                         const scaledQty = scaleIngredient(Number(ingredient.quantity), scale, ingredient.unit) 
                         return (
@@ -213,7 +225,7 @@ export default function RecipeDetailScreen() {
 
                     <View style={styles.divider} />
 
-                    <Text style={styles.sectionTitle}>Modo de Preparo</Text>
+                    <Text style={styles.sectionTitle}>{t('recipeDetail.preparationTitle')}</Text>
                     {recipe.preparation.split('\n').filter(s => s.trim()).map((step, index) => (
                         <View key={index} style={styles.stepRow}>
                             <View style={styles.stepNumber}>
@@ -234,7 +246,7 @@ export default function RecipeDetailScreen() {
                         </>
                     )}
 
-                    <Text style={styles.sectionTitle}>Avaliações</Text>
+                    <Text style={styles.sectionTitle}>{t('recipeDetail.reviewsTitle')}</Text>
 
                     <RatingAverage average={ratingAverage} count={ratingCount} />
 
@@ -253,7 +265,7 @@ export default function RecipeDetailScreen() {
                     )}
 
                     {comments.length === 0 ? (
-                        <Text style={styles.emptyComments}>Nenhum comentário ainda.</Text>
+                        <Text style={styles.emptyComments}>{t('recipeDetail.emptyComments')}</Text>
                     ) : (
                         comments.map(comment => (
                             <CommentCard

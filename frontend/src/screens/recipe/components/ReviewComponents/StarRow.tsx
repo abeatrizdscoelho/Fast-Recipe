@@ -32,5 +32,8 @@ export function StarRow({ rating, interactive = false, size = 20, onRate }: Prop
 }
 
 const styles = StyleSheet.create({
-    starsRow: { flexDirection: 'row', gap: 2 },
+    starsRow: { 
+        flexDirection: 'row', 
+        gap: 2 
+    },
 })

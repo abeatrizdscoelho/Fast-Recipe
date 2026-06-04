@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { colors } from '@/src/theme/color'
 import { PantrySuggestion } from '@/src/types/pantry'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     item: PantrySuggestion
@@ -11,6 +12,7 @@ interface Props {
 
 export function PantrySuggestionCard({ item }: Props) {
     const photo = item.photos?.[0]
+    const { t } = useTranslation()
 
     return (
         <TouchableOpacity
@@ -43,7 +45,7 @@ export function PantrySuggestionCard({ item }: Props) {
                 <View style={styles.matchBadge}>
                     <Ionicons name="checkmark-circle" size={12} color={colors.primary} />
                     <Text style={styles.matchText}>
-                        {item.matchCount} ingrediente{item.matchCount !== 1 ? 's' : ''} ({item.matchPercentage}%)
+                        {t('pantrySuggestion.match', { count: item.matchCount, percentage: item.matchPercentage })}
                     </Text>
                 </View>
             </View>

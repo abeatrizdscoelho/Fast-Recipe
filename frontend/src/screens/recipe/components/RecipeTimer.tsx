@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Vibration } from 'react-nativ
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '../../../theme/color'
 import { useRecipeTimer } from '../../../hooks/recipe/useRecipeTimer'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     time: string
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function RecipeTimer({ time, recipeTitle, onFinished }: Props) {
+    const { t } = useTranslation()
     const {
         formatted, progress, isRunning, isFinished, totalSeconds, start, pause, reset
     } = useRecipeTimer(time, recipeTitle)
@@ -28,7 +30,7 @@ export function RecipeTimer({ time, recipeTitle, onFinished }: Props) {
         <View style={styles.container}>
             <View style={styles.labelRow}>
                 <Ionicons name="time-outline" size={18} color={colors.primary} />
-                <Text style={styles.label}>Timer de Preparo</Text>
+                <Text style={styles.label}>{t('recipeTimer.title')}</Text>
             </View>
 
             <View style={styles.timerRow}>
@@ -52,20 +54,22 @@ export function RecipeTimer({ time, recipeTitle, onFinished }: Props) {
                                     size={18}
                                     color={colors.white}
                                 />
-                                <Text style={styles.btnText}>{isRunning ? 'Pausar' : 'Iniciar'}</Text>
+                                <Text style={styles.btnText}>
+                                    {isRunning ? t('recipeTimer.pause') : t('recipeTimer.start')}
+                                </Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity style={[styles.btn, styles.btnSecondary]} onPress={reset}>
                                 <Ionicons name="refresh-outline" size={16} color={colors.primary} />
-                                <Text style={styles.btnTextSecondary}>Resetar</Text>
+                                <Text style={styles.btnTextSecondary}>{t('recipeTimer.reset')}</Text>
                             </TouchableOpacity>
                         </>
                     ) : (
                         <>
-                            <Text style={styles.doneText}>Receita pronta!</Text>
+                            <Text style={styles.doneText}>{t('recipeTimer.done')}</Text>
                             <TouchableOpacity style={[styles.btn, styles.btnSecondary]} onPress={reset}>
                                 <Ionicons name="refresh-outline" size={16} color={colors.primary} />
-                                <Text style={styles.btnTextSecondary}>Usar novamente</Text>
+                                <Text style={styles.btnTextSecondary}>{t('recipeTimer.useAgain')}</Text>
                             </TouchableOpacity>
                         </>
                     )}
@@ -77,7 +81,7 @@ export function RecipeTimer({ time, recipeTitle, onFinished }: Props) {
             </View>
 
             {isRunning && (
-                <Text style={styles.hint}>O timer continua mesmo se você sair da tela.</Text>
+                <Text style={styles.hint}>{t('recipeTimer.backgroundHint')}</Text>
             )}
         </View>
     )

@@ -15,6 +15,7 @@ import { colors } from '../../theme/color'
 import { MonthStat, CategoryStat } from '../../types/stats'
 import { useProfileStats } from '@/src/hooks/profile/useProfileStats'
 import { BAR_COLORS, formatMonth } from '@/src/utils/statsUtil'
+import { useTranslation } from 'react-i18next'
 
 type IoniconsName = ComponentProps<typeof Ionicons>['name']
 
@@ -63,10 +64,13 @@ function BarChart({ data, maxValue }: { data: MonthStat[]; maxValue: number }) {
 }
 
 function HorizontalBar({ item, maxValue, color }: { item: CategoryStat; maxValue: number; color: string }) {
+    const { t } = useTranslation()
     const widthPct = maxValue > 0 ? (item.count / maxValue) * 100 : 0
     return (
         <View style={styles.hBarRow}>
-            <Text style={styles.hBarLabel} numberOfLines={1}>{item.category}</Text>
+            <Text style={styles.hBarLabel} numberOfLines={1}>
+                {t(`categories.${item.category}`, item.category)}
+            </Text>
             <View style={styles.hBarBackground}>
                 <View style={[styles.hBarFill, { width: `${widthPct}%`, backgroundColor: color }]} />
             </View>
@@ -85,6 +89,7 @@ function EmptyState({ icon, text }: { icon: IoniconsName; text: string }) {
 }
 
 export default function ProfileStatsScreen() {
+    const { t } = useTranslation()
     const { stats, fetching, loadStats, maxCooked, maxFavorites } = useProfileStats()
 
     useFocusEffect(
@@ -106,7 +111,7 @@ export default function ProfileStatsScreen() {
                 contentContainerStyle={styles.scrollContent}
             >
                 <View style={styles.card}>
-                    <Text style={styles.pageTitle}>Relatório de Estatísticas</Text>
+                    <Text style={styles.pageTitle}>{t('profileStats.title')}</Text>
 
                     {fetching ? (
                         <View style={styles.centered}>
@@ -115,20 +120,20 @@ export default function ProfileStatsScreen() {
                     ) : (
                         <>
                             <View style={styles.statsRow}>
-                                <StatCard icon="flame-outline" label="Cozinhadas" value={stats?.totalCooked ?? 0} />
-                                <StatCard icon="heart-outline" label="Favoritas"  value={stats?.totalFavorites ?? 0} />
-                                <StatCard icon="book-outline"  label="Criadas"    value={stats?.totalRecipesCreated ?? 0} />
+                                <StatCard icon="flame-outline" label={t('profileStats.statCooked')} value={stats?.totalCooked ?? 0} />
+                                <StatCard icon="heart-outline" label={t('profileStats.statFavorites')}  value={stats?.totalFavorites ?? 0} />
+                                <StatCard icon="book-outline"  label={t('profileStats.statCreated')}    value={stats?.totalRecipesCreated ?? 0} />
                             </View>
 
-                            <SectionCard title="Receitas Cozinhadas por Mês" icon="bar-chart-outline">
+                            <SectionCard title={t('profileStats.sectionCookedByMonth')} icon="bar-chart-outline">
                                 {stats && stats.cookedByMonth.length > 0 ? (
                                     <BarChart data={stats.cookedByMonth} maxValue={maxCooked} />
                                 ) : (
-                                    <EmptyState icon="bar-chart-outline" text="Nenhum dado ainda" />
+                                    <EmptyState icon="bar-chart-outline" text={t('profileStats.emptyData')} />
                                 )}
                             </SectionCard>
 
-                            <SectionCard title="Receitas Favoritas por Categoria" icon="heart-outline">
+                            <SectionCard title={t('profileStats.sectionFavoritesByCategory')} icon="heart-outline">
                                 {stats && stats.favoritesByCategory.length > 0 ? (
                                     <View style={styles.hBarsContainer}>
                                         {stats.favoritesByCategory.map((item, index) => (
@@ -141,7 +146,7 @@ export default function ProfileStatsScreen() {
                                         ))}
                                     </View>
                                 ) : (
-                                    <EmptyState icon="pie-chart-outline" text="Nenhum favorito ainda" />
+                                    <EmptyState icon="pie-chart-outline" text={t('profileStats.emptyFavorites')} />
                                 )}
                             </SectionCard>
                         </>

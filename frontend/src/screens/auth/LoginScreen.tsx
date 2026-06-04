@@ -7,8 +7,10 @@ import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { useLogin } from '../../hooks/auth/useLogin';
 import { colors } from '../../theme/color';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginScreen() {
+  const { t } = useTranslation()
   const {
     email, setEmail, password, setPassword,
     showPassword, setShowPassword, loading,
@@ -34,10 +36,10 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>LOGIN</Text>
+          <Text style={styles.title}>{t('auth.login.title')}</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('auth.login.labelEmail')}</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -49,7 +51,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Senha</Text>
+            <Text style={styles.label}>{t('auth.login.labelPassword')}</Text>
             <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
               <TextInput
                 value={password}
@@ -67,7 +69,7 @@ export default function LoginScreen() {
           <TouchableOpacity
             onPress={() => router.push('/(auth)/forgot-password')}
             style={styles.forgotWrapper}>
-            <Text style={styles.forgotText}>Esqueci minha senha</Text>
+            <Text style={styles.forgotText}>{t('auth.login.forgotPassword')}</Text>
           </TouchableOpacity>
 
           {apiError ? <FieldError message={apiError} centered={true} /> : null}
@@ -76,13 +78,15 @@ export default function LoginScreen() {
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? 'ENTRANDO...' : 'ENTRAR'}</Text>
+            <Text style={styles.buttonText}>
+              {loading ? t('auth.login.loadingBtn') : t('auth.login.submitBtn')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/(auth)/register')} style={styles.registerWrapper}>
             <Text style={styles.registerText}>
-              Não tem uma conta?{' '}
-              <Text style={styles.registerBold}>Cadastre-se</Text>
+              {t('auth.login.registerPrompt')}{' '}
+              <Text style={styles.registerBold}>{t('auth.login.registerAction')}</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -94,7 +98,10 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: colors.primary },
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.primary 
+  },
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
@@ -106,7 +113,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { width: 200, height: 200 },
+  logo: { 
+    width: 200, 
+    height: 200 
+  },
   card: {
     width: '100%',
     backgroundColor: colors.white,
@@ -126,9 +136,20 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 32 },
-  inputGroup: { marginBottom: 24 },
-  label: { color: colors.gray, marginBottom: 4, fontSize: 14 },
+  title: { 
+    color: colors.primary, 
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    marginBottom: 32 
+  },
+  inputGroup: { 
+    marginBottom: 24 
+  },
+  label: { 
+    color: colors.gray, 
+    marginBottom: 4, 
+    fontSize: 14 
+  },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
@@ -136,17 +157,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.black,
   },
-  inputError: { borderBottomColor: colors.error },
-  inputNoBorder: { paddingBottom: 8, fontSize: 16, color: colors.black },
+  inputError: { 
+    borderBottomColor: colors.error 
+  },
+  inputNoBorder: { 
+    paddingBottom: 8, 
+    fontSize: 16, 
+    color: colors.black 
+  },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: colors.primary,
   },
-  passwordRowError: { borderBottomColor: colors.error },
-  forgotWrapper: { alignItems: 'flex-end', marginBottom: 16 },
-  forgotText: { color: colors.gray, fontSize: 13 },
+  passwordRowError: { 
+    borderBottomColor: colors.error 
+  },
+  forgotWrapper: { 
+    alignItems: 'flex-end', 
+    marginBottom: 16 
+  },
+  forgotText: { 
+    color: colors.gray, 
+    fontSize: 13 
+  },
   button: {
     backgroundColor: colors.primary,
     borderRadius: 50,
@@ -155,9 +190,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 8,
   },
-  buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: colors.white, fontWeight: 'bold', letterSpacing: 2, fontSize: 15 },
-  registerWrapper: { alignItems: 'center' },
-  registerText: { color: colors.primary, fontSize: 13 },
-  registerBold: { fontWeight: 'bold', },
+  buttonDisabled: { 
+    opacity: 0.7 
+  },
+  buttonText: { 
+    color: colors.white, 
+    fontWeight: 'bold', 
+    letterSpacing: 2, 
+    fontSize: 15 
+  },
+  registerWrapper: { 
+    alignItems: 'center' 
+  },
+  registerText: { 
+    color: colors.primary, 
+    fontSize: 13 
+  },
+  registerBold: { 
+    fontWeight: 'bold', 
+  },
 })

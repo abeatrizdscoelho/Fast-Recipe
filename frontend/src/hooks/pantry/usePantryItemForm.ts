@@ -3,11 +3,12 @@ import { Alert } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { pantryService } from '@/src/services/pantryService'
 import { PantryItem } from '@/src/types/pantry'
-import { PANTRY_CATEGORIES } from '@/src/validations/pantryValidation'
-import { INGREDIENT_UNITS } from '@/src/hooks/recipe/useRecipeForm'
 import { formatDateInput, parseDateInputToISO, formatISOToDateInput } from '@/src/utils/dateUtil'
+import { useAppConstants } from '../useAppConstants'
+import { useTranslation } from 'react-i18next'
 
 export function usePantryItemForm() {
+    const { t } = useTranslation()
     const params = useLocalSearchParams<{
         mode: 'add' | 'edit'
         item?: string
@@ -20,10 +21,12 @@ export function usePantryItemForm() {
     const [quantity, setQuantity] = useState(editItem ? String(editItem.quantity) : '')
     const [unit, setUnit] = useState(editItem?.unit ?? '')
     const [unitOpen, setUnitOpen] = useState(false)
-    const [category, setCategory] = useState(editItem?.category ?? 'Outros')
+    const [category, setCategory] = useState(editItem?.category ?? 'Others')
     const [expiresAt, setExpiresAt] = useState(formatISOToDateInput(editItem?.expiresAt ?? null))
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<{ name?: string; quantity?: string; unit?: string; expiresAt?: string }>({})
+
+    const { INGREDIENT_UNITS, INGREDIENT_CATEGORIES } = useAppConstants()
 
     function handleExpiresAtChange(value: string) {
         setExpiresAt(formatDateInput(value))
@@ -31,13 +34,16 @@ export function usePantryItemForm() {
 
     function validate() {
         const next: typeof errors = {}
-        if (!name.trim()) next.name = 'Informe o nome do ingrediente.'
+        if (!name.trim()) next.name = t('pantry.validation.nameRequired')
+        
         const qty = parseFloat(quantity.replace(',', '.'))
-        if (isNaN(qty) || qty <= 0) next.quantity = 'Informe uma quantidade válida.'
-        if (!unit.trim()) next.unit = 'Selecione uma unidade.'
+        if (isNaN(qty) || qty <= 0) next.quantity = t('pantry.validation.quantityInvalid')
+        
+        if (!unit.trim()) next.unit = t('pantry.validation.unitRequired')
+        
         if (expiresAt && expiresAt.replace(/\D/g, '').length === 8) {
             const parsed = parseDateInputToISO(expiresAt)
-            if (!parsed) next.expiresAt = 'Data inválida.'
+            if (!parsed) next.expiresAt = t('pantry.validation.dateInvalid')
         }
         setErrors(next)
         return Object.keys(next).length === 0
@@ -47,14 +53,13 @@ export function usePantryItemForm() {
         if (!validate()) return
         setLoading(true)
         const qty = parseFloat(quantity.replace(',', '.'))
-
         const isoExpiry = expiresAt ? parseDateInputToISO(expiresAt) : null
 
         const payload = {
             name: name.trim(),
             quantity: qty,
             unit: unit.trim(),
-            category: category.trim() || 'Outros',
+            category: category.trim() || 'Others',
             expiresAt: isoExpiry,
         }
 
@@ -66,7 +71,7 @@ export function usePantryItemForm() {
             }
             router.back()
         } catch (err) {
-            Alert.alert('Erro', err instanceof Error ? err.message : 'Erro ao salvar item')
+            Alert.alert(t('pantry.alerts.errorTitle'), err instanceof Error ? err.message : t('pantry.alerts.saveError'))
         } finally {
             setLoading(false)
         }
@@ -81,7 +86,7 @@ export function usePantryItemForm() {
         category, setCategory,
         expiresAt,
         handleExpiresAtChange,
-        allCategories: [...PANTRY_CATEGORIES],
+        allCategories: [...INGREDIENT_CATEGORIES],
         allUnits: INGREDIENT_UNITS,
         loading,
         errors,

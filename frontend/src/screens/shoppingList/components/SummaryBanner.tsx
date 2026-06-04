@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet, DimensionValue } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     pending: number
@@ -9,8 +10,10 @@ interface Props {
 }
 
 export function SummaryBanner({ pending, bought }: Props) {
+    const { t } = useTranslation()
     const total = pending + bought
     const progress = total > 0 ? bought / total : 0
+    const percentValue = Math.round(progress * 100)
 
     return (
         <View style={styles.container}>
@@ -21,7 +24,7 @@ export function SummaryBanner({ pending, bought }: Props) {
                         <Ionicons name="cart-outline" size={20} color={colors.primary} />
                     </View>
                     <Text style={styles.count}>{pending}</Text>
-                    <Text style={styles.label}>Pendentes</Text>
+                    <Text style={styles.label}>{t('shoppingList.pending')}</Text>
                 </View>
 
                 <View style={styles.divider} />
@@ -31,7 +34,7 @@ export function SummaryBanner({ pending, bought }: Props) {
                         <Ionicons name="checkmark-circle-outline" size={20} color="#4CAF50" />
                     </View>
                     <Text style={[styles.count, bought > 0 && styles.countDone]}>{bought}</Text>
-                    <Text style={styles.label}>Comprados</Text>
+                    <Text style={styles.label}>{t('shoppingList.bought')}</Text>
                 </View>
             </View>
 
@@ -41,7 +44,7 @@ export function SummaryBanner({ pending, bought }: Props) {
                         <View style={[styles.progressFill, { width: `${progress * 100}%` as DimensionValue }]} />
                     </View>
                     <Text style={styles.progressLabel}>
-                        {Math.round(progress * 100)}% concluído
+                        {t('shoppingList.completedPercent', { percent: percentValue })}
                     </Text>
                 </View>
             )}

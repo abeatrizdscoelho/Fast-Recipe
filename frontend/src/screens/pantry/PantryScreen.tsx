@@ -11,8 +11,10 @@ import { BottomNav } from '@/src/components/BottomNav'
 import { SearchBar } from '@/src/components/SearchBar'
 import { usePantry } from '@/src/hooks/pantry/usePantry'
 import { PantryItemCard } from './components/PantryItemCard'
+import { useTranslation } from 'react-i18next'
 
 export default function PantryScreen() {
+    const { t } = useTranslation()
     const {
         items,
         loading,
@@ -38,17 +40,15 @@ export default function PantryScreen() {
 
             <View style={styles.headerSection}>
                 <View>
-                    <Text style={styles.headerTitle}>Minha Despensa</Text>
-                    <Text style={styles.headerSub}>
-                        Adicione os ingredientes que você tem em casa{'\n'}e descubra receitas incríveis!
-                    </Text>
+                    <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
+                    <Text style={styles.headerSub}>{t('pantry.subtitle')}</Text>
                 </View>
                 <TouchableOpacity
                     style={styles.refreshBadge}
                     onPress={onRefresh}
                 >
                     <Ionicons name="refresh-outline" size={14} color={colors.white} />
-                    <Text style={styles.refreshBadgeText}>Atualizar</Text>
+                    <Text style={styles.refreshBadgeText}>{t('pantry.refresh')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -72,7 +72,7 @@ export default function PantryScreen() {
                                     <SearchBar
                                         value={search}
                                         onChangeText={setSearch}
-                                        placeholder="Buscar ingrediente..."
+                                        placeholder={t('pantry.searchPlaceholder')}
                                     />
                                 </View>
                                 <ScrollView
@@ -83,12 +83,12 @@ export default function PantryScreen() {
                                 >
                                     {categories.map(cat => (
                                         <TouchableOpacity
-                                            key={cat}
-                                            style={[styles.chip, selectedCategory === cat && styles.chipActive]}
-                                            onPress={() => setSelectedCategory(cat)}
+                                            key={cat.key}
+                                            style={[styles.chip, selectedCategory === cat.key && styles.chipActive]}
+                                            onPress={() => setSelectedCategory(cat.key)}
                                         >
-                                            <Text style={[styles.chipText, selectedCategory === cat && styles.chipTextActive]}>
-                                                {cat} ({categoryCounts[cat] ?? 0})
+                                            <Text style={[styles.chipText, selectedCategory === cat.key && styles.chipTextActive]}>
+                                                {cat.label} ({categoryCounts[cat.key] ?? 0})
                                             </Text>
                                         </TouchableOpacity>
                                     ))}
@@ -117,10 +117,8 @@ export default function PantryScreen() {
                                     <Ionicons name="color-wand-outline" size={22} color={colors.primary} />
                                 </View>
                                 <View style={styles.suggestionsBannerText}>
-                                    <Text style={styles.suggestionsBannerTitle}>Pronto para encontrar receitas?</Text>
-                                    <Text style={styles.suggestionsBannerSub}>
-                                        Com seus ingredientes, podemos sugerir receitas deliciosas para você!
-                                    </Text>
+                                    <Text style={styles.suggestionsBannerTitle}>{t('pantry.suggestionsTitle')}</Text>
+                                    <Text style={styles.suggestionsBannerSub}>{t('pantry.suggestionsSub')}</Text>
                                 </View>
                                 <Ionicons name="chevron-forward" size={18} color={colors.primary} />
                             </TouchableOpacity>
@@ -131,10 +129,8 @@ export default function PantryScreen() {
                                 <View style={styles.emptyIllustration}>
                                     <Ionicons name="basket-outline" size={56} color={colors.primary} style={{ opacity: 0.3 }} />
                                 </View>
-                                <Text style={styles.emptyTitle}>Sua despensa está vazia</Text>
-                                <Text style={styles.emptySubText}>
-                                    Adicione ingredientes para receber{'\n'}sugestões de receitas personalizadas!
-                                </Text>
+                                <Text style={styles.emptyTitle}>{t('pantry.emptyTitle')}</Text>
+                                <Text style={styles.emptySubText}>{t('pantry.emptySub')}</Text>
                             </View>
                         )}
 

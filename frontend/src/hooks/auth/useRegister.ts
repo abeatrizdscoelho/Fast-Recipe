@@ -3,8 +3,10 @@ import { ValidationError } from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import { registerValidation } from '../../validations/authValidation';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export function useRegister() {
+  const { t } = useTranslation()
   const { register } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -32,7 +34,7 @@ export function useRegister() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : 'Erro ao cadastrar')
+        setApiError(err instanceof Error ? err.message : t('auth.errors.registerError'))
       }
     } finally {
       setLoading(false)

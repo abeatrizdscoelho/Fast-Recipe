@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, TextInput, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
     value: string
@@ -9,13 +10,16 @@ interface Props {
     autoFocus?: boolean
 }
 
-export function SearchBar({ value, onChangeText, placeholder = 'Pesquisar...', autoFocus = false }: Props) {
+export function SearchBar({ value, onChangeText, placeholder, autoFocus = false }: Props) {
+    const { t } = useTranslation()
+    const resolvedPlaceholder = placeholder || t('components.searchBar.placeholder')
+
     return (
         <View style={styles.container}>
             <Ionicons name="search-outline" size={20} color="#aaa" style={styles.icon} />
             <TextInput
                 style={styles.input}
-                placeholder={placeholder}
+                placeholder={resolvedPlaceholder}
                 placeholderTextColor="#aaa"
                 value={value}
                 onChangeText={onChangeText}
