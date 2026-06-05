@@ -32,7 +32,7 @@ export function useForgotPassword() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : t('auth.errors.sendEmailError'))
+        setApiError(err instanceof Error ? err.message : t('errors.sendEmailError'))
       }
     } finally {
       setLoading(false)

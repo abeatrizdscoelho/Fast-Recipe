@@ -32,7 +32,7 @@ export function useLogin() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : t('auth.errors.loginError'))
+        setApiError(err instanceof Error ? err.message : t('errors.loginError'))
       }
     } finally {
       setLoading(false)

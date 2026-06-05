@@ -36,10 +36,10 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>{t('auth.login.title')}</Text>
+          <Text style={styles.title}>{t('login.title')}</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.login.labelEmail')}</Text>
+            <Text style={styles.label}>{t('login.labelEmail')}</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -51,7 +51,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.login.labelPassword')}</Text>
+            <Text style={styles.label}>{t('login.labelPassword')}</Text>
             <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
               <TextInput
                 value={password}
@@ -69,7 +69,7 @@ export default function LoginScreen() {
           <TouchableOpacity
             onPress={() => router.push('/(auth)/forgot-password')}
             style={styles.forgotWrapper}>
-            <Text style={styles.forgotText}>{t('auth.login.forgotPassword')}</Text>
+            <Text style={styles.forgotText}>{t('login.forgotPassword')}</Text>
           </TouchableOpacity>
 
           {apiError ? <FieldError message={apiError} centered={true} /> : null}
@@ -79,14 +79,14 @@ export default function LoginScreen() {
             onPress={handleLogin}
             disabled={loading}>
             <Text style={styles.buttonText}>
-              {loading ? t('auth.login.loadingBtn') : t('auth.login.submitBtn')}
+              {loading ? t('login.loadingBtn') : t('login.submitBtn')}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/(auth)/register')} style={styles.registerWrapper}>
             <Text style={styles.registerText}>
-              {t('auth.login.registerPrompt')}{' '}
-              <Text style={styles.registerBold}>{t('auth.login.registerAction')}</Text>
+              {t('login.registerPrompt')}{' '}
+              <Text style={styles.registerBold}>{t('login.registerAction')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

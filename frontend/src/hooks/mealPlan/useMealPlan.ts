@@ -10,6 +10,7 @@ import { useAppConstants } from '../useAppConstants'
 import { useTranslation } from 'react-i18next'
 import NetInfo from '@react-native-community/netinfo'
 import { mealPlanStorage } from '@/src/storage/mealPlanStorage'
+import { mealNotificationService } from '@/src/services/mealPlanNotificationService'
 
 export function useMealPlan() {
     const today = new Date()
@@ -48,6 +49,7 @@ export function useMealPlan() {
                 const data = await mealPlanService.getWeekPlan(weekStart)
                 setMealPlan(data.mealPlan)
                 await mealPlanStorage.save(data.mealPlan)
+                await mealNotificationService.scheduleForWeek(data.mealPlan)
             }
         } catch (err) {
             Alert.alert(
@@ -135,6 +137,7 @@ export function useMealPlan() {
             }
             setMealPlan(updated)
             await mealPlanStorage.save(updated)
+            await mealNotificationService.scheduleForWeek(updated)
         } catch (err) {
             Alert.alert(
                 t('mealPlan.alerts.errorTitle'),
@@ -155,6 +158,7 @@ export function useMealPlan() {
                             const res = await mealPlanService.removeEntry(entryId)
                             setMealPlan(res.mealPlan)
                             await mealPlanStorage.save(res.mealPlan)
+                            await mealNotificationService.scheduleForWeek(res.mealPlan)
                         } catch (err) {
                             Alert.alert(
                                 t('mealPlan.alerts.errorTitle'),
@@ -205,6 +209,7 @@ export function useMealPlan() {
                 }
             })
             await mealPlanStorage.save(res.mealPlan)
+            await mealNotificationService.scheduleForWeek(res.mealPlan) 
         } catch (err) {
             setMealPlan(prev => {
                 if (!prev) return prev

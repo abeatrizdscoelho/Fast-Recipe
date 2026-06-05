@@ -5,6 +5,17 @@ import * as Notifications from 'expo-notifications'
 import { AuthProvider } from '@/src/context/AuthContext'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { initI18n } from '@/src/lang'
+import { mealNotificationService } from '@/src/services/mealPlanNotificationService'
+
+Notifications.setNotificationHandler({                            
+  handleNotification: async () => ({                      
+    shouldShowAlert: true,                                
+    shouldPlaySound: true,                                  
+    shouldSetBadge: false,
+    shouldShowBanner: true,   
+    shouldShowList: true,                                     
+  }),                                                       
+})                                                       
 
 if (Platform.OS === 'android') {
   Notifications.setNotificationChannelAsync('timer', {
@@ -13,13 +24,22 @@ if (Platform.OS === 'android') {
     sound: 'default',
     vibrationPattern: [0, 400, 200, 400],
   })
+
+  Notifications.setNotificationChannelAsync('meal-reminders', {  
+    name: 'Lembretes de refeições',                               
+    importance: Notifications.AndroidImportance.DEFAULT,          
+    sound: 'default',                                             
+  })                                                              
 }
 
 export default function RootLayout() {
   const [i18nReady, setI18nReady] = useState(false)
 
   useEffect(() => {
-    initI18n().then(() => setI18nReady(true))
+    initI18n().then(() => {
+      setI18nReady(true)
+      mealNotificationService.requestPermission()                 
+    })
   }, [])
 
   if (!i18nReady) return null

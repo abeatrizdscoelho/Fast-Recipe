@@ -34,7 +34,7 @@ export function useResetPassword() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : t('auth.errors.resetPasswordError'))
+        setApiError(err instanceof Error ? err.message : t('errors.resetPasswordError'))
       }
     } finally {
       setLoading(false)

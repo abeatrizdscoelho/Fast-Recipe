@@ -34,17 +34,17 @@ export default function ForgotPasswordScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>{t('auth.forgotPassword.title')}</Text>
-          <Text style={styles.subtitle}>{t('auth.forgotPassword.subtitle')}</Text>
+          <Text style={styles.title}>{t('forgotPassword.title')}</Text>
+          <Text style={styles.subtitle}>{t('forgotPassword.subtitle')}</Text>
 
           {success ? (
             <Text style={styles.successText}>
-              {t('auth.forgotPassword.successMessage')}
+              {t('forgotPassword.successMessage')}
             </Text>
           ) : (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('auth.forgotPassword.labelEmail')}</Text>
+                <Text style={styles.label}>{t('forgotPassword.labelEmail')}</Text>
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
@@ -56,7 +56,7 @@ export default function ForgotPasswordScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('auth.forgotPassword.labelConfirmEmail')}</Text>
+                <Text style={styles.label}>{t('forgotPassword.labelConfirmEmail')}</Text>
                 <TextInput
                   value={confirmEmail}
                   onChangeText={setConfirmEmail}
@@ -74,14 +74,14 @@ export default function ForgotPasswordScreen() {
                 onPress={handleForgotPassword}
                 disabled={loading}>
                 <Text style={styles.buttonText}>
-                  {loading ? t('auth.forgotPassword.loadingBtn') : t('auth.forgotPassword.submitBtn')}
+                  {loading ? t('forgotPassword.loadingBtn') : t('forgotPassword.submitBtn')}
                 </Text>
               </TouchableOpacity>
             </>
           )}
 
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backWrapper}>
-            <Text style={styles.backText}>{t('auth.forgotPassword.backToLogin')}</Text>
+            <Text style={styles.backText}>{t('forgotPassword.backToLogin')}</Text>
           </TouchableOpacity>
         </View>
 

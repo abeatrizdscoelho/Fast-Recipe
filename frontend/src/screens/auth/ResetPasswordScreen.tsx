@@ -36,22 +36,22 @@ export default function ResetPasswordScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>{t('auth.resetPassword.title')}</Text>
-          <Text style={styles.subtitle}>{t('auth.resetPassword.subtitle')}</Text>
+          <Text style={styles.title}>{t('resetPassword.title')}</Text>
+          <Text style={styles.subtitle}>{t('resetPassword.subtitle')}</Text>
 
           {success ? (
             <>
-              <Text style={styles.successText}>{t('auth.resetPassword.successMessage')}</Text>
+              <Text style={styles.successText}>{t('resetPassword.successMessage')}</Text>
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => router.replace('/(auth)/login')}>
-                <Text style={styles.buttonText}>{t('auth.resetPassword.goToLoginBtn')}</Text>
+                <Text style={styles.buttonText}>{t('resetPassword.goToLoginBtn')}</Text>
               </TouchableOpacity>
             </>
           ) : (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('auth.resetPassword.labelNewPassword')}</Text>
+                <Text style={styles.label}>{t('resetPassword.labelNewPassword')}</Text>
                 <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
                   <TextInput
                     value={password}
@@ -67,7 +67,7 @@ export default function ResetPasswordScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('auth.resetPassword.labelConfirmPassword')}</Text>
+                <Text style={styles.label}>{t('resetPassword.labelConfirmPassword')}</Text>
                 <View style={[styles.passwordRow, errors.confirmPassword ? styles.passwordRowError : null]}>
                   <TextInput
                     value={confirmPassword}
@@ -89,14 +89,14 @@ export default function ResetPasswordScreen() {
                 onPress={handleResetPassword}
                 disabled={loading}>
                 <Text style={styles.buttonText}>
-                  {loading ? t('auth.resetPassword.loadingBtn') : t('auth.resetPassword.submitBtn')}
+                  {loading ? t('resetPassword.loadingBtn') : t('resetPassword.submitBtn')}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => router.replace('/(auth)/login')}
                 style={styles.backWrapper}>
-                <Text style={styles.backText}>{t('auth.resetPassword.backToLogin')}</Text>
+                <Text style={styles.backText}>{t('resetPassword.backToLogin')}</Text>
               </TouchableOpacity>
             </>
           )}

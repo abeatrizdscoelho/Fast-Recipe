@@ -36,10 +36,10 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.title}>{t('auth.register.title')}</Text>
+          <Text style={styles.title}>{t('register.title')}</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.register.labelName')}</Text>
+            <Text style={styles.label}>{t('register.labelName')}</Text>
             <TextInput
               value={name}
               onChangeText={setName}
@@ -50,7 +50,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.register.labelEmail')}</Text>
+            <Text style={styles.label}>{t('register.labelEmail')}</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -62,7 +62,7 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.register.labelPassword')}</Text>
+            <Text style={styles.label}>{t('register.labelPassword')}</Text>
             <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
               <TextInput
                 value={password}
@@ -84,14 +84,14 @@ export default function RegisterScreen() {
             onPress={handleRegister}
             disabled={loading}>
             <Text style={styles.buttonText}>
-              {loading ? t('auth.register.loadingBtn') : t('auth.register.submitBtn')}
+              {loading ? t('register.loadingBtn') : t('register.submitBtn')}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/(auth)/login')} style={styles.loginWrapper}>
             <Text style={styles.loginText}>
-              {t('auth.register.loginPrompt')}{' '}
-              <Text style={styles.loginBold}>{t('auth.register.loginAction')}</Text>
+              {t('register.loginPrompt')}{' '}
+              <Text style={styles.loginBold}>{t('register.loginAction')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

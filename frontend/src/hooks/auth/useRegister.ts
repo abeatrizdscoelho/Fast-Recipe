@@ -34,7 +34,7 @@ export function useRegister() {
         })
         setErrors(fieldErrors)
       } else {
-        setApiError(err instanceof Error ? err.message : t('auth.errors.registerError'))
+        setApiError(err instanceof Error ? err.message : t('errors.registerError'))
       }
     } finally {
       setLoading(false)
