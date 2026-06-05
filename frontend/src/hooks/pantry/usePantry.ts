@@ -4,21 +4,33 @@ import { pantryService } from '@/src/services/pantryService'
 import { PantryItem } from '@/src/types/pantry'
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
+import NetInfo from '@react-native-community/netinfo'         
+import { pantryStorage } from '@/src/storage/pantryStorage'  
 
 export function usePantry() {
     const { t } = useTranslation()
     const [items, setItems] = useState<PantryItem[]>([])
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
+    const [isOffline, setIsOffline] = useState(false)         
     const [search, setSearch] = useState('')
-    
     const [selectedCategory, setSelectedCategory] = useState('all')
 
     const loadItems = useCallback(async (silent = false) => {
         if (!silent) setLoading(true)
         try {
-            const data = await pantryService.getItems()
-            setItems(data.items)
+            const net = await NetInfo.fetch()                 
+            const offline = !net.isConnected                  
+            setIsOffline(offline)                             
+
+            if (offline) {                                    
+                const local = await pantryStorage.getAll()   
+                setItems(local)                               
+            } else {
+                const data = await pantryService.getItems()
+                setItems(data.items)
+                await pantryStorage.save(data.items)          
+            }
         } catch (err) {
             Alert.alert(t('pantry.alerts.errorTitle'), err instanceof Error ? err.message : t('pantry.alerts.loadError'))
         } finally {
@@ -56,6 +68,7 @@ export function usePantry() {
                         setItems(prev => prev.filter(i => i.id !== item.id))
                         try {
                             await pantryService.deleteItem(item.id)
+                            await pantryStorage.remove(item.id)  
                         } catch (err) {
                             loadItems(true)
                             Alert.alert(t('pantry.alerts.errorTitle'), err instanceof Error ? err.message : t('pantry.alerts.removeError'))
@@ -93,6 +106,7 @@ export function usePantry() {
         loading,
         refreshing,
         onRefresh,
+        isOffline,                                          
         search,
         setSearch,
         selectedCategory,

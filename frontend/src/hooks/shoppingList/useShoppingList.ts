@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Alert } from 'react-native'
 import { router } from 'expo-router'
+import NetInfo from '@react-native-community/netinfo'
 import { shoppingListService } from '@/src/services/shoppingListService'
 import { ShoppingList, ShoppingListItem } from '@/src/types/shoppingList'
 import { consolidateShoppingList } from '@/src/utils/consolidateShoppingListUtil'
+import { shoppingListStorage } from '@/src/storage/shoppingListStorage'
 import { useTranslation } from 'react-i18next'
 
 export function useShoppingList(weekStart?: string) {
@@ -11,18 +13,35 @@ export function useShoppingList(weekStart?: string) {
     const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
+    const [isOffline, setIsOffline] = useState(false)
     const [message, setMessage] = useState<string | undefined>()
     const [search, setSearch] = useState('')
 
     const loadList = useCallback(async (silent = false) => {
         if (!silent) setLoading(true)
         try {
+            const net = await NetInfo.fetch()
+            const offline = !net.isConnected
+            setIsOffline(offline)
+
+            if (offline) {
+                const key = weekStart ?? new Date().toISOString().slice(0, 10)
+                const local = await shoppingListStorage.getByWeek(key)
+                if (local) {
+                    const consolidated = consolidateShoppingList(local.items) as ShoppingListItem[]
+                    setShoppingList({ ...local, items: consolidated })
+                }
+                return
+            }
+
             const data = await shoppingListService.getList(weekStart)
             const list = data.shoppingList
             if (!list) return
             const consolidatedItems = consolidateShoppingList(list.items) as ShoppingListItem[]
-            setShoppingList({ ...list, items: consolidatedItems })
+            const consolidated = { ...list, items: consolidatedItems }
+            setShoppingList(consolidated)
             setMessage(data.message)
+            await shoppingListStorage.save(consolidated)
         } catch (err) {
             Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingListScreen.loadError'))
         } finally {
@@ -39,27 +58,49 @@ export function useShoppingList(weekStart?: string) {
     }, [loadList])
 
     async function handleToggleBought(item: ShoppingListItem) {
+        const key = item.ingredientIds.join()
+        const newBought = !item.bought
+
         setShoppingList(prev => {
             if (!prev) return prev
             return {
                 ...prev,
                 items: prev.items.map(i =>
-                    i.ingredientIds.join() === item.ingredientIds.join() ? { ...i, bought: !i.bought } : i
+                    i.ingredientIds.join() === key ? { ...i, bought: newBought } : i
                 ),
             }
         })
+
+        if (shoppingList?.weekStart) {
+            await shoppingListStorage.updateItemBought(
+                shoppingList.weekStart,
+                item.ingredientIds,
+                newBought
+            )
+        }
+        
+        const net = await NetInfo.fetch()                                        
+        if (!net.isConnected) return                                             
+
         try {
-            await shoppingListService.toggleBought({ ingredientIds: item.ingredientIds, bought: !item.bought })
+            await shoppingListService.toggleBought({ ingredientIds: item.ingredientIds, bought: newBought })
         } catch (err) {
             setShoppingList(prev => {
                 if (!prev) return prev
                 return {
                     ...prev,
                     items: prev.items.map(i =>
-                        i.ingredientIds.join() === item.ingredientIds.join() ? { ...i, bought: item.bought } : i
+                        i.ingredientIds.join() === key ? { ...i, bought: item.bought } : i
                     ),
                 }
             })
+            if (shoppingList?.weekStart) {
+                await shoppingListStorage.updateItemBought(
+                    shoppingList.weekStart,
+                    item.ingredientIds,
+                    item.bought
+                )
+            }
             Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingListScreen.toggleError'))
         }
     }
@@ -93,15 +134,17 @@ export function useShoppingList(weekStart?: string) {
                 { text: t('common.cancel'), style: 'cancel' },
                 { text: t('common.remove'), style: 'destructive',
                     onPress: async () => {
+                        const key = item.ingredientIds.join()
                         setShoppingList(prev => {
                             if (!prev) return prev
                             return {
                                 ...prev,
-                                items: prev.items.filter(i => i.ingredientIds.join() !== item.ingredientIds.join()),
+                                items: prev.items.filter(i => i.ingredientIds.join() !== key),
                             }
                         })
                         try {
                             await shoppingListService.deleteItem({ ingredientIds: item.ingredientIds })
+                            await loadList(true)
                         } catch (err) {
                             loadList(true)
                             Alert.alert(t('common.errorTitle'), err instanceof Error ? err.message : t('shoppingListScreen.removeError'))
@@ -132,6 +175,7 @@ export function useShoppingList(weekStart?: string) {
     return {
         shoppingList,
         loading, refreshing, onRefresh,
+        isOffline,
         message,
         search, setSearch,
         categories,

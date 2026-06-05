@@ -8,6 +8,8 @@ import { useState, useCallback, useEffect } from 'react'
 import { Alert } from 'react-native'
 import { useAppConstants } from '../useAppConstants'
 import { useTranslation } from 'react-i18next'
+import NetInfo from '@react-native-community/netinfo'
+import { mealPlanStorage } from '@/src/storage/mealPlanStorage'
 
 export function useMealPlan() {
     const today = new Date()
@@ -21,8 +23,9 @@ export function useMealPlan() {
     const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [selectingSlot, setSelectingSlot] = useState<{ 
-        dayOfWeek: number; mealType: MealType; replaceEntryId?: string 
+    const [isOffline, setIsOffline] = useState(false)
+    const [selectingSlot, setSelectingSlot] = useState<{
+        dayOfWeek: number; mealType: MealType; replaceEntryId?: string
     } | null>(null)
     const [recipes, setRecipes] = useState<FeedRecipe[]>([])
     const [recipeSearch, setRecipeSearch] = useState('')
@@ -34,11 +37,21 @@ export function useMealPlan() {
     const loadPlan = useCallback(async (weekStart: string, silent = false) => {
         if (!silent) setLoading(true)
         try {
-            const data = await mealPlanService.getWeekPlan(weekStart)
-            setMealPlan(data.mealPlan)
+            const net = await NetInfo.fetch()
+            const offline = !net.isConnected
+            setIsOffline(offline)
+
+            if (offline) {
+                const local = await mealPlanStorage.getByWeek(weekStart)
+                setMealPlan(local)
+            } else {
+                const data = await mealPlanService.getWeekPlan(weekStart)
+                setMealPlan(data.mealPlan)
+                await mealPlanStorage.save(data.mealPlan)
+            }
         } catch (err) {
             Alert.alert(
-                t('mealPlan.alerts.errorTitle'), 
+                t('mealPlan.alerts.errorTitle'),
                 err instanceof Error ? err.message : t('mealPlan.alerts.loadError')
             )
         } finally {
@@ -121,9 +134,10 @@ export function useMealPlan() {
                 updated = res.mealPlan
             }
             setMealPlan(updated)
+            await mealPlanStorage.save(updated)
         } catch (err) {
             Alert.alert(
-                t('mealPlan.alerts.errorTitle'), 
+                t('mealPlan.alerts.errorTitle'),
                 err instanceof Error ? err.message : t('mealPlan.alerts.addRecipeError')
             )
         } finally { setSelectingSlot(null) }
@@ -131,8 +145,8 @@ export function useMealPlan() {
 
     async function handleRemoveEntry(entryId: string) {
         Alert.alert(
-            t('mealPlan.alerts.removeTitle'), 
-            t('mealPlan.alerts.removeMessage'), 
+            t('mealPlan.alerts.removeTitle'),
+            t('mealPlan.alerts.removeMessage'),
             [
                 { text: t('mealPlan.alerts.cancel'), style: 'cancel' },
                 { text: t('mealPlan.alerts.remove'), style: 'destructive',
@@ -140,9 +154,10 @@ export function useMealPlan() {
                         try {
                             const res = await mealPlanService.removeEntry(entryId)
                             setMealPlan(res.mealPlan)
+                            await mealPlanStorage.save(res.mealPlan)
                         } catch (err) {
                             Alert.alert(
-                                t('mealPlan.alerts.errorTitle'), 
+                                t('mealPlan.alerts.errorTitle'),
                                 err instanceof Error ? err.message : t('mealPlan.alerts.removeRecipeError')
                             )
                         }
@@ -162,6 +177,20 @@ export function useMealPlan() {
                 ),
             }
         })
+        
+        if (mealPlan) {                                            
+            const optimistic: MealPlan = {                         
+                ...mealPlan,                                       
+                entries: mealPlan.entries.map(e =>                
+                    e.id === entryId ? { ...e, completed: !e.completed } : e 
+                ),                                                 
+            }                                                      
+            await mealPlanStorage.save(optimistic)                
+        }                                                         
+                   
+        const net = await NetInfo.fetch()                           
+        if (!net.isConnected) return                                
+
         try {
             const res = await mealPlanService.toggleCompleted(entryId)
             setMealPlan(prev => {
@@ -175,6 +204,7 @@ export function useMealPlan() {
                     ),
                 }
             })
+            await mealPlanStorage.save(res.mealPlan)
         } catch (err) {
             setMealPlan(prev => {
                 if (!prev) return prev
@@ -185,8 +215,11 @@ export function useMealPlan() {
                     ),
                 }
             })
+            if (mealPlan) {                                      
+                await mealPlanStorage.save(mealPlan)               
+            }                                                    
             Alert.alert(
-                t('mealPlan.alerts.errorTitle'), 
+                t('mealPlan.alerts.errorTitle'),
                 err instanceof Error ? err.message : t('mealPlan.alerts.updateRecipeError')
             )
         }
@@ -209,6 +242,7 @@ export function useMealPlan() {
         loading, refreshing, onRefresh,
         selectedDay, setSelectedDay,
         currentWeekStart, weekStartStr,
+        isOffline,
         goToPrevWeek, goToNextWeek,
         getWeekDates, weekDates,
         getEntriesForDay, dayHasAnyEntry,
