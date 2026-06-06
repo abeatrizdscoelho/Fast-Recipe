@@ -157,6 +157,7 @@ export const recipeService = {
 
         const photo = recipe.photos?.[0] ?? ''
         const apkUrl = process.env.APK_URL ?? 'https://expo.dev/accounts/abeatrizdscoelho/projects/fast-recipe'
+        const deepLink = `fastrecipe:///(tabs)/recipe/${id}`
 
         return `<!DOCTYPE html>
     <html lang="pt-BR">
@@ -194,11 +195,34 @@ export const recipeService = {
             <span class="chip">👥 ${recipe.portions} porções</span>
             ${recipe.difficulty ? `<span class="chip">🔥 ${recipe.difficulty}</span>` : ''}
             </div>
-            <a class="btn" href="${apkUrl}">📱 Baixar o Fast Recipe</a>
+            <a class="btn" href="${apkUrl}" id="download-btn">Baixar o Fast Recipe</a>
         </div>
         </div>
         <div class="footer">Fast Recipe — Compartilhe receitas incríveis</div>
     </div>
+
+    <script>
+    (function () {
+        const deepLink = "${deepLink}";
+        const fallbackUrl = "${apkUrl}";
+
+        window.location.href = deepLink;
+
+        const fallbackTimer = setTimeout(function () {
+        window.location.href = fallbackUrl;
+        }, 1500);
+
+        window.addEventListener('blur', function () {
+        clearTimeout(fallbackTimer);
+        });
+
+        document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            clearTimeout(fallbackTimer);
+        }
+        });
+    })();
+    </script>
     </body>
     </html>`
     },

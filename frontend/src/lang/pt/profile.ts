@@ -35,7 +35,7 @@ export default {
         avatarGallery: 'Escolher da galeria',
         noChangesTitle: 'Aviso',
         noChangesMessage: 'Nenhuma alteração foi feita.',
-        successTitle: 'Sucesso',
+        successTitle: 'Sucesso!',
         successMessage: 'Perfil atualizado com sucesso!',
         updateError: 'Não foi possível atualizar o perfil.',
     },

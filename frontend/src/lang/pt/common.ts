@@ -101,7 +101,7 @@ export default {
         edit: 'Editar',
         save: 'Salvar',
         errorTitle: 'Erro',
-        successTitle: 'Sucesso',
+        successTitle: 'Sucesso!',
         unexpectedError: 'Erro inesperado',
     },
 };

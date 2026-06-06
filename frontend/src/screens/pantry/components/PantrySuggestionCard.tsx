@@ -37,7 +37,7 @@ export function PantrySuggestionCard({ item }: Props) {
                     {item.difficulty && (
                         <>
                             <Text style={styles.metaDot}>·</Text>
-                            <Text style={styles.metaText}>{item.difficulty}</Text>
+                            <Text style={styles.metaText}>{t(`difficulties.${item.difficulty}`, item.difficulty)}</Text>
                         </>
                     )}
                 </View>
