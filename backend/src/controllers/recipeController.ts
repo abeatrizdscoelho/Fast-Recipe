@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { ValidationError } from 'yup'
 import { AuthRequest } from '../middlewares/authMiddleware'
 import { recipeService } from '../services/recipeService'
@@ -91,6 +91,19 @@ export const recipeController = {
       return res.status(204).send()
     } catch (err) {
       return handleError(err, res)
+    }
+  },
+
+  async share(req: Request, res: Response) {
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const html = await recipeService.share(id)
+      return res.send(html)
+    } catch (err) {
+      if (err instanceof Error && err.message === 'Receita não encontrada') {
+        return res.status(404).send('Receita não encontrada')
+      }
+      return res.status(500).send('Erro interno')
     }
   },
 }

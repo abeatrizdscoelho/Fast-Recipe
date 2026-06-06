@@ -18,8 +18,8 @@ export function useRecipeDetail(id: string) {
   const [loading, setLoading] = useState(true)
   const [activePhoto, setActivePhoto] = useState(0)
   const [togglingFavorite, setTogglingFavorite] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)        
-  const [isOffline, setIsOffline] = useState<boolean | null>(null) 
+  const [isSaved, setIsSaved] = useState(false)
+  const [isOffline, setIsOffline] = useState<boolean | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -86,10 +86,10 @@ export function useRecipeDetail(id: string) {
   async function shareRecipe() {
     if (!recipe) return
     try {
-      const deepLink = `fastrecipe://recipe/${recipe.id}`
+      const shareUrl = `https://fast-recipe-production.up.railway.app/recipes/share/${recipe.id}`
       await Share.share({
         title: recipe.title,
-        message: `🍽️ ${recipe.title}\n\n${recipe.description ?? ''}\n\nAbrir no app: ${deepLink}`,
+        message: `🍽️ ${recipe.title}\n\n${recipe.description ?? ''}\n\n${shareUrl}`,
       })
     } catch {
       Alert.alert(t('common.errorTitle'), t('recipeDetail.shareError'))
@@ -98,8 +98,8 @@ export function useRecipeDetail(id: string) {
 
   const onTimerFinished = useCallback(async () => {
     if (!id) return
-    try { 
-      await statsService.registerCooked(id) 
+    try {
+      await statsService.registerCooked(id)
     } catch { }
   }, [id])
 
@@ -115,7 +115,7 @@ export function useRecipeDetail(id: string) {
     userInitials, userAvatarUrl,
     originalPortions: Number(recipe?.portions) || 1,
     onTimerFinished,
-    isSaved, isOffline, toggleSaveOffline, 
+    isSaved, isOffline, toggleSaveOffline,
     shareRecipe,
   }
 }

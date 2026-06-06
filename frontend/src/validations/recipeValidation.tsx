@@ -37,8 +37,8 @@ export const recipeValidation = yup.object({
   photos: yup
     .array()
     .of(yup.string().required())
-    .min(1, () => i18next.t('recipeValidation.photosMin'))
-    .required(() => i18next.t('recipeValidation.photosRequired')),
+    .optional()
+    .default([]),
   difficulty: yup.string().required(() => i18next.t('recipeValidation.difficultyRequired')),
   description: yup.string().optional(),
 })

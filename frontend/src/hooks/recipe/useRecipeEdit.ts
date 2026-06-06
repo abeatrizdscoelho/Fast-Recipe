@@ -25,7 +25,7 @@ export function useEditRecipe(id: string) {
           dietaryRestrictions: data.recipe.dietaryRestrictions,
           difficulty: data.recipe.difficulty ?? '',
           description: data.recipe.description ?? '',
-          photos: data.recipe.photos ?? (data.recipe.photos ? [data.recipe.photos] : []),
+          photos: data.recipe.photos ?? [],
         })
       } catch (err) {
         Alert.alert(t('common.errorTitle'), t('recipeDetail.loadError'))

@@ -7,11 +7,11 @@ import recipe from './recipe';
 import shoppingList from './shoppingList';
 import common from './common';
 import services from './services';
-import onboarding from '@/app/onboarding';
+import onBoarding from './onBoarding';
 
 export default {
     ...auth,
-    ...onboarding,
+    ...onBoarding,
     ...mealPlan,
     ...pantry,
     ...profile,

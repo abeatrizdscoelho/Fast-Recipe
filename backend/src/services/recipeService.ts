@@ -150,4 +150,56 @@ export const recipeService = {
         if (recipe.authorId !== userId) throw new Error('Sem permissão para excluir esta receita')
         await recipeRepository.delete(id)
     },
+
+    async share(id: string): Promise<string> {
+        const recipe = await recipeRepository.findById(id)
+        if (!recipe) throw new Error('Receita não encontrada')
+
+        const photo = recipe.photos?.[0] ?? ''
+        const apkUrl = process.env.APK_URL ?? 'https://expo.dev/accounts/abeatrizdscoelho/projects/fast-recipe'
+
+        return `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta property="og:title" content="${recipe.title}"/>
+    <meta property="og:description" content="${recipe.description ?? 'Veja essa receita incrível!'}"/>
+    ${photo ? `<meta property="og:image" content="${photo}"/>` : ''}
+    <title>${recipe.title} — Fast Recipe</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background: #7A0000; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .card { background: white; border-radius: 24px; max-width: 420px; width: 100%; overflow: hidden; }
+        .photo { width: 100%; height: 240px; object-fit: cover; }
+        .photo-placeholder { width: 100%; height: 180px; background: #f5ece8; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 48px; }
+        .content { padding: 24px; }
+        .title { font-size: 22px; font-weight: bold; color: #7A0000; margin-bottom: 8px; }
+        .description { font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 16px; }
+        .meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+        .chip { background: #f5ece8; border-radius: 50px; padding: 6px 14px; font-size: 12px; color: #7A0000; font-weight: 600; }
+        .btn { display: block; background: #7A0000; color: white; text-align: center; padding: 16px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 16px; }
+        .footer { text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 16px; }
+    </style>
+    </head>
+    <body>
+    <div>
+        <div class="card">
+        ${photo ? `<img class="photo" src="${photo}" alt="${recipe.title}"/>` : '<div class="photo-placeholder">🍽️</div>'}
+        <div class="content">
+            <div class="title">${recipe.title}</div>
+            ${recipe.description ? `<div class="description">${recipe.description}</div>` : ''}
+            <div class="meta">
+            <span class="chip">⏱ ${recipe.time} min</span>
+            <span class="chip">👥 ${recipe.portions} porções</span>
+            ${recipe.difficulty ? `<span class="chip">🔥 ${recipe.difficulty}</span>` : ''}
+            </div>
+            <a class="btn" href="${apkUrl}">📱 Baixar o Fast Recipe</a>
+        </div>
+        </div>
+        <div class="footer">Fast Recipe — Compartilhe receitas incríveis</div>
+    </div>
+    </body>
+    </html>`
+    },
 }

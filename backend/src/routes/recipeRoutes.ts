@@ -7,7 +7,7 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'image/webp']
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
     if (allowed.includes(file.mimetype)) {
       cb(null, true)
     } else {
@@ -21,6 +21,7 @@ const router = Router()
 router.post('/', authMiddleware, upload.array('photos', 5), recipeController.create)
 router.get('/me', authMiddleware, recipeController.getMyRecipes)
 router.get('/all', authMiddleware, recipeController.getAll)
+router.get('/share/:id', recipeController.share)
 router.get('/:id', authMiddleware, recipeController.getById)
 router.put('/:id', authMiddleware, upload.array('photos', 5), recipeController.update)
 router.delete('/:id', authMiddleware, recipeController.delete)
