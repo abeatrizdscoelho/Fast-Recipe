@@ -157,7 +157,7 @@ export const recipeService = {
 
         const photo = recipe.photos?.[0] ?? ''
         const apkUrl = process.env.APK_URL ?? 'https://expo.dev/accounts/abeatrizdscoelho/projects/fast-recipe'
-        const deepLink = `fastrecipe:///(tabs)/recipe/${id}`
+        const deepLink = `fastrecipe://recipe/${id}`
 
         return `<!DOCTYPE html>
     <html lang="pt-BR">
