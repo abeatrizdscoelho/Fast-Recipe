@@ -61,7 +61,7 @@ export const authController = {
     if (!token || typeof token !== 'string') {
       return res.status(400).send('Token inválido')
     }
-    // return res.redirect(`fastrecipe://reset-password?token=${token}`)
-    return res.redirect(`${process.env.EXPO_URL}/--/(auth)/reset-password?token=${token}`)
+    const APP_URL = process.env.APP_URL
+    return res.redirect(`${APP_URL}?token=${token}`)
   },
 }

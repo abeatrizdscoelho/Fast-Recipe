@@ -9,7 +9,7 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.registerError'))
+        throw new Error(err.response?.data?.error ?? i18next.t('errors.registerError'))
       }
       throw new Error(i18next.t('common.unexpectedError'))
     }
@@ -21,7 +21,7 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.loginError'))
+        throw new Error(err.response?.data?.error ?? i18next.t('errors.loginError'))
       }
       throw new Error(i18next.t('common.unexpectedError'))
     }
@@ -33,7 +33,7 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.sendEmailError'))
+        throw new Error(err.response?.data?.error ?? i18next.t('errors.sendEmailError'))
       }
       throw new Error(i18next.t('common.unexpectedError'))
     }
@@ -45,7 +45,7 @@ export const authService = {
       return response.data
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        throw new Error(err.response?.data?.error ?? i18next.t('auth.errors.resetPasswordError'))
+        throw new Error(err.response?.data?.error ?? i18next.t('errors.resetPasswordError'))
       }
       throw new Error(i18next.t('common.unexpectedError'))
     }
