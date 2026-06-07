@@ -1,12 +1,12 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '@/src/theme/color'
 import { ShoppingListItem } from '@/src/types/shoppingList'
 import { ConsolidatedItem } from '@/src/utils/consolidateShoppingListUtil'
 import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
 import { DotsMenu } from '@/src/components/DotsMenu'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface Props {
     item: ConsolidatedItem
@@ -17,19 +17,29 @@ interface Props {
 
 export function ShoppingItem({ item, onToggle, onEdit, onDelete }: Props) {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
+
+    const dynStyles = StyleSheet.create({
+        row: { borderBottomColor: theme.divider },
+        rowBought: { backgroundColor: isDark ? theme.surfaceSecondary : '#fafafa' },
+        checkbox: { borderColor: isDark ? theme.textMuted : '#ccc' },
+        checkboxChecked: { backgroundColor: theme.primary, borderColor: theme.primary },
+        name: { color: isDark ? theme.textPrimary : '#333' },
+    })
+
     return (
-        <View style={[styles.row, item.bought && styles.rowBought]}>
+        <View style={[styles.row, dynStyles.row, item.bought && styles.rowBought, item.bought && dynStyles.rowBought]}>
             <TouchableOpacity
-                style={[styles.checkbox, item.bought && styles.checkboxChecked]}
+                style={[styles.checkbox, dynStyles.checkbox, item.bought && styles.checkboxChecked, item.bought && dynStyles.checkboxChecked]}
                 onPress={() => onToggle(item)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-                {item.bought && <Ionicons name="checkmark" size={13} color={colors.white} />}
+                {item.bought && <Ionicons name="checkmark" size={13} color={theme.white} />}
             </TouchableOpacity>
 
             <View style={styles.info}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Text style={[styles.name, item.bought && styles.nameBought]}>
+                    <Text style={[styles.name, dynStyles.name, item.bought && styles.nameBought]}>
                         {item.name}
                     </Text>
                     {item.hasUnitConflict && (
@@ -66,7 +76,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f5f5f5',
     },
-    rowBought: { backgroundColor: '#fafafa' },
+    rowBought: { 
+        backgroundColor: '#fafafa' 
+    },
     checkbox: {
         width: 22,
         height: 22,
@@ -77,10 +89,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     checkboxChecked: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
+        backgroundColor: '#7A0000',
+        borderColor: '#7A0000',
     },
-    info: { flex: 1 },
+    info: { 
+        flex: 1 
+    },
     name: {
         fontSize: 14,
         fontWeight: '600',

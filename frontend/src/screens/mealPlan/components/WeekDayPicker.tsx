@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/src/theme/color'
 import { DAY_KEYS } from '@/src/types/mealPlan'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface Props {
   weekDates: Date[]
@@ -14,11 +15,22 @@ interface Props {
 }
 
 export function WeekDayPicker({ weekDates, selectedDay, onSelectDay, onPrevWeek, onNextWeek }: Props) {
+  const { theme } = useTheme()
   const { t } = useTranslation()
+
+  const dynStyles = StyleSheet.create({
+    wrapper: { backgroundColor: theme.card },
+    dayBtnActive: { backgroundColor: theme.primary },
+    dayLabel: { color: theme.textMuted },
+    dayNum: { color: theme.textPrimary },
+    dayNumToday: { color: theme.primary },
+    todayDot: { backgroundColor: theme.primary },
+  })
+
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, dynStyles.wrapper]}>
       <TouchableOpacity onPress={onPrevWeek} style={styles.navBtn}>
-        <Ionicons name="chevron-back" size={20} color={colors.primary} />
+        <Ionicons name="chevron-back" size={20} color={theme.primary} />
       </TouchableOpacity>
 
       <View style={styles.daysRow}>
@@ -28,23 +40,23 @@ export function WeekDayPicker({ weekDates, selectedDay, onSelectDay, onPrevWeek,
           return (
             <TouchableOpacity
               key={index}
-              style={[styles.dayBtn, isSelected && styles.dayBtnActive]}
+              style={[styles.dayBtn, isSelected && dynStyles.dayBtnActive]}
               onPress={() => onSelectDay(index)}
             >
-              <Text style={[styles.dayLabel, isSelected && styles.dayLabelActive]}>
+              <Text style={[styles.dayLabel, dynStyles.dayLabel, isSelected && styles.dayLabelActive]}>
                 {t(`dayLabels.${DAY_KEYS[index]}`)}
               </Text>
-              <Text style={[styles.dayNum, isSelected && styles.dayNumActive, isToday && !isSelected && styles.dayNumToday]}>
+              <Text style={[styles.dayNum, dynStyles.dayNum, isSelected && styles.dayNumActive, isToday && !isSelected && dynStyles.dayNumToday]}>
                 {date.getDate()}
               </Text>
-              {isToday && <View style={[styles.todayDot, isSelected && styles.todayDotActive]} />}
+              {isToday && <View style={[styles.todayDot, dynStyles.todayDot, isSelected && styles.todayDotActive]} />}
             </TouchableOpacity>
           )
         })}
       </View>
 
       <TouchableOpacity onPress={onNextWeek} style={styles.navBtn}>
-        <Ionicons name="chevron-forward" size={20} color={colors.primary} />
+        <Ionicons name="chevron-forward" size={20} color={theme.primary} />
       </TouchableOpacity>
     </View>
   )
@@ -54,7 +66,6 @@ const styles = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 12,
     marginHorizontal: 16,
@@ -64,11 +75,13 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  navBtn: { padding: 4 },
-  daysRow: { 
-    flex: 1, 
-    flexDirection: 'row', 
-    justifyContent: 'space-around' 
+  navBtn: {
+    padding: 4
+  },
+  daysRow: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around'
   },
   dayBtn: {
     alignItems: 'center',
@@ -77,27 +90,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     minWidth: 36,
   },
-  dayBtnActive: { backgroundColor: colors.primary },
-  dayLabel: { 
-    fontSize: 10, 
-    fontWeight: '600', 
-    color: '#999',
-    marginBottom: 4 
+  dayLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginBottom: 4
   },
-  dayLabelActive: { color: colors.white },
-  dayNum: { 
-    fontSize: 15, 
-    fontWeight: 'bold', 
-    color: '#333' 
+  dayLabelActive: {
+    color: colors.white
   },
-  dayNumActive: { color: colors.white },
-  dayNumToday: { color: colors.primary },
+  dayNum: {
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  dayNumActive: {
+    color: colors.white
+  },
   todayDot: {
-    width: 4, 
-    height: 4, 
+    width: 4,
+    height: 4,
     borderRadius: 2,
-    backgroundColor: colors.primary, 
     marginTop: 3,
   },
-  todayDotActive: { backgroundColor: colors.white },
+  todayDotActive: {
+    backgroundColor: colors.white
+  },
 })

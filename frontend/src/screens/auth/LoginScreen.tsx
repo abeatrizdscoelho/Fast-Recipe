@@ -1,15 +1,19 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet,
-    Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { useLogin } from '../../hooks/auth/useLogin';
 import { colors } from '../../theme/color';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function LoginScreen() {
+  const { theme } = useTheme()
   const { t } = useTranslation()
   const {
     email, setEmail, password, setPassword,
@@ -17,8 +21,21 @@ export default function LoginScreen() {
     errors, apiError, handleLogin
   } = useLogin()
 
+  const dynStyles = StyleSheet.create({
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    title: { color: theme.primary },
+    label: { color: theme.textMuted },
+    input: { borderBottomColor: theme.primary, color: theme.textPrimary },
+    inputNoBorder: { color: theme.textPrimary },
+    passwordRow: { borderBottomColor: theme.primary },
+    forgotText: { color: theme.textMuted },
+    button: { backgroundColor: theme.primary },
+    registerText: { color: theme.primary },
+  })
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, dynStyles.container]}>
       <KeyboardAwareScrollView
         enableOnAndroid
         enableAutomaticScroll
@@ -35,29 +52,31 @@ export default function LoginScreen() {
           />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>{t('login.title')}</Text>
+        <View style={[styles.card, dynStyles.card]}>
+          <Text style={[styles.title, dynStyles.title]}>{t('login.title')}</Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('login.labelEmail')}</Text>
+            <Text style={[styles.label, dynStyles.label]}>{t('login.labelEmail')}</Text>
             <TextInput
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              style={[styles.input, errors.email ? styles.inputError : null]}
+              placeholderTextColor={theme.textMuted}
+              style={[styles.input, dynStyles.input, errors.email ? styles.inputError : null]}
             />
             <FieldError message={errors.email} />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('login.labelPassword')}</Text>
-            <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
+            <Text style={[styles.label, dynStyles.label]}>{t('login.labelPassword')}</Text>
+            <View style={[styles.passwordRow, dynStyles.passwordRow, errors.password ? styles.passwordRowError : null]}>
               <TextInput
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
-                style={[styles.inputNoBorder, styles.flex]}
+                placeholderTextColor={theme.textMuted}
+                style={[styles.inputNoBorder, dynStyles.inputNoBorder, styles.flex]}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <EyeIcon visible={showPassword} />
@@ -69,13 +88,13 @@ export default function LoginScreen() {
           <TouchableOpacity
             onPress={() => router.push('/(auth)/forgot-password')}
             style={styles.forgotWrapper}>
-            <Text style={styles.forgotText}>{t('login.forgotPassword')}</Text>
+            <Text style={[styles.forgotText, dynStyles.forgotText]}>{t('login.forgotPassword')}</Text>
           </TouchableOpacity>
 
           {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
           <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+            style={[styles.button, dynStyles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}>
             <Text style={styles.buttonText}>
@@ -84,7 +103,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/(auth)/register')} style={styles.registerWrapper}>
-            <Text style={styles.registerText}>
+            <Text style={[styles.registerText, dynStyles.registerText]}>
               {t('login.registerPrompt')}{' '}
               <Text style={styles.registerBold}>{t('login.registerAction')}</Text>
             </Text>
@@ -98,9 +117,9 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { 
-    flex: 1, 
-    backgroundColor: colors.primary 
+  container: {
+    flex: 1,
+    backgroundColor: colors.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -113,9 +132,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { 
-    width: 200, 
-    height: 200 
+  logo: {
+    width: 200,
+    height: 200
   },
   card: {
     width: '100%',
@@ -136,77 +155,68 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { 
-    color: colors.primary, 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    marginBottom: 32 
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 32
   },
-  inputGroup: { 
-    marginBottom: 24 
+  inputGroup: {
+    marginBottom: 24
   },
-  label: { 
-    color: colors.gray, 
-    marginBottom: 4, 
-    fontSize: 14 
+  label: {
+    marginBottom: 4,
+    fontSize: 14
   },
   input: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
     paddingBottom: 8,
     fontSize: 16,
-    color: colors.black,
   },
-  inputError: { 
-    borderBottomColor: colors.error 
+  inputError: {
+    borderBottomColor: colors.error
   },
-  inputNoBorder: { 
-    paddingBottom: 8, 
-    fontSize: 16, 
-    color: colors.black 
+  inputNoBorder: {
+    paddingBottom: 8,
+    fontSize: 16,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
   },
-  passwordRowError: { 
-    borderBottomColor: colors.error 
+  passwordRowError: {
+    borderBottomColor: colors.error
   },
-  forgotWrapper: { 
-    alignItems: 'flex-end', 
-    marginBottom: 16 
+  forgotWrapper: {
+    alignItems: 'flex-end',
+    marginBottom: 16
   },
-  forgotText: { 
-    color: colors.gray, 
-    fontSize: 13 
+  forgotText: {
+    fontSize: 13
   },
   button: {
-    backgroundColor: colors.primary,
     borderRadius: 50,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 16,
     marginTop: 8,
   },
-  buttonDisabled: { 
-    opacity: 0.7 
+  buttonDisabled: {
+    opacity: 0.7
   },
-  buttonText: { 
-    color: colors.white, 
-    fontWeight: 'bold', 
-    letterSpacing: 2, 
-    fontSize: 15 
+  buttonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+    fontSize: 15
   },
-  registerWrapper: { 
-    alignItems: 'center' 
+  registerWrapper: {
+    alignItems: 'center'
   },
-  registerText: { 
-    color: colors.primary, 
-    fontSize: 13 
+  registerText: {
+    fontSize: 13
   },
-  registerBold: { 
-    fontWeight: 'bold', 
+  registerBold: {
+    fontWeight: 'bold',
   },
 })

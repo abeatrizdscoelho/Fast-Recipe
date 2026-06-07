@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Switch, Alert } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Switch } from 'react-native'
 import { Header } from '../../components/Header'
 import { BottomNav } from '../../components/BottomNav'
-import { colors } from '../../theme/color'
 import { useTranslation } from 'react-i18next'
 import { useLanguage } from '@/src/hooks/useLanguage'
+import { useTheme } from '@/src/context/ThemeContext'
 
 type SettingItemProps = {
   icon: keyof typeof Ionicons.glyphMap
@@ -14,9 +14,15 @@ type SettingItemProps = {
   onPress?: () => void
   right?: React.ReactNode
   destructive?: boolean
+  theme: ReturnType<typeof useTheme>['theme']
 }
 
-function SettingItem({ icon, label, onPress, right, destructive }: SettingItemProps) {
+function SettingItem({ icon, label, onPress, right, destructive, theme }: SettingItemProps) {
+  const dynStyles = StyleSheet.create({
+    iconBox: { backgroundColor: theme.iconBox },
+    itemLabel: { color: theme.textPrimary },
+  })
+
   return (
     <TouchableOpacity
       style={styles.item}
@@ -25,99 +31,112 @@ function SettingItem({ icon, label, onPress, right, destructive }: SettingItemPr
       disabled={!onPress && !right}
     >
       <View style={styles.itemLeft}>
-        <View style={[styles.iconBox, destructive && styles.iconBoxDestructive]}>
+        <View style={[styles.iconBox, destructive && styles.iconBoxDestructive, dynStyles.iconBox]}>
           <Ionicons
             name={icon}
             size={18}
-            color={destructive ? '#e05c5c' : colors.primary}
+            color={destructive ? '#e05c5c' : theme.textPrimary}
           />
         </View>
-        <Text style={[styles.itemLabel, destructive && styles.itemLabelDestructive]}>
+        <Text style={[styles.itemLabel, destructive && styles.itemLabelDestructive, dynStyles.itemLabel]}>
           {label}
         </Text>
       </View>
       {right ?? (
         onPress && (
-          <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+          <Ionicons name="chevron-forward" size={18} color={theme.textPrimary} />
         )
       )}
     </TouchableOpacity>
   )
 }
 
-function SectionTitle({ label }: { label: string }) {
-  return <Text style={styles.sectionTitle}>{label}</Text>
+function SectionTitle({ label, theme }: { label: string, theme: ReturnType<typeof useTheme>['theme'] }) {
+  return <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>{label}</Text>
 }
 
-function Divider() {
-  return <View style={styles.divider} />
+function Divider({ theme }: { theme: ReturnType<typeof useTheme>['theme'] }) {
+  return <View style={[styles.divider, { backgroundColor: theme.divider }]} />
 }
 
 export default function ProfileSettingsScreen() {
   const { t } = useTranslation()
+  const { isDark, toggleTheme, theme } = useTheme()
   const { currentLanguageLabel, handleLanguagePress } = useLanguage()
-  const darkModeEnabled = false
+
+  const dynStyles = StyleSheet.create({
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    pageTitle: { color: theme.textPrimary },
+    section: { backgroundColor: theme.surfaceSecondary },
+    languageBadgeText: { color: theme.textPrimary },
+  })
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynStyles.container]}>
       <Header />
 
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.card}>
-          <Text style={styles.pageTitle}>{t('profileSettings.title')}</Text>
+        <View style={[styles.card, dynStyles.card]}>
+          <Text style={[styles.pageTitle, dynStyles.pageTitle]}>{t('profileSettings.title')}</Text>
 
-          <SectionTitle label={t('profileSettings.sectionAccount')} />
-          <View style={styles.section}>
+          <SectionTitle label={t('profileSettings.sectionAccount')} theme={theme} />
+          <View style={[styles.section, dynStyles.section]}>
             <SettingItem
               icon="create-outline"
               label={t('profileSettings.editProfile')}
               onPress={() => router.push('/profile/edit')}
+              theme={theme}
             />
           </View>
 
-          <SectionTitle label={t('profileSettings.sectionRecipes')} />
-          <View style={styles.section}>
+          <SectionTitle label={t('profileSettings.sectionRecipes')} theme={theme} />
+          <View style={[styles.section, dynStyles.section]}>
             <SettingItem
               icon="time-outline"
               label={t('profileSettings.viewHistory')}
               onPress={() => router.push('/profile/history')}
+              theme={theme}
             />
-            <Divider />
+            <Divider theme={theme} />
             <SettingItem
               icon="bar-chart-outline"
               label={t('profileSettings.statsReport')}
               onPress={() => router.push('/profile/stats')}
+              theme={theme}
             />
           </View>
 
-          <SectionTitle label={t('profileSettings.sectionPreferences')} />
-          <View style={styles.section}>
-            {/* <SettingItem
+          <SectionTitle label={t('profileSettings.sectionPreferences')} theme={theme} />
+          <View style={[styles.section, dynStyles.section]}>
+            <SettingItem
               icon="moon-outline"
               label={t('profileSettings.darkMode')}
+              theme={theme}
               right={
                 <Switch
-                  value={darkModeEnabled}
-                  onValueChange={() => {}} 
-                  trackColor={{ false: '#e0e0e0', true: colors.primary }}
-                  thumbColor={colors.white}
+                  value={isDark}
+                  onValueChange={toggleTheme}
+                  trackColor={{ false: '#e0e0e0', true: theme.primary }}
+                  thumbColor={theme.white}
                 />
               }
-            /> */}
-            <Divider />
+            />
+            <Divider theme={theme} />
             <SettingItem
               icon="language-outline"
               label={t('profileSettings.language')}
+              theme={theme}
               right={
                 <View style={styles.languageBadge}>
-                  <Text style={styles.languageBadgeText}>{currentLanguageLabel}</Text>
-                  <Ionicons name="chevron-forward" size={16} color={colors.primary} />
+                  <Text style={[styles.languageBadgeText, dynStyles.languageBadgeText]}>{currentLanguageLabel}</Text>
+                  <Ionicons name="chevron-forward" size={16} color={theme.textPrimary} />
                 </View>
               }
-              onPress={() => handleLanguagePress()} 
+              onPress={() => handleLanguagePress()}
             />
           </View>
         </View>
@@ -131,7 +150,7 @@ export default function ProfileSettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000',
   },
   content: {
     paddingTop: 16,
@@ -139,7 +158,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
@@ -148,13 +167,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   pageTitle: {
-    color: colors.primary,
+    color: '#7A0000',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 24,
   },
   sectionTitle: {
-    color: colors.primary,
+    color: '#7A0000',
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -193,7 +212,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(224,92,92,0.12)',
   },
   itemLabel: {
-    color: colors.primary,
+    color: '#7A0000',
     fontSize: 15,
   },
   itemLabelDestructive: {
@@ -210,7 +229,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   languageBadgeText: {
-    color: colors.primary,
+    color: '#7A0000',
     fontSize: 14,
     opacity: 0.5,
   },

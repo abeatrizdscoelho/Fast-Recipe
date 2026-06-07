@@ -1,8 +1,8 @@
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { colors } from '../theme/color'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export type ActiveFilters = {
     categories: string[]
@@ -19,6 +19,7 @@ type Props = {
 }
 
 export function FilterModal({ visible, filters, onClose, onApply, categories, dietaryRestrictions }: Props) {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const [local, setLocal] = React.useState<ActiveFilters>(filters)
 
@@ -44,21 +45,34 @@ export function FilterModal({ visible, filters, onClose, onApply, categories, di
 
     const totalSelected = local.categories.length + local.dietaryRestrictions.length
 
+    const dynStyles = StyleSheet.create({
+        sheet: { backgroundColor: theme.card },
+        header: { borderBottomColor: theme.border },
+        title: { color: theme.textPrimary },
+        sectionLabel: { color: theme.textPrimary },
+        chip: { borderColor: theme.border },
+        chipActive: { backgroundColor: theme.primary, borderColor: theme.primary },
+        chipText: { color: theme.textPrimary },
+        footer: { borderTopColor: theme.border },
+        clearText: { color: theme.textPrimary },
+        applyBtn: { backgroundColor: theme.primary },
+    })
+
     return (
         <Modal visible={visible} transparent onRequestClose={onClose}>
             <View style={styles.modalWrapper}>
                 <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose} />
 
-                <View style={styles.sheet}>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>{t('filterModal.title')}</Text>
+                <View style={[styles.sheet, dynStyles.sheet]}>
+                    <View style={[styles.header, dynStyles.header]}>
+                        <Text style={[styles.title, dynStyles.title]}>{t('filterModal.title')}</Text>
                         <TouchableOpacity onPress={onClose}>
-                            <Ionicons name="close" size={22} color={colors.primary} />
+                            <Ionicons name="close" size={22} color={theme.primary} />
                         </TouchableOpacity>
                     </View>
 
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
-                        <Text style={styles.sectionLabel}>{t('filterModal.categoryLabel')}</Text>
+                        <Text style={[styles.sectionLabel, dynStyles.sectionLabel]}>{t('filterModal.categoryLabel')}</Text>
                         <Text style={styles.sectionHint}>{t('filterModal.selectionHint')}</Text>
                         <View style={styles.chipsContainer}>
                             {categories.map(({ key, label }) => {
@@ -66,11 +80,11 @@ export function FilterModal({ visible, filters, onClose, onApply, categories, di
                                 return (
                                     <TouchableOpacity
                                         key={key}
-                                        style={[styles.chip, isSelected && styles.chipActive]}
+                                        style={[styles.chip, dynStyles.chip, isSelected && styles.chipActive, isSelected && dynStyles.chipActive]}
                                         onPress={() => toggle('categories', key)}
                                     >
-                                        {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
-                                        <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                                        {isSelected && <Ionicons name="checkmark" size={13} color={theme.white} />}
+                                        <Text style={[styles.chipText, dynStyles.chipText, isSelected && styles.chipTextActive]}>
                                             {label}
                                         </Text>
                                     </TouchableOpacity>
@@ -78,7 +92,7 @@ export function FilterModal({ visible, filters, onClose, onApply, categories, di
                             })}
                         </View>
 
-                        <Text style={[styles.sectionLabel, { marginTop: 24 }]}>{t('filterModal.dietaryLabel')}</Text>
+                        <Text style={[styles.sectionLabel, dynStyles.sectionLabel, { marginTop: 24 }]}>{t('filterModal.dietaryLabel')}</Text>
                         <Text style={styles.sectionHint}>{t('filterModal.selectionHint')}</Text>
                         <View style={styles.chipsContainer}>
                             {dietaryRestrictions.map(({ key, label }) => {
@@ -86,11 +100,11 @@ export function FilterModal({ visible, filters, onClose, onApply, categories, di
                                 return (
                                     <TouchableOpacity
                                         key={key}
-                                        style={[styles.chip, isSelected && styles.chipActive]}
+                                        style={[styles.chip, dynStyles.chip, isSelected && styles.chipActive, isSelected && dynStyles.chipActive]}
                                         onPress={() => toggle('dietaryRestrictions', key)}
                                     >
-                                        {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
-                                        <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                                        {isSelected && <Ionicons name="checkmark" size={13} color={theme.white} />}
+                                        <Text style={[styles.chipText, dynStyles.chipText, isSelected && styles.chipTextActive]}>
                                             {label}
                                         </Text>
                                     </TouchableOpacity>
@@ -99,18 +113,18 @@ export function FilterModal({ visible, filters, onClose, onApply, categories, di
                         </View>
                     </ScrollView>
 
-                    <View style={styles.footer}>
+                    <View style={[styles.footer, dynStyles.footer]}>
                         <TouchableOpacity
                             style={styles.clearBtn}
                             onPress={handleClear}
                             disabled={totalSelected === 0}
                         >
-                            <Text style={[styles.clearText, totalSelected === 0 && styles.clearTextDisabled]}>
+                            <Text style={[styles.clearText, dynStyles.clearText, totalSelected === 0 && styles.clearTextDisabled]}>
                                 {t('filterModal.clearBtn')}
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.applyBtn} onPress={handleApply}>
+                        <TouchableOpacity style={[styles.applyBtn, dynStyles.applyBtn]} onPress={handleApply}>
                             <Text style={styles.applyText}>
                                 {totalSelected > 0
                                     ? t('filterModal.applyBtnCount', { count: totalSelected })
@@ -135,7 +149,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.45)',
     },
     sheet: {
-        backgroundColor: colors.white,
+        backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         maxHeight: '75%',
@@ -157,7 +171,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: colors.primary,
+        color: '#7A0000',
     },
     body: {
         paddingHorizontal: 24,
@@ -167,12 +181,12 @@ const styles = StyleSheet.create({
     sectionLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: colors.primary,
+        color: '#7A0000',
         marginBottom: 4,
     },
     sectionHint: {
         fontSize: 12,
-        color: colors.gray,
+        color: '#9CA3AF',
         marginBottom: 10,
     },
     chipsContainer: {
@@ -190,17 +204,17 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#e0d6d0',
     },
-    chipActive: { 
-        backgroundColor: colors.primary, 
-        borderColor: colors.primary 
+    chipActive: {
+        backgroundColor: '#7A0000',
+        borderColor: '#7A0000',
     },
     chipText: {
         fontSize: 13,
-        color: colors.primary,
+        color: '#7A0000',
         fontWeight: '600',
     },
-    chipTextActive: { 
-        color: colors.white 
+    chipTextActive: {
+        color: '#FFFFFF',
     },
     footer: {
         flexDirection: 'row',
@@ -212,27 +226,27 @@ const styles = StyleSheet.create({
         borderTopColor: '#f0ebe8',
         gap: 12,
     },
-    clearBtn: { 
-        paddingVertical: 14, 
-        paddingHorizontal: 20 
+    clearBtn: {
+        paddingVertical: 14,
+        paddingHorizontal: 20,
     },
     clearText: {
         fontSize: 14,
         fontWeight: '600',
-        color: colors.primary,
+        color: '#7A0000',
     },
-    clearTextDisabled: { 
-        color: colors.gray 
+    clearTextDisabled: {
+        color: '#9CA3AF',
     },
     applyBtn: {
         flex: 1,
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 50,
         paddingVertical: 14,
         alignItems: 'center',
     },
     applyText: {
-        color: colors.white,
+        color: '#FFFFFF',
         fontWeight: 'bold',
         letterSpacing: 1,
         fontSize: 14,

@@ -12,9 +12,11 @@ import { SearchBar } from '@/src/components/SearchBar'
 import { usePantry } from '@/src/hooks/pantry/usePantry'
 import { PantryItemCard } from './components/PantryItemCard'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export default function PantryScreen() {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const {
         items,
         loading,
@@ -34,8 +36,28 @@ export default function PantryScreen() {
         isEmpty,
     } = usePantry()
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        body: { backgroundColor: isDark ? '#181818' : '#f5f5f5' },
+        chip: {
+            borderColor: isDark ? theme.border : '#e0d6d0',
+            backgroundColor: theme.card,
+        },
+        chipActive: { backgroundColor: theme.primary, borderColor: theme.primary },
+        chipText: { color: theme.primary },
+        emptyBanner: { backgroundColor: theme.card },
+        emptyIllustration: { backgroundColor: isDark ? theme.iconBox : '#FFF0EC' },
+        emptyTitle: { color: theme.primary },
+        emptySubText: { color: theme.textMuted },
+        suggestionsBanner: { backgroundColor: theme.card },
+        suggestionsBannerIcon: { backgroundColor: isDark ? theme.iconBox : '#FFF0EC' },
+        suggestionsBannerTitle: { color: theme.textPrimary },
+        suggestionsBannerSub: { color: theme.textMuted },
+        fab: { backgroundColor: theme.primary },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <View style={styles.headerSection}>
@@ -52,16 +74,16 @@ export default function PantryScreen() {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.body}>
+            <View style={[styles.body, dynStyles.body]}>
                 {loading ? (
                     <View style={styles.loadingWrapper}>
-                        <ActivityIndicator size="large" color={colors.primary} />
+                        <ActivityIndicator size="large" color={theme.primary} />
                     </View>
                 ) : (
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />
                         }
                         contentContainerStyle={styles.scrollContent}
                         keyboardShouldPersistTaps="handled"
@@ -84,10 +106,10 @@ export default function PantryScreen() {
                                     {categories.map(cat => (
                                         <TouchableOpacity
                                             key={cat.key}
-                                            style={[styles.chip, selectedCategory === cat.key && styles.chipActive]}
+                                            style={[styles.chip, dynStyles.chip, selectedCategory === cat.key && dynStyles.chipActive]}
                                             onPress={() => setSelectedCategory(cat.key)}
                                         >
-                                            <Text style={[styles.chipText, selectedCategory === cat.key && styles.chipTextActive]}>
+                                            <Text style={[styles.chipText, dynStyles.chipText, selectedCategory === cat.key && styles.chipTextActive]}>
                                                 {cat.label} ({categoryCounts[cat.key] ?? 0})
                                             </Text>
                                         </TouchableOpacity>
@@ -109,28 +131,28 @@ export default function PantryScreen() {
 
                         {!isEmpty && (
                             <TouchableOpacity
-                                style={styles.suggestionsBanner}
+                                style={[styles.suggestionsBanner, dynStyles.suggestionsBanner]}
                                 onPress={() => router.push('/pantry/suggestions')}
                                 activeOpacity={0.85}
                             >
-                                <View style={styles.suggestionsBannerIcon}>
-                                    <Ionicons name="color-wand-outline" size={22} color={colors.primary} />
+                                <View style={[styles.suggestionsBannerIcon, dynStyles.suggestionsBannerIcon]}>
+                                    <Ionicons name="color-wand-outline" size={22} color={theme.primary} />
                                 </View>
                                 <View style={styles.suggestionsBannerText}>
-                                    <Text style={styles.suggestionsBannerTitle}>{t('pantry.suggestionsTitle')}</Text>
-                                    <Text style={styles.suggestionsBannerSub}>{t('pantry.suggestionsSub')}</Text>
+                                    <Text style={[styles.suggestionsBannerTitle, dynStyles.suggestionsBannerTitle]}>{t('pantry.suggestionsTitle')}</Text>
+                                    <Text style={[styles.suggestionsBannerSub, dynStyles.suggestionsBannerSub]}>{t('pantry.suggestionsSub')}</Text>
                                 </View>
-                                <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+                                <Ionicons name="chevron-forward" size={18} color={theme.primary} />
                             </TouchableOpacity>
                         )}
 
                         {isEmpty && (
-                            <View style={styles.emptyBanner}>
-                                <View style={styles.emptyIllustration}>
-                                    <Ionicons name="basket-outline" size={56} color={colors.primary} style={{ opacity: 0.3 }} />
+                            <View style={[styles.emptyBanner, dynStyles.emptyBanner]}>
+                                <View style={[styles.emptyIllustration, dynStyles.emptyIllustration]}>
+                                    <Ionicons name="basket-outline" size={56} color={theme.primary} style={{ opacity: 0.3 }} />
                                 </View>
-                                <Text style={styles.emptyTitle}>{t('pantry.emptyTitle')}</Text>
-                                <Text style={styles.emptySubText}>{t('pantry.emptySub')}</Text>
+                                <Text style={[styles.emptyTitle, dynStyles.emptyTitle]}>{t('pantry.emptyTitle')}</Text>
+                                <Text style={[styles.emptySubText, dynStyles.emptySubText]}>{t('pantry.emptySub')}</Text>
                             </View>
                         )}
 
@@ -139,7 +161,7 @@ export default function PantryScreen() {
                 )}
             </View>
 
-            <TouchableOpacity style={styles.fab} onPress={handleOpenAdd}>
+            <TouchableOpacity style={[styles.fab, dynStyles.fab]} onPress={handleOpenAdd}>
                 <Ionicons name="add" size={26} color={colors.white} />
             </TouchableOpacity>
 
@@ -149,11 +171,9 @@ export default function PantryScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        backgroundColor: colors.primary 
+    container: {
+        flex: 1,
     },
-
     headerSection: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -165,7 +185,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#fff',
+        color: colors.white,
     },
     headerSub: {
         fontSize: 12,
@@ -173,7 +193,6 @@ const styles = StyleSheet.create({
         marginTop: 2,
         lineHeight: 17,
     },
-
     refreshBadge: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -182,16 +201,14 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingHorizontal: 10,
         paddingVertical: 5,
-        marginTop: 14, 
+        marginTop: 14,
     },
     refreshBadgeText: {
         fontSize: 11,
         color: colors.white,
     },
-
     body: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
@@ -204,7 +221,6 @@ const styles = StyleSheet.create({
         padding: 16,
         paddingTop: 20,
     },
-
     fab: {
         position: 'absolute',
         bottom: 90,
@@ -212,7 +228,6 @@ const styles = StyleSheet.create({
         width: 52,
         height: 52,
         borderRadius: 26,
-        backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 6,
@@ -221,7 +236,6 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 4 },
     },
-
     chipsScroll: { marginBottom: 12 },
     chips: {
         flexDirection: 'row',
@@ -233,29 +247,19 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderRadius: 50,
         borderWidth: 1.5,
-        borderColor: '#e0d6d0',
-        backgroundColor: '#fff',
     },
-    chipActive: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
+    chipTextActive: {
+        color: colors.white,
+        fontWeight: '700',
     },
     chipText: {
         fontSize: 13,
-        color: colors.primary,
         fontWeight: '600',
     },
-    chipTextActive: {
-        color: '#fff',
-        fontWeight: '700',
-    },
-
     searchRow: { marginBottom: 12 },
     itemsList: { gap: 0 },
-
     emptyBanner: {
         alignItems: 'center',
-        backgroundColor: '#fff',
         borderRadius: 20,
         padding: 36,
         marginBottom: 16,
@@ -265,7 +269,6 @@ const styles = StyleSheet.create({
         width: 110,
         height: 110,
         borderRadius: 55,
-        backgroundColor: '#FFF0EC',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 8,
@@ -273,18 +276,14 @@ const styles = StyleSheet.create({
     emptyTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: colors.primary,
         textAlign: 'center',
     },
     emptySubText: {
         fontSize: 13,
-        color: '#aaa',
         textAlign: 'center',
         lineHeight: 20,
     },
-
     suggestionsBanner: {
-        backgroundColor: '#fff',
         borderRadius: 16,
         padding: 16,
         flexDirection: 'row',
@@ -300,19 +299,18 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 12,
-        backgroundColor: '#FFF0EC',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    suggestionsBannerText: { flex: 1 },
+    suggestionsBannerText: {
+        flex: 1
+    },
     suggestionsBannerTitle: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#222',
     },
     suggestionsBannerSub: {
         fontSize: 11,
-        color: '#aaa',
         marginTop: 2,
         lineHeight: 16,
     },

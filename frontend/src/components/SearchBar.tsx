@@ -2,6 +2,7 @@ import React from 'react'
 import { View, TextInput, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface Props {
     value: string
@@ -11,16 +12,22 @@ interface Props {
 }
 
 export function SearchBar({ value, onChangeText, placeholder, autoFocus = false }: Props) {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const resolvedPlaceholder = placeholder || t('components.searchBar.placeholder')
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.card },
+        input: { color: theme.textPrimary },
+    })
+
     return (
-        <View style={styles.container}>
-            <Ionicons name="search-outline" size={20} color="#aaa" style={styles.icon} />
+        <View style={[styles.container, dynStyles.container]}>
+            <Ionicons name="search-outline" size={20} color={theme.textMuted} style={styles.icon} />
             <TextInput
-                style={styles.input}
+                style={[styles.input, dynStyles.input]}
                 placeholder={resolvedPlaceholder}
-                placeholderTextColor="#aaa"
+                placeholderTextColor={theme.textMuted}
                 value={value}
                 onChangeText={onChangeText}
                 returnKeyType="search"
@@ -36,7 +43,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 50,
         paddingHorizontal: 16,
     },

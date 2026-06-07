@@ -11,9 +11,11 @@ import { BottomNav } from '@/src/components/BottomNav'
 import { PantrySuggestionCard } from './components/PantrySuggestionCard'
 import { usePantrySuggestions } from '@/src/hooks/pantry/usePantrySuggestions'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export default function PantrySuggestionsScreen() {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const {
         suggestions,
         loading,
@@ -24,13 +26,19 @@ export default function PantrySuggestionsScreen() {
         loadSuggestions()
     }, [])
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        emptyIcon: { color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)' },
+        emptyText: { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.4)' },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <View style={styles.headerSection}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Ionicons name="chevron-back" size={22} color="#fff" />
+                    <Ionicons name="chevron-back" size={22} color={colors.white} />
                 </TouchableOpacity>
                 <View style={styles.headerText}>
                     <Text style={styles.headerTitle}>{t('pantrySuggestions.title')}</Text>
@@ -51,8 +59,8 @@ export default function PantrySuggestionsScreen() {
                     contentContainerStyle={styles.listContent}
                     ListEmptyComponent={
                         <View style={styles.empty}>
-                            <Ionicons name="search-outline" size={48} color="rgba(255,255,255,0.2)" />
-                            <Text style={styles.emptyText}>{t('pantrySuggestions.empty')}</Text>
+                            <Ionicons name="search-outline" size={48} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.2)'} />
+                            <Text style={[styles.emptyText, dynStyles.emptyText]}>{t('pantrySuggestions.empty')}</Text>
                         </View>
                     }
                 />
@@ -66,7 +74,6 @@ export default function PantrySuggestionsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.primary,
     },
     headerSection: {
         flexDirection: 'row',
@@ -86,7 +93,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#fff',
+        color: colors.white,
     },
     headerSub: {
         fontSize: 12,
@@ -122,7 +129,6 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     emptyText: {
-        color: 'rgba(255,255,255,0.4)',
         fontSize: 14,
         textAlign: 'center',
         paddingHorizontal: 32,

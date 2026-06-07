@@ -4,16 +4,32 @@ import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BottomNav } from '../../components/BottomNav';
 import { Header } from '../../components/Header';
-import { colors } from '../../theme/color';
 import { useProfile } from '../../hooks/profile/useProfile';
 import { RecipeCard } from '../recipe/components/RecipeCard';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function ProfileScreen() {
+  const { theme, isDark } = useTheme()
   const { t } = useTranslation()
   const {
     user, activeTab, setActiveTab, fetching, displayed, initials, loadRecipes, toggleFavorite, handleDelete, isOffline,
   } = useProfile()
+
+  const dynStyles = StyleSheet.create({
+    container: { backgroundColor: theme.background },
+    userCard: { backgroundColor: theme.card },
+    avatar: { backgroundColor: theme.primary },
+    userName: { color: theme.textPrimary },
+    avatarText: { color: theme.cream },
+    actionButton: { backgroundColor: theme.primary },
+    actionOutline: { borderColor: theme.cream },
+    actionText: { color: theme.white },
+    sectionTitle: { color: theme.cream },
+    tabBtnActive: { backgroundColor: theme.cream, borderColor: theme.cream },
+    tabTextActive: { color: theme.primary },
+    offlineText: { color: theme.cream },
+  })
 
   useFocusEffect(
     useCallback(() => {
@@ -22,7 +38,7 @@ export default function ProfileScreen() {
   )
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynStyles.container]}>
       <Header />
 
       <FlatList
@@ -32,62 +48,62 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
-            <View style={styles.userCard}>
+            <View style={[styles.userCard, dynStyles.userCard]}>
               {user?.avatarUrl ? (
                 <Image
                   source={{ uri: user.avatarUrl }}
                   style={styles.avatar}
                 />
               ) : (
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{initials}</Text>
+                <View style={[styles.avatar, dynStyles.avatar]}>
+                  <Text style={[styles.avatarText, dynStyles.avatarText]}>{initials}</Text>
                 </View>
               )}
-              <Text style={styles.userName}>{user?.name ?? t('profile.fallbackName')}</Text>
+              <Text style={[styles.userName, dynStyles.userName]}>{user?.name ?? t('profile.fallbackName')}</Text>
               <Text style={styles.userEmail}>{user?.email ?? ''}</Text>
 
               <View style={styles.actions}>
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={[styles.actionButton, dynStyles.actionButton]}
                   onPress={() => router.push('/recipe/create')}
                 >
-                  <Ionicons name="add-circle-outline" size={18} color={colors.white} />
-                  <Text style={styles.actionText}>{t('profile.newRecipe')}</Text>
+                  <Ionicons name="add-circle-outline" size={18} color={theme.white} />
+                  <Text style={[styles.actionText, dynStyles.actionText]}>{t('profile.newRecipe')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.actionButton, styles.actionOutline]}
+                  style={[styles.actionButton, styles.actionOutline, dynStyles.actionOutline]}
                   onPress={() => router.push('/profile/settings')}
                 >
-                  <Ionicons name="settings-outline" size={18} color={colors.cream} />
-                  <Text style={[styles.actionText, { color: colors.cream }]}>{t('profile.settings')}</Text>
+                  <Ionicons name="settings-outline" size={18} color={theme.cream} />
+                  <Text style={[styles.actionText, { color: theme.cream }]}>{t('profile.settings')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
             <View style={styles.tabsContainer}>
-              <Text style={styles.sectionTitle}>{t('profile.sectionTitle')}</Text>
+              <Text style={[styles.sectionTitle, dynStyles.sectionTitle]}>{t('profile.sectionTitle')}</Text>
               <View style={styles.tabs}>
                 <TouchableOpacity
-                  style={[styles.tabBtn, activeTab === 'minhas' && styles.tabBtnActive]}
+                  style={[styles.tabBtn, activeTab === 'minhas' && styles.tabBtnActive, activeTab === 'minhas' && dynStyles.tabBtnActive]}
                   onPress={() => setActiveTab('minhas')}
                 >
-                  <Text style={[styles.tabText, activeTab === 'minhas' && styles.tabTextActive]}>
+                  <Text style={[styles.tabText, activeTab === 'minhas' && styles.tabTextActive, activeTab === 'minhas' && dynStyles.tabTextActive]}>
                     {t('profile.tabMine')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.tabBtn, activeTab === 'favoritas' && styles.tabBtnActive]}
+                  style={[styles.tabBtn, activeTab === 'favoritas' && styles.tabBtnActive, activeTab === 'favoritas' && dynStyles.tabBtnActive]}
                   onPress={() => setActiveTab('favoritas')}
                 >
-                  <Text style={[styles.tabText, activeTab === 'favoritas' && styles.tabTextActive]}>
+                  <Text style={[styles.tabText, activeTab === 'favoritas' && styles.tabTextActive, activeTab === 'favoritas' && dynStyles.tabTextActive]}>
                     {t('profile.tabFavorites')}
                   </Text>
                 </TouchableOpacity>
               </View>
               {isOffline && activeTab === 'favoritas' && (
                 <View style={styles.offlineBanner}>
-                  <Ionicons name="cloud-offline-outline" size={14} color={colors.cream} />
-                  <Text style={styles.offlineText}>{t('profile.offlineWarning')}</Text>
+                  <Ionicons name="cloud-offline-outline" size={14} color={theme.cream} />
+                  <Text style={[styles.offlineText, dynStyles.offlineText]}>{t('profile.offlineWarning')}</Text>
                 </View>
               )}
             </View>
@@ -96,11 +112,11 @@ export default function ProfileScreen() {
         ListEmptyComponent={
           fetching ? (
             <View style={styles.empty}>
-              <ActivityIndicator size="large" color="rgba(255,255,255,0.4)" />
+              <ActivityIndicator size="large" color={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(122,0,0,0.3)'} />
             </View>
           ) : (
             <View style={styles.empty}>
-              <Ionicons name="bookmark-outline" size={48} color="rgba(255,255,255,0.2)" />
+              <Ionicons name="bookmark-outline" size={48} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(122,0,0,0.15)'} />
               <Text style={styles.emptyText}>
                 {activeTab === 'minhas' ? t('profile.emptyMine') : t('profile.emptyFavorites')}
               </Text>
@@ -131,13 +147,13 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000',
   },
   listContent: {
     paddingBottom: 16,
   },
   userCard: {
-    backgroundColor: colors.white,
+    backgroundColor: '#FFFFFF',
     marginHorizontal: 20,
     borderRadius: 20,
     padding: 24,
@@ -152,20 +168,20 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   avatarText: {
-    color: colors.cream,
+    color: '#DDBC9B',
     fontSize: 24,
     fontWeight: 'bold',
   },
   userName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: '#7A0000',
     marginBottom: 4,
   },
   userEmail: {
@@ -184,17 +200,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000',
     borderRadius: 50,
     paddingVertical: 10,
   },
   actionOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: colors.cream,
+    borderColor: '#DDBC9B',
   },
   actionText: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: 'bold',
   },
@@ -203,7 +219,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    color: colors.cream,
+    color: '#DDBC9B',
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 12,
@@ -220,15 +236,15 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.2)',
   },
   tabBtnActive: {
-    backgroundColor: colors.cream,
-    borderColor: colors.cream,
+    backgroundColor: '#DDBC9B',
+    borderColor: '#DDBC9B',
   },
   tabText: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: 13,
   },
   tabTextActive: {
-    color: colors.primary,
+    color: '#7A0000',
     fontWeight: 'bold',
   },
   offlineBanner: {
@@ -242,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   offlineText: {
-    color: colors.cream,
+    color: '#DDBC9B',
     fontSize: 12,
   },
   empty: {

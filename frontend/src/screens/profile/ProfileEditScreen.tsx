@@ -1,18 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Platform, StyleSheet,
-    Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    Image, Platform, StyleSheet,
+    Text, TextInput, TouchableOpacity, View
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FieldError from '../../components/FieldError';
 import EyeIcon from '../../components/icons/EyeIcon';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
-import { colors } from '../../theme/color';
 import { useEditProfile } from '../../hooks/profile/useProfileEdit';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function EditProfileScreen() {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const {
         user, name, setName, email, setEmail, password, setPassword,
@@ -22,8 +25,24 @@ export default function EditProfileScreen() {
         togglePreference, handlePickAvatar, handleSave, dietaryOptions
     } = useEditProfile()
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        card: { backgroundColor: theme.card },
+        title: { color: theme.textPrimary },
+        avatar: { borderColor: theme.primary, backgroundColor: theme.surfaceSecondary },
+        avatarEditBadge: { backgroundColor: theme.primary },
+        label: { color: theme.textPrimary },
+        inputRow: { borderBottomColor: theme.border },
+        input: { color: theme.textMuted },
+        inputActive: { color: theme.textPrimary },
+        chip: { borderColor: theme.border },
+        chipActive: { backgroundColor: theme.primary, borderColor: theme.primary },
+        chipText: { color: theme.textPrimary },
+        button: { backgroundColor: theme.primary },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <KeyboardAwareScrollView
@@ -34,11 +53,11 @@ export default function EditProfileScreen() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
             >
-                <View style={styles.card}>
+                <View style={[styles.card, dynStyles.card]}>
                     <View style={styles.cardHeader}>
-                        <Text style={styles.title}>{user?.name ?? t('editProfile.fallbackName')}</Text>
+                        <Text style={[styles.title, dynStyles.title]}>{user?.name ?? t('editProfile.fallbackName')}</Text>
                         <TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} style={styles.backBtn}>
-                            <Ionicons name="arrow-undo-outline" size={22} color={colors.primary} />
+                            <Ionicons name="arrow-undo-outline" size={22} color={theme.primary} />
                         </TouchableOpacity>
                     </View>
 
@@ -46,21 +65,21 @@ export default function EditProfileScreen() {
                         {avatarUri ? (
                             <Image
                                 source={{ uri: avatarUri }}
-                                style={[styles.avatar, { overflow: 'hidden' }]}
+                                style={[styles.avatar, dynStyles.avatar, { overflow: 'hidden' }]}
                             />
                         ) : (
-                            <View style={styles.avatar}>
-                                <Ionicons name="person-outline" size={48} color={colors.primary} />
+                            <View style={[styles.avatar, dynStyles.avatar]}>
+                                <Ionicons name="person-outline" size={48} color={theme.primary} />
                             </View>
                         )}
-                        <View style={styles.avatarEditBadge}>
-                            <Ionicons name="camera-outline" size={14} color={colors.white} />
+                        <View style={[styles.avatarEditBadge, dynStyles.avatarEditBadge]}>
+                            <Ionicons name="camera-outline" size={14} color={theme.white} />
                         </View>
                     </TouchableOpacity>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>{t('editProfile.labelName')}</Text>
-                        <View style={styles.inputRow}>
+                        <Text style={[styles.label, dynStyles.label]}>{t('editProfile.labelName')}</Text>
+                        <View style={[styles.inputRow, dynStyles.inputRow]}>
                             <TextInput
                                 value={name}
                                 onChangeText={setName}
@@ -68,9 +87,11 @@ export default function EditProfileScreen() {
                                 editable={editingField === 'name'}
                                 style={[
                                     styles.input,
+                                    dynStyles.input,
                                     editingField === 'name' && styles.inputActive,
+                                    editingField === 'name' && dynStyles.inputActive,
                                 ]}
-                                placeholderTextColor={colors.gray}
+                                placeholderTextColor={theme.textMuted}
                             />
                             <TouchableOpacity
                                 onPress={() => setEditingField(editingField === 'name' ? null : 'name')}
@@ -78,7 +99,7 @@ export default function EditProfileScreen() {
                                 <Ionicons
                                     name="pencil-outline"
                                     size={18}
-                                    color={editingField === 'name' ? colors.primary : colors.gray}
+                                    color={editingField === 'name' ? theme.primary : theme.textMuted}
                                 />
                             </TouchableOpacity>
                         </View>
@@ -86,8 +107,8 @@ export default function EditProfileScreen() {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>{t('editProfile.labelEmail')}</Text>
-                        <View style={styles.inputRow}>
+                        <Text style={[styles.label, dynStyles.label]}>{t('editProfile.labelEmail')}</Text>
+                        <View style={[styles.inputRow, dynStyles.inputRow]}>
                             <TextInput
                                 value={email}
                                 onChangeText={setEmail}
@@ -96,9 +117,11 @@ export default function EditProfileScreen() {
                                 editable={editingField === 'email'}
                                 style={[
                                     styles.input,
+                                    dynStyles.input,
                                     editingField === 'email' && styles.inputActive,
+                                    editingField === 'email' && dynStyles.inputActive,
                                 ]}
-                                placeholderTextColor={colors.gray}
+                                placeholderTextColor={theme.textMuted}
                             />
                             <TouchableOpacity
                                 onPress={() => setEditingField(editingField === 'email' ? null : 'email')}
@@ -106,7 +129,7 @@ export default function EditProfileScreen() {
                                 <Ionicons
                                     name="pencil-outline"
                                     size={18}
-                                    color={editingField === 'email' ? colors.primary : colors.gray}
+                                    color={editingField === 'email' ? theme.primary : theme.textMuted}
                                 />
                             </TouchableOpacity>
                         </View>
@@ -114,8 +137,8 @@ export default function EditProfileScreen() {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>{t('editProfile.labelPassword')}</Text>
-                        <View style={styles.inputRow}>
+                        <Text style={[styles.label, dynStyles.label]}>{t('editProfile.labelPassword')}</Text>
+                        <View style={[styles.inputRow, dynStyles.inputRow]}>
                             <TextInput
                                 value={password}
                                 onChangeText={setPassword}
@@ -124,9 +147,11 @@ export default function EditProfileScreen() {
                                 placeholder="••••••••"
                                 style={[
                                     styles.input,
+                                    dynStyles.input,
                                     editingField === 'password' && styles.inputActive,
+                                    editingField === 'password' && dynStyles.inputActive,
                                 ]}
-                                placeholderTextColor={colors.gray}
+                                placeholderTextColor={theme.textMuted}
                             />
                             {editingField === 'password' && (
                                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -140,7 +165,7 @@ export default function EditProfileScreen() {
                                 <Ionicons
                                     name="pencil-outline"
                                     size={18}
-                                    color={editingField === 'password' ? colors.primary : colors.gray}
+                                    color={editingField === 'password' ? theme.primary : theme.textMuted}
                                 />
                             </TouchableOpacity>
                         </View>
@@ -149,15 +174,15 @@ export default function EditProfileScreen() {
 
                     {editingField === 'password' && (
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>{t('editProfile.labelConfirmPassword')}</Text>
-                            <View style={styles.inputRow}>
+                            <Text style={[styles.label, dynStyles.label]}>{t('editProfile.labelConfirmPassword')}</Text>
+                            <View style={[styles.inputRow, dynStyles.inputRow]}>
                                 <TextInput
                                     value={confirmPassword}
                                     onChangeText={setConfirmPassword}
                                     secureTextEntry={!showConfirmPassword}
                                     placeholder="••••••••"
-                                    style={[styles.input, styles.inputActive]}
-                                    placeholderTextColor={colors.gray}
+                                    style={[styles.input, dynStyles.input, styles.inputActive, dynStyles.inputActive]}
+                                    placeholderTextColor={theme.textMuted}
                                 />
                                 <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                                     <EyeIcon visible={showConfirmPassword} />
@@ -168,7 +193,7 @@ export default function EditProfileScreen() {
                     )}
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>{t('editProfile.labelDietary')}</Text>
+                        <Text style={[styles.label, dynStyles.label]}>{t('editProfile.labelDietary')}</Text>
                         <Text style={styles.labelHint}>{t('editProfile.dietaryHint')}</Text>
                         <View style={styles.chipsContainer}>
                             {dietaryOptions.map((pref: { key: string; label: string }) => {
@@ -176,11 +201,11 @@ export default function EditProfileScreen() {
                                 return (
                                     <TouchableOpacity
                                         key={pref.key}
-                                        style={[styles.chip, isSelected && styles.chipActive]}
+                                        style={[styles.chip, dynStyles.chip, isSelected && styles.chipActive, isSelected && dynStyles.chipActive]}
                                         onPress={() => togglePreference(pref.key)}
                                     >
-                                        {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
-                                        <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                                        {isSelected && <Ionicons name="checkmark" size={13} color={theme.white} />}
+                                        <Text style={[styles.chipText, dynStyles.chipText, isSelected && styles.chipTextActive]}>
                                             {pref.label}
                                         </Text>
                                     </TouchableOpacity>
@@ -192,7 +217,7 @@ export default function EditProfileScreen() {
                     {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
                     <TouchableOpacity
-                        style={[styles.button, loading && styles.buttonDisabled]}
+                        style={[styles.button, dynStyles.button, loading && styles.buttonDisabled]}
                         onPress={handleSave}
                         disabled={loading}
                     >
@@ -211,7 +236,7 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
     },
     scrollContent: {
         flexGrow: 1,
@@ -219,7 +244,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
     },
     card: {
-        backgroundColor: colors.white,
+        backgroundColor: '#FFFFFF',
         borderRadius: 24,
         paddingHorizontal: 28,
         paddingTop: 24,
@@ -243,7 +268,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: colors.primary,
+        color: '#7A0000',
         flexShrink: 1,
         marginRight: 8,
     },
@@ -255,7 +280,7 @@ const styles = StyleSheet.create({
         height: 88,
         borderRadius: 44,
         borderWidth: 2,
-        borderColor: colors.primary,
+        borderColor: '#7A0000',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#f5f0ee',
@@ -269,7 +294,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         right: '35%',
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 12,
         padding: 4,
     },
@@ -277,13 +302,13 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     label: {
-        color: colors.primary,
+        color: '#7A0000',
         fontSize: 14,
         fontWeight: '600',
         marginBottom: 6,
     },
     labelHint: {
-        color: colors.gray,
+        color: '#9CA3AF',
         fontSize: 12,
         marginBottom: 10,
     },
@@ -298,11 +323,11 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: 15,
-        color: colors.black,
+        color: '#9CA3AF',
         paddingVertical: 0,
     },
     inputActive: {
-        color: colors.primary,
+        color: '#7A0000',
     },
     chipsContainer: {
         flexDirection: 'row',
@@ -320,19 +345,19 @@ const styles = StyleSheet.create({
         borderColor: '#e0d6d0',
     },
     chipActive: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
+        backgroundColor: '#7A0000',
+        borderColor: '#7A0000',
     },
     chipText: {
         fontSize: 13,
-        color: colors.primary,
+        color: '#7A0000',
         fontWeight: '600',
     },
     chipTextActive: {
-        color: colors.white,
+        color: '#FFFFFF',
     },
     button: {
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 50,
         paddingVertical: 16,
         alignItems: 'center',
@@ -340,7 +365,7 @@ const styles = StyleSheet.create({
     },
     buttonDisabled: { opacity: 0.7 },
     buttonText: {
-        color: colors.white,
+        color: '#FFFFFF',
         fontWeight: 'bold',
         letterSpacing: 2,
         fontSize: 15,

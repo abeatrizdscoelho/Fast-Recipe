@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '@/src/theme/color'
 import { ShoppingListItem } from '@/src/types/shoppingList'
 import { ShoppingItem } from './ShoppingItem'
 import { useTranslation } from 'react-i18next'
 import { useAppConstants } from '@/src/hooks/useAppConstants'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
     drinks: 'wine-outline',
@@ -33,22 +33,32 @@ interface Props {
 
 export function CategorySection({ category, items, onToggle, onEdit, onDelete }: Props) {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const { INGREDIENT_CATEGORIES } = useAppConstants()
     const [expanded, setExpanded] = useState(true)
     const icon = CATEGORY_ICONS[category] ?? 'basket-outline'
     const label = INGREDIENT_CATEGORIES.find(c => c.key === category)?.label ?? category
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.card },
+        iconBox: { backgroundColor: isDark ? theme.iconBox : '#FFF0EC' },
+        title: { color: theme.textPrimary },
+        badge: { backgroundColor: isDark ? theme.iconBox : '#FFF0EC' },
+        badgeText: { color: theme.primary },
+        list: { borderTopColor: theme.divider },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <TouchableOpacity style={styles.header} onPress={() => setExpanded(p => !p)} activeOpacity={0.7}>
-                <View style={styles.iconBox}>
-                    <Ionicons name={icon} size={18} color={colors.primary} />
+                <View style={[styles.iconBox, dynStyles.iconBox]}>
+                    <Ionicons name={icon} size={18} color={theme.primary} />
                 </View>
 
-                <Text style={styles.title}>{label}</Text>
+                <Text style={[styles.title, dynStyles.title]}>{label}</Text>
 
-                <View style={styles.badge}>
-                    <Text style={styles.badgeText}>
+                <View style={[styles.badge, dynStyles.badge]}>
+                    <Text style={[styles.badgeText, dynStyles.badgeText]}>
                         {items.length} {t('shoppingList.item', { count: items.length })}
                     </Text>
                 </View>
@@ -56,12 +66,12 @@ export function CategorySection({ category, items, onToggle, onEdit, onDelete }:
                 <Ionicons
                     name={expanded ? 'chevron-up' : 'chevron-down'}
                     size={18}
-                    color="#aaa"
+                    color={theme.textMuted}
                 />
             </TouchableOpacity>
 
             {expanded && (
-                <View style={styles.list}>
+                <View style={[styles.list, dynStyles.list]}>
                     {items.map(item => (
                         <ShoppingItem
                             key={item.ingredientIds.join('-')}
@@ -79,7 +89,7 @@ export function CategorySection({ category, items, onToggle, onEdit, onDelete }:
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: colors.white,
+        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         marginBottom: 12,
         overflow: 'hidden',
@@ -103,7 +113,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 15,
         fontWeight: '700',
-        color: colors.primary,
+        color: '#7A0000',
     },
     badge: {
         backgroundColor: '#FFF0EC',
@@ -114,7 +124,7 @@ const styles = StyleSheet.create({
     },
     badgeText: {
         fontSize: 12,
-        color: colors.primary,
+        color: '#7A0000',
         fontWeight: '600',
     },
     list: {

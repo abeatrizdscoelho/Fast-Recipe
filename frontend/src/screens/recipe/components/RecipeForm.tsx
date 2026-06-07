@@ -4,11 +4,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image 
 import { Ionicons } from '@expo/vector-icons'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { RecipeFormData } from '@/src/types/recipe'
-import { colors } from '@/src/theme/color'
 import FieldError from '@/src/components/FieldError'
 import { SelectDropdown } from '@/src/components/SelectDropdown'
 import { useTranslation } from 'react-i18next'
 import { useRecipeForm } from '@/src/hooks/recipe/useRecipeForm'
+import { useTheme } from '@/src/context/ThemeContext'
 
 type Props = {
     initialData?: Partial<RecipeFormData>
@@ -18,6 +18,7 @@ type Props = {
 }
 
 export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Receita', loading = false }: Props) {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const {
         title, setTitle, time, setTime,
@@ -28,9 +29,24 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
         difficulty, setDifficulty, difficultyOpen, setDifficultyOpen,
         description, setDescription, photos, errors, apiError,
         handlePhotoPress, removePhoto, addIngredient, removeIngredient, handleSubmit,
-        unitOpen, setUnitOpen, catIngOpen, setCatIngOpen, 
-        CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES, INGREDIENT_CATEGORIES, INGREDIENT_UNITS,    
+        unitOpen, setUnitOpen, catIngOpen, setCatIngOpen,
+        CATEGORIES, DIETARY_RESTRICTIONS, DIFFICULTIES, INGREDIENT_CATEGORIES, INGREDIENT_UNITS,
     } = useRecipeForm({ initialData, onSubmit })
+
+    const dynStyles = StyleSheet.create({
+        card: { backgroundColor: theme.card },
+        cardTitle: { color: theme.textPrimary },
+        label: { color: theme.textPrimary },
+        input: { backgroundColor: theme.surface, borderColor: theme.border, color: theme.textPrimary },
+        photoAddBtn: { backgroundColor: theme.surfaceSecondary },
+        photoBadge: { backgroundColor: theme.primary },
+        tag: { backgroundColor: theme.primary },
+        addButton: { backgroundColor: theme.primary },
+        chip: { borderColor: theme.border },
+        chipActive: { backgroundColor: theme.primary, borderColor: theme.primary },
+        chipText: { color: theme.textPrimary },
+        submitButton: { backgroundColor: theme.primary },
+    })
 
     return (
         <KeyboardAwareScrollView
@@ -39,21 +55,23 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
         >
-            <View style={styles.card}>
+            <View style={[styles.card, dynStyles.card]}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle}>{t('recipeForm.title')}</Text>
+                    <Text style={[styles.cardTitle, dynStyles.cardTitle]}>{t('recipeForm.title')}</Text>
                     <TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} style={styles.backBtn}>
-                        <Ionicons name="arrow-undo-outline" size={22} color={colors.primary} />
+                        <Ionicons name="arrow-undo-outline" size={22} color={theme.primary} />
                     </TouchableOpacity>
                 </View>
 
-                <Text style={styles.label}>{t('recipeForm.photosLabel')} <Text style={styles.labelHint}>{t('recipeForm.photosMax')}</Text></Text>
+                <Text style={[styles.label, dynStyles.label]}>
+                    {t('recipeForm.photosLabel')} <Text style={styles.labelHint}>{t('recipeForm.photosMax')}</Text>
+                </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photosRow}>
                     {photos.map((uri, index) => (
                         <View key={index} style={styles.photoThumb}>
                             <Image source={{ uri }} style={styles.photoThumbImage} />
                             {index === 0 && (
-                                <View style={styles.photoBadge}>
+                                <View style={[styles.photoBadge, dynStyles.photoBadge]}>
                                     <Text style={styles.photoBadgeText}>{t('recipeForm.coverBadge')}</Text>
                                 </View>
                             )}
@@ -63,7 +81,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                         </View>
                     ))}
                     {photos.length < 5 && (
-                        <TouchableOpacity style={styles.photoAddBtn} onPress={handlePhotoPress}>
+                        <TouchableOpacity style={[styles.photoAddBtn, dynStyles.photoAddBtn]} onPress={handlePhotoPress}>
                             <Ionicons name="camera-outline" size={28} color="rgba(0,0,0,0.3)" />
                             <Text style={styles.photoText}>
                                 {photos.length === 0 ? t('recipeForm.addPhoto') : t('recipeForm.addMorePhotos')}
@@ -73,22 +91,22 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 </ScrollView>
                 <FieldError message={errors.photos} />
 
-                <Text style={styles.label}>{t('recipeForm.titleLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.titleLabel')}</Text>
                 <TextInput
-                    style={[styles.input, errors.title ? styles.inputError : null]}
+                    style={[styles.input, dynStyles.input, errors.title ? styles.inputError : null]}
                     placeholder={t('recipeForm.titlePlaceholder')}
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textMuted}
                     value={title}
                     onChangeText={setTitle}
                 />
                 <FieldError message={errors.title} />
 
-                <Text style={styles.label}>{t('recipeForm.ingredientsLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.ingredientsLabel')}</Text>
                 <View style={styles.ingredientForm}>
                     <TextInput
-                        style={[styles.input, ingredientError ? styles.inputError : null]}
+                        style={[styles.input, dynStyles.input, ingredientError ? styles.inputError : null]}
                         placeholder={t('recipeForm.ingredientNamePlaceholder')}
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor={theme.textMuted}
                         value={ingredientInput.name}
                         onChangeText={v => setIngredientInput(prev => ({ ...prev, name: v }))}
                         returnKeyType="next"
@@ -96,9 +114,9 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
 
                     <View style={styles.ingredientRow}>
                         <TextInput
-                            style={[styles.input, styles.inputQty, ingredientError ? styles.inputError : null]}
+                            style={[styles.input, styles.inputQty, dynStyles.input, ingredientError ? styles.inputError : null]}
                             placeholder={t('recipeForm.ingredientQtyPlaceholder')}
-                            placeholderTextColor="#aaa"
+                            placeholderTextColor={theme.textMuted}
                             value={ingredientInput.quantity}
                             onChangeText={v => setIngredientInput(prev => ({ ...prev, quantity: v }))}
                             keyboardType="decimal-pad"
@@ -134,61 +152,61 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 {ingredients.length > 0 && (
                     <View style={styles.tagsContainer}>
                         {ingredients.map((ing, index) => (
-                            <TouchableOpacity key={index} style={styles.tag} onPress={() => removeIngredient(index)}>
+                            <TouchableOpacity key={index} style={[styles.tag, dynStyles.tag]} onPress={() => removeIngredient(index)}>
                                 <Text style={styles.tagText}>{ing.quantity} {ing.unit} — {ing.name}</Text>
-                                <Ionicons name="close" size={12} color={colors.white} />
+                                <Ionicons name="close" size={12} color={theme.white} />
                             </TouchableOpacity>
                         ))}
                     </View>
                 )}
 
-                <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
-                    <Ionicons name="add" size={18} color={colors.white} />
+                <TouchableOpacity style={[styles.addButton, dynStyles.addButton]} onPress={addIngredient}>
+                    <Ionicons name="add" size={18} color={theme.white} />
                     <Text style={styles.addButtonText}>{t('recipeForm.addIngredientBtn')}</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.label}>{t('recipeForm.preparationLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.preparationLabel')}</Text>
                 <TextInput
-                    style={[styles.input, styles.textArea, errors.preparation ? styles.inputError : null]}
+                    style={[styles.input, styles.textArea, dynStyles.input, errors.preparation ? styles.inputError : null]}
                     placeholder={t('recipeForm.preparationPlaceholder')}
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textMuted}
                     value={preparation}
                     onChangeText={setPreparation}
                     multiline numberOfLines={4} textAlignVertical="top"
                 />
                 <FieldError message={errors.preparation} />
 
-                <Text style={styles.label}>{t('recipeForm.timeLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.timeLabel')}</Text>
                 <TextInput
-                    style={[styles.input, errors.time ? styles.inputError : null]}
+                    style={[styles.input, dynStyles.input, errors.time ? styles.inputError : null]}
                     placeholder={t('recipeForm.timePlaceholder')}
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textMuted}
                     value={time} onChangeText={setTime} keyboardType="numeric"
                 />
                 <FieldError message={errors.time} />
 
-                <Text style={styles.label}>{t('recipeForm.portionsLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.portionsLabel')}</Text>
                 <TextInput
-                    style={[styles.input, errors.portions ? styles.inputError : null]}
+                    style={[styles.input, dynStyles.input, errors.portions ? styles.inputError : null]}
                     placeholder={t('recipeForm.portionsPlaceholder')}
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textMuted}
                     value={portions} onChangeText={setPortions} keyboardType="numeric"
                 />
                 <FieldError message={errors.portions} />
 
-                <Text style={styles.label}>{t('recipeForm.categoryLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.categoryLabel')}</Text>
                 <SelectDropdown
                     value={category}
                     placeholder={t('recipeForm.categoryPlaceholder')}
                     options={CATEGORIES}
                     open={categoryOpen}
-                    onToggle={() => { setCategoryOpen(p => !p)}}
+                    onToggle={() => { setCategoryOpen(p => !p) }}
                     onSelect={v => { setCategory(v); setCategoryOpen(false) }}
                     error={errors.category}
                 />
                 <FieldError message={errors.category} />
 
-                <Text style={styles.label}>{t('recipeForm.difficultyLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.difficultyLabel')}</Text>
                 <SelectDropdown
                     value={difficulty}
                     placeholder={t('recipeForm.difficultyPlaceholder')}
@@ -200,7 +218,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 />
                 <FieldError message={errors.difficulty} />
 
-                <Text style={styles.label}>
+                <Text style={[styles.label, dynStyles.label]}>
                     {t('recipeForm.dietaryLabel')} <Text style={styles.labelHint}>{t('recipeForm.optional')}</Text>
                 </Text>
                 <Text style={styles.dietaryHint}>{t('recipeForm.dietaryHint')}</Text>
@@ -210,21 +228,23 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                         return (
                             <TouchableOpacity
                                 key={opt.key}
-                                style={[styles.chip, isSelected && styles.chipActive]}
+                                style={[styles.chip, dynStyles.chip, isSelected && styles.chipActive, isSelected && dynStyles.chipActive]}
                                 onPress={() => toggleDietaryRestrictions(opt.key)}
                             >
-                                {isSelected && <Ionicons name="checkmark" size={13} color={colors.white} />}
-                                <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>{opt.label}</Text>
+                                {isSelected && <Ionicons name="checkmark" size={13} color={theme.white} />}
+                                <Text style={[styles.chipText, dynStyles.chipText, isSelected && styles.chipTextActive]}>
+                                    {opt.label}
+                                </Text>
                             </TouchableOpacity>
                         )
                     })}
                 </View>
 
-                <Text style={styles.label}>{t('recipeForm.descriptionLabel')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipeForm.descriptionLabel')}</Text>
                 <TextInput
-                    style={[styles.input, styles.textArea, errors.description ? styles.inputError : null]}
+                    style={[styles.input, styles.textArea, dynStyles.input, errors.description ? styles.inputError : null]}
                     placeholder={t('recipeForm.descriptionPlaceholder')}
-                    placeholderTextColor="#aaa"
+                    placeholderTextColor={theme.textMuted}
                     value={description} onChangeText={setDescription}
                     multiline numberOfLines={3} textAlignVertical="top"
                 />
@@ -233,7 +253,7 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
                 {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
                 <TouchableOpacity
-                    style={[styles.submitButton, loading && styles.submitDisabled]}
+                    style={[styles.submitButton, dynStyles.submitButton, loading && styles.submitDisabled]}
                     onPress={handleSubmit}
                     disabled={loading}
                 >
@@ -247,10 +267,15 @@ export function RecipeForm({ initialData, onSubmit, submitLabel = 'Publicar Rece
 }
 
 const styles = StyleSheet.create({
-    scroll: { flex: 1 },
-    content: { padding: 20, paddingBottom: 32 },
+    scroll: {
+        flex: 1
+    },
+    content: {
+        padding: 20,
+        paddingBottom: 32
+    },
     card: {
-        backgroundColor: colors.white,
+        backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
         shadowColor: '#000',
@@ -267,23 +292,31 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: colors.primary,
+        color: '#7A0000',
     },
-    backBtn: { padding: 4 },
+    backBtn: {
+        padding: 4
+    },
     label: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: colors.primary,
+        color: '#7A0000',
         marginBottom: 8,
         marginTop: 16,
     },
     labelHint: {
         fontSize: 12,
         fontWeight: 'normal',
-        color: colors.gray,
+        color: '#9CA3AF',
     },
-    photoText: { color: 'rgba(0,0,0,0.35)', fontSize: 13 },
-    photosRow: { flexDirection: 'row', marginTop: 4 },
+    photoText: {
+        color: 'rgba(0,0,0,0.35)',
+        fontSize: 13
+    },
+    photosRow: {
+        flexDirection: 'row',
+        marginTop: 4
+    },
     photoThumb: {
         width: 100,
         height: 100,
@@ -291,18 +324,30 @@ const styles = StyleSheet.create({
         marginRight: 10,
         position: 'relative',
     },
-    photoThumbImage: { width: '100%', height: '100%', borderRadius: 10 },
+    photoThumbImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10
+    },
     photoBadge: {
         position: 'absolute',
         bottom: 4,
         left: 4,
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 6,
         paddingHorizontal: 6,
         paddingVertical: 2,
     },
-    photoBadgeText: { color: colors.white, fontSize: 10, fontWeight: 'bold' },
-    photoRemove: { position: 'absolute', top: -2, right: -2 },
+    photoBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: 'bold'
+    },
+    photoRemove: {
+        position: 'absolute',
+        top: -2,
+        right: -2
+    },
     photoAddBtn: {
         width: 100,
         height: 100,
@@ -322,12 +367,27 @@ const styles = StyleSheet.create({
         color: '#333',
         backgroundColor: '#fafafa',
     },
-    inputError: { borderColor: colors.error ?? '#e05c5c' },
-    textArea: { height: 100, paddingTop: 12 },
-    ingredientForm: { gap: 8, marginTop: 4 },
-    ingredientRow: { flexDirection: 'row', gap: 8 },
-    inputQty: { width: 90 },
-    selectUnit: { flex: 1 },
+    inputError: {
+        borderColor: '#DC2626'
+    },
+    textArea: {
+        height: 100,
+        paddingTop: 12
+    },
+    ingredientForm: {
+        gap: 8,
+        marginTop: 4
+    },
+    ingredientRow: {
+        flexDirection: 'row',
+        gap: 8
+    },
+    inputQty: {
+        width: 90
+    },
+    selectUnit: {
+        flex: 1
+    },
     tagsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -338,26 +398,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 50,
         paddingHorizontal: 12,
         paddingVertical: 5,
     },
-    tagText: { color: colors.white, fontSize: 12, fontWeight: 'bold' },
+    tagText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: 'bold'
+    },
     addButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 50,
         paddingVertical: 12,
         marginTop: 12,
     },
-    addButtonText: { color: colors.white, fontSize: 14, fontWeight: 'bold' },
+    addButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: 'bold'
+    },
     dietaryHint: {
         fontSize: 12,
-        color: colors.gray,
+        color: '#9CA3AF',
         marginBottom: 10,
         marginTop: -4,
     },
@@ -378,25 +446,29 @@ const styles = StyleSheet.create({
         borderColor: '#e0d6d0',
     },
     chipActive: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
+        backgroundColor: '#7A0000',
+        borderColor: '#7A0000',
     },
     chipText: {
         fontSize: 13,
-        color: colors.primary,
+        color: '#7A0000',
         fontWeight: '600',
     },
-    chipTextActive: { color: colors.white },
+    chipTextActive: {
+        color: '#FFFFFF'
+    },
     submitButton: {
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
         borderRadius: 50,
         paddingVertical: 16,
         alignItems: 'center',
         marginTop: 28,
     },
-    submitDisabled: { opacity: 0.7 },
+    submitDisabled: {
+        opacity: 0.7
+    },
     submitText: {
-        color: colors.white,
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
         letterSpacing: 0.5,

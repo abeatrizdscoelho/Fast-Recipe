@@ -10,9 +10,11 @@ import { useShoppingItemForm } from '@/src/hooks/shoppingList/useShoppingItemFor
 import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export default function ShoppingItemFormScreen() {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const {
         isEdit,
         name, setName,
@@ -27,8 +29,27 @@ export default function ShoppingItemFormScreen() {
         INGREDIENT_UNITS,
     } = useShoppingItemForm()
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        card: { backgroundColor: theme.card },
+        cardTitle: { color: theme.primary },
+        label: { color: theme.primary },
+        input: {
+            borderColor: theme.border,
+            backgroundColor: isDark ? theme.surfaceSecondary : '#fafafa',
+            color: theme.textPrimary,
+        },
+        chip: {
+            borderColor: isDark ? theme.border : '#e0d6d0',
+            backgroundColor: theme.card,
+        },
+        chipActive: { backgroundColor: theme.primary, borderColor: theme.primary },
+        chipText: { color: theme.primary },
+        saveBtn: { backgroundColor: theme.primary },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <KeyboardAwareScrollView
@@ -37,9 +58,9 @@ export default function ShoppingItemFormScreen() {
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={styles.card}>
+                <View style={[styles.card, dynStyles.card]}>
                     <View style={styles.cardHeader}>
-                        <Text style={styles.cardTitle}>
+                        <Text style={[styles.cardTitle, dynStyles.cardTitle]}>
                             {isEdit ? t('shoppingItemForm.editTitle') : t('shoppingItemForm.addTitle')}
                         </Text>
                         <TouchableOpacity
@@ -47,17 +68,17 @@ export default function ShoppingItemFormScreen() {
                             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                             style={styles.backBtn}
                         >
-                            <Ionicons name="arrow-undo-outline" size={22} color={colors.primary} />
+                            <Ionicons name="arrow-undo-outline" size={22} color={theme.primary} />
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.label}>{t('shoppingItemForm.labelIngredientName')}</Text>
+                    <Text style={[styles.label, dynStyles.label]}>{t('shoppingItemForm.labelIngredientName')}</Text>
                     <TextInput
-                        style={[styles.input, errors.name ? styles.inputError : null]}
+                        style={[styles.input, dynStyles.input, errors.name ? styles.inputError : null]}
                         value={name}
                         onChangeText={setName}
                         placeholder={t('shoppingItemForm.placeholderIngredientName')}
-                        placeholderTextColor="#aaa"
+                        placeholderTextColor={theme.textMuted}
                         autoCapitalize="sentences"
                         onFocus={() => setUnitOpen(false)}
                     />
@@ -65,20 +86,20 @@ export default function ShoppingItemFormScreen() {
 
                     <View style={styles.row}>
                         <View style={styles.rowItem}>
-                            <Text style={styles.label}>{t('shoppingItemForm.labelQuantity')}</Text>
+                            <Text style={[styles.label, dynStyles.label]}>{t('shoppingItemForm.labelQuantity')}</Text>
                             <TextInput
-                                style={[styles.input, errors.quantity ? styles.inputError : null]}
+                                style={[styles.input, dynStyles.input, errors.quantity ? styles.inputError : null]}
                                 value={quantity}
                                 onChangeText={setQuantity}
                                 placeholder={t('shoppingItemForm.placeholderQuantity')}
                                 keyboardType="decimal-pad"
-                                placeholderTextColor="#aaa"
+                                placeholderTextColor={theme.textMuted}
                                 onFocus={() => setUnitOpen(false)}
                             />
                             <FieldError message={errors.quantity} />
                         </View>
                         <View style={styles.rowItem}>
-                            <Text style={styles.label}>{t('shoppingItemForm.labelUnit')}</Text>
+                            <Text style={[styles.label, dynStyles.label]}>{t('shoppingItemForm.labelUnit')}</Text>
                             <SelectDropdown
                                 value={unit}
                                 placeholder={t('shoppingItemForm.placeholderUnit')}
@@ -90,7 +111,7 @@ export default function ShoppingItemFormScreen() {
                         </View>
                     </View>
 
-                    <Text style={styles.label}>{t('shoppingItemForm.labelCategory')}</Text>
+                    <Text style={[styles.label, dynStyles.label]}>{t('shoppingItemForm.labelCategory')}</Text>
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -100,10 +121,10 @@ export default function ShoppingItemFormScreen() {
                         {allCategories.map(cat => (
                             <TouchableOpacity
                                 key={cat}
-                                style={[styles.chip, category === cat && styles.chipActive]}
+                                style={[styles.chip, dynStyles.chip, category === cat && dynStyles.chipActive]}
                                 onPress={() => { setCategory(cat); setUnitOpen(false) }}
                             >
-                                <Text style={[styles.chipText, category === cat && styles.chipTextActive]}>
+                                <Text style={[styles.chipText, dynStyles.chipText, category === cat && styles.chipTextActive]}>
                                     {t(`ingredientCategories.${cat}`, cat)}
                                 </Text>
                             </TouchableOpacity>
@@ -111,15 +132,15 @@ export default function ShoppingItemFormScreen() {
                     </ScrollView>
 
                     <TouchableOpacity
-                        style={[styles.saveBtn, loading && styles.saveBtnDisabled]}
+                        style={[styles.saveBtn, dynStyles.saveBtn, loading && styles.saveBtnDisabled]}
                         onPress={handleSave}
                         disabled={loading}
                     >
                         <Text style={styles.saveBtnText}>
-                            {loading 
-                                ? t('shoppingItemForm.saving') 
-                                : isEdit 
-                                    ? t('shoppingItemForm.editAction') 
+                            {loading
+                                ? t('shoppingItemForm.saving')
+                                : isEdit
+                                    ? t('shoppingItemForm.editAction')
                                     : t('shoppingItemForm.addAction')
                             }
                         </Text>
@@ -137,7 +158,6 @@ export default function ShoppingItemFormScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.primary,
     },
     scroll: { flex: 1 },
     scrollContent: {
@@ -145,7 +165,6 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     card: {
-        backgroundColor: colors.white,
         borderRadius: 20,
         padding: 24,
         shadowColor: '#000',
@@ -162,7 +181,6 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: colors.primary,
     },
     backBtn: {
         padding: 4,
@@ -170,22 +188,18 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: colors.primary,
         marginBottom: 8,
         marginTop: 16,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#e0e0e0',
         borderRadius: 10,
         paddingHorizontal: 14,
         paddingVertical: 12,
         fontSize: 14,
-        color: '#333',
-        backgroundColor: '#fafafa',
     },
     inputError: {
-        borderColor: colors.error ?? '#e05c5c',
+        borderColor: '#e05c5c',
     },
     row: {
         flexDirection: 'row',
@@ -206,24 +220,16 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderRadius: 50,
         borderWidth: 1.5,
-        borderColor: '#e0d6d0',
-        backgroundColor: '#fff',
-    },
-    chipActive: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary,
     },
     chipText: {
         fontSize: 13,
-        color: colors.primary,
         fontWeight: '600',
     },
     chipTextActive: {
-        color: '#fff',
+        color: colors.white,
         fontWeight: '700',
     },
     saveBtn: {
-        backgroundColor: colors.primary,
         borderRadius: 50,
         paddingVertical: 16,
         alignItems: 'center',
@@ -233,7 +239,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     saveBtnText: {
-        color: '#fff',
+        color: colors.white,
         fontSize: 16,
         fontWeight: 'bold',
         letterSpacing: 0.5,

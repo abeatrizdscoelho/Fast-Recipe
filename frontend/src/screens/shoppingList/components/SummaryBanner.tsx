@@ -1,8 +1,8 @@
 import React from 'react'
 import { View, Text, StyleSheet, DimensionValue } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '@/src/theme/color'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface Props {
     pending: number
@@ -11,36 +11,51 @@ interface Props {
 
 export function SummaryBanner({ pending, bought }: Props) {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const total = pending + bought
     const progress = total > 0 ? bought / total : 0
     const percentValue = Math.round(progress * 100)
 
-    return (
-        <View style={styles.container}>
+    const dynStyles = StyleSheet.create({
+        container: {
+            backgroundColor: theme.card,
+            shadowColor: '#000',
+            shadowOpacity: isDark ? 0.4 : 0.06,
+            shadowRadius: isDark ? 12 : 8,
+            elevation: isDark ? 6 : 3,
+        },
+        iconBox: { backgroundColor: isDark ? theme.iconBox : '#FFF0EC' },
+        iconBoxDone: { backgroundColor: isDark ? 'rgba(76,175,80,0.12)' : '#E8F5E9' },
+        divider: { backgroundColor: theme.divider },
+        count: { color: isDark ? theme.textPrimary : '#222' },
+        progressTrack: { backgroundColor: isDark ? theme.surfaceSecondary : '#f0f0f0' },
+    })
 
+    return (
+        <View style={[styles.container, dynStyles.container]}>
             <View style={styles.counters}>
                 <View style={styles.side}>
-                    <View style={styles.iconBox}>
-                        <Ionicons name="cart-outline" size={20} color={colors.primary} />
+                    <View style={[styles.iconBox, dynStyles.iconBox]}>
+                        <Ionicons name="cart-outline" size={20} color={theme.primary} />
                     </View>
-                    <Text style={styles.count}>{pending}</Text>
+                    <Text style={[styles.count, dynStyles.count]}>{pending}</Text>
                     <Text style={styles.label}>{t('shoppingList.pending')}</Text>
                 </View>
 
-                <View style={styles.divider} />
+                <View style={[styles.divider, dynStyles.divider]} />
 
                 <View style={styles.side}>
-                    <View style={[styles.iconBox, styles.iconBoxDone]}>
+                    <View style={[styles.iconBox, dynStyles.iconBoxDone]}>
                         <Ionicons name="checkmark-circle-outline" size={20} color="#4CAF50" />
                     </View>
-                    <Text style={[styles.count, bought > 0 && styles.countDone]}>{bought}</Text>
+                    <Text style={[styles.count, dynStyles.count, bought > 0 && styles.countDone]}>{bought}</Text>
                     <Text style={styles.label}>{t('shoppingList.bought')}</Text>
                 </View>
             </View>
 
             {total > 0 && (
                 <View style={styles.progressWrapper}>
-                    <View style={styles.progressTrack}>
+                    <View style={[styles.progressTrack, dynStyles.progressTrack]}>
                         <View style={[styles.progressFill, { width: `${progress * 100}%` as DimensionValue }]} />
                     </View>
                     <Text style={styles.progressLabel}>
@@ -54,11 +69,11 @@ export function SummaryBanner({ pending, bought }: Props) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
         borderRadius: 16,
         padding: 16,
         marginBottom: 16,
         gap: 12,
+        shadowOffset: { width: 0, height: 2 },
     },
     counters: {
         flexDirection: 'row',
@@ -73,24 +88,18 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#FFF0EC',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 2,
     },
-    iconBoxDone: {
-        backgroundColor: '#E8F5E9',
-    },
     divider: {
         width: 1,
         height: 50,
-        backgroundColor: '#eee',
         marginHorizontal: 8,
     },
     count: {
         fontSize: 22,
         fontWeight: '800',
-        color: '#222',
     },
     countDone: {
         color: '#4CAF50',
@@ -105,7 +114,6 @@ const styles = StyleSheet.create({
     },
     progressTrack: {
         height: 6,
-        backgroundColor: '#f0f0f0',
         borderRadius: 3,
         overflow: 'hidden',
     },

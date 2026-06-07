@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '@/src/theme/color'
+import { useTheme } from '@/src/context/ThemeContext'
 
 type Props = {
     rating: number
@@ -11,6 +11,8 @@ type Props = {
 }
 
 export function StarRow({ rating, interactive = false, size = 20, onRate }: Props) {
+    const { theme } = useTheme()
+
     return (
         <View style={styles.starsRow}>
             {[1, 2, 3, 4, 5].map(star => (
@@ -23,7 +25,7 @@ export function StarRow({ rating, interactive = false, size = 20, onRate }: Prop
                     <Ionicons
                         name={star <= rating ? 'star' : 'star-outline'}
                         size={size}
-                        color={star <= rating ? colors.star : colors.cream}
+                        color={star <= rating ? theme.star : theme.cream}
                     />
                 </TouchableOpacity>
             ))}
@@ -32,8 +34,8 @@ export function StarRow({ rating, interactive = false, size = 20, onRate }: Prop
 }
 
 const styles = StyleSheet.create({
-    starsRow: { 
-        flexDirection: 'row', 
-        gap: 2 
+    starsRow: {
+        flexDirection: 'row',
+        gap: 2,
     },
 })

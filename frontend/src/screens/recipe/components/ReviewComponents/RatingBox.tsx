@@ -5,6 +5,7 @@ import { colors } from '@/src/theme/color'
 import { StarRow } from './StarRow'
 import { CommentInput } from './CommentInput'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 type Props = {
     userRating: number | null
@@ -23,32 +24,40 @@ export function RatingBox({
     commentValue, onCommentChange, onCommentSubmit, submittingComment,
     userAvatarUrl, userInitials,
 }: Props) {
-
+    const { theme } = useTheme()
     const { t } = useTranslation()
 
+    const dynStyles = StyleSheet.create({
+        ratingBox: { backgroundColor: theme.surfaceSecondary },
+        ratingBoxAvatar: { backgroundColor: theme.surfaceSecondary },
+        ratingBoxInitials: { color: theme.primary },
+        ratingBoxPrompt: { color: theme.primary },
+        ratingBoxSub: { color: theme.textMuted },
+    })
+
     return (
-        <View style={styles.ratingBox}>
+        <View style={[styles.ratingBox, dynStyles.ratingBox]}>
             <View style={styles.ratingBoxHeader}>
                 {userAvatarUrl ? (
                     <Image source={{ uri: userAvatarUrl }} style={styles.ratingBoxAvatar} />
                 ) : (
-                    <View style={styles.ratingBoxAvatar}>
+                    <View style={[styles.ratingBoxAvatar, dynStyles.ratingBoxAvatar]}>
                         {userInitials ? (
-                            <Text style={styles.ratingBoxInitials}>{userInitials}</Text>
+                            <Text style={[styles.ratingBoxInitials, dynStyles.ratingBoxInitials]}>{userInitials}</Text>
                         ) : (
-                            <Ionicons name="person-outline" size={20} color={colors.primary} />
+                            <Ionicons name="person-outline" size={20} color={theme.primary} />
                         )}
                     </View>
                 )}
                 <View style={styles.ratingBoxContent}>
-                    <Text style={styles.ratingBoxPrompt}>
+                    <Text style={[styles.ratingBoxPrompt, dynStyles.ratingBoxPrompt]}>
                         {userRating ? t('ratingBox.promptRated') : t('ratingBox.promptUnrated')}
                     </Text>
-                    <Text style={styles.ratingBoxSub}>
+                    <Text style={[styles.ratingBoxSub, dynStyles.ratingBoxSub]}>
                         {userRating ? t('ratingBox.subRated') : t('ratingBox.subUnrated')}
                     </Text>
                     {submitting ? (
-                        <ActivityIndicator size="small" color={colors.primary} />
+                        <ActivityIndicator size="small" color={theme.primary} />
                     ) : (
                         <StarRow rating={userRating ?? 0} interactive size={16} onRate={onRate} />
                     )}
@@ -67,41 +76,36 @@ export function RatingBox({
 
 const styles = StyleSheet.create({
     ratingBox: {
-        gap: 12, 
-        backgroundColor: '#faf8f6',
-        borderRadius: 16, 
-        padding: 14, 
+        gap: 12,
+        borderRadius: 16,
+        padding: 14,
         marginBottom: 20,
     },
-    ratingBoxHeader: { 
-        flexDirection: 'row', 
-        gap: 12 
+    ratingBoxHeader: {
+        flexDirection: 'row',
+        gap: 12
     },
     ratingBoxAvatar: {
-        width: 40, 
-        height: 40, 
+        width: 40,
+        height: 40,
         borderRadius: 20,
-        backgroundColor: '#e8e0da',
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
     },
-    ratingBoxInitials: { 
-        fontSize: 13, 
-        fontWeight: 'bold', 
-        color: colors.primary 
+    ratingBoxInitials: {
+        fontSize: 13,
+        fontWeight: 'bold',
     },
-    ratingBoxContent: { 
-        flex: 1, 
-        gap: 6 
+    ratingBoxContent: {
+        flex: 1,
+        gap: 6
     },
-    ratingBoxPrompt: { 
-        fontSize: 13, 
-        fontWeight: 'bold', 
-        color: colors.primary 
+    ratingBoxPrompt: {
+        fontSize: 13,
+        fontWeight: 'bold',
     },
-    ratingBoxSub: { 
-        fontSize: 12, 
-        color: '#888' 
+    ratingBoxSub: {
+        fontSize: 12,
     },
 })

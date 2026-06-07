@@ -3,7 +3,6 @@ import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { feedStore, useFeed } from '../../hooks/recipe/useRecipeFeed';
-import { colors } from '../../theme/color';
 import { Header } from '../../components/Header';
 import { BottomNav } from '../../components/BottomNav';
 import { SearchBar } from '../../components/SearchBar';
@@ -12,9 +11,11 @@ import { RecipeCard } from './components/RecipeCard';
 import { FilterModal } from '@/src/components/FilterModal';
 import { useTranslation } from 'react-i18next';
 import { useAppConstants } from '@/src/hooks/useAppConstants';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function RecipeFeedScreen() {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const { CATEGORIES, DIETARY_RESTRICTIONS } = useAppConstants()
     const [filterVisible, setFilterVisible] = useState(false)
 
@@ -24,6 +25,11 @@ export default function RecipeFeedScreen() {
     } = useFeed()
 
     const activeFilterCount = filters.categories.length + filters.dietaryRestrictions.length
+
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        filterBtnActive: { backgroundColor: theme.primary },
+    })
 
     useFocusEffect(
         useCallback(() => {
@@ -53,7 +59,7 @@ export default function RecipeFeedScreen() {
 
     if (loading && recipes.length === 0) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, dynStyles.container]}>
                 <Header />
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="rgba(255,255,255,0.6)" />
@@ -64,7 +70,7 @@ export default function RecipeFeedScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <View style={styles.searchRow}>
@@ -75,10 +81,10 @@ export default function RecipeFeedScreen() {
                 />
 
                 <TouchableOpacity
-                    style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+                    style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive, activeFilterCount > 0 && dynStyles.filterBtnActive]}
                     onPress={() => setFilterVisible(true)}
                 >
-                    <Ionicons name="options-outline" size={22} color={colors.white} />
+                    <Ionicons name="options-outline" size={22} color={theme.white} />
                     {activeFilterCount > 0 && (
                         <View style={styles.filterBadge}>
                             <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
@@ -108,7 +114,7 @@ export default function RecipeFeedScreen() {
                 onRefresh={refresh}
                 ListEmptyComponent={
                     <View style={styles.empty}>
-                        <Ionicons name="restaurant-outline" size={48} color="rgba(255,255,255,0.2)" />
+                        <Ionicons name="restaurant-outline" size={48} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(122,0,0,0.15)'} />
                         <Text style={styles.emptyText}>
                             {search
                                 ? t('recipeFeed.emptySearch', { search })
@@ -123,7 +129,7 @@ export default function RecipeFeedScreen() {
                     loading && recipes.length > 0 ? (
                         <ActivityIndicator
                             size="small"
-                            color="rgba(255,255,255,0.4)"
+                            color={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(122,0,0,0.3)'}
                             style={{ marginVertical: 16 }}
                         />
                     ) : null
@@ -138,13 +144,15 @@ export default function RecipeFeedScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.primary
+        backgroundColor: '#7A0000',
     },
-    listContent: { paddingBottom: 16 },
+    listContent: { 
+        paddingBottom: 16 
+    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     searchRow: {
         flexDirection: 'row',
@@ -160,7 +168,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     filterBtnActive: {
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
     },
     filterBadge: {
         position: 'absolute',
@@ -175,10 +183,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 3,
     },
     filterBadgeText: {
-        color: colors.white,
+        color: '#FFFFFF',
         fontSize: 10,
         fontWeight: 'bold',
     },
-    empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
-    emptyText: { color: 'rgba(255,255,255,0.4)', fontSize: 14 },
+    empty: { 
+        alignItems: 'center', 
+        paddingTop: 60, 
+        gap: 12 
+    },
+    emptyText: { 
+        color: 'rgba(255,255,255,0.4)', 
+        fontSize: 14 
+    },
 })

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons"
 import React, { useState } from "react"
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { colors } from "@/src/theme/color"
+import { useTheme } from "@/src/context/ThemeContext"
 
 interface MenuOption {
     label: string
@@ -15,7 +15,14 @@ interface Props {
 }
 
 export function DotsMenu({ options }: Props) {
+    const { theme } = useTheme()
     const [visible, setVisible] = useState(false)
+
+    const dynStyles = StyleSheet.create({
+        menu: { backgroundColor: theme.card },
+        menuDivider: { backgroundColor: theme.divider },
+        menuText: { color: theme.textMuted },
+    })
 
     return (
         <>
@@ -23,21 +30,21 @@ export function DotsMenu({ options }: Props) {
                 onPress={() => setVisible(true)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-                <Ionicons name="ellipsis-vertical" size={16} color="#999" />
+                <Ionicons name="ellipsis-vertical" size={16} color={theme.textMuted} />
             </TouchableOpacity>
 
             <Modal transparent visible={visible} animationType="fade" onRequestClose={() => setVisible(false)}>
                 <Pressable style={styles.overlay} onPress={() => setVisible(false)}>
-                    <View style={styles.menu}>
+                    <View style={[styles.menu, dynStyles.menu]}>
                         {options.map((opt, index) => (
                             <React.Fragment key={opt.label}>
-                                {index > 0 && <View style={styles.menuDivider} />}
+                                {index > 0 && <View style={[styles.menuDivider, dynStyles.menuDivider]} />}
                                 <TouchableOpacity
                                     style={styles.menuItem}
                                     onPress={() => { setVisible(false); opt.onPress() }}
                                 >
-                                    <Ionicons name={opt.icon} size={16} color={opt.destructive ? '#e74c3c' : '#555'} />
-                                    <Text style={[styles.menuText, opt.destructive && { color: '#e74c3c' }]}>
+                                    <Ionicons name={opt.icon} size={16} color={opt.destructive ? '#e74c3c' : theme.textMuted} />
+                                    <Text style={[styles.menuText, dynStyles.menuText, opt.destructive && { color: '#e74c3c' }]}>
                                         {opt.label}
                                     </Text>
                                 </TouchableOpacity>
@@ -58,7 +65,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     menu: {
-        backgroundColor: colors.white,
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         width: 180,
         paddingVertical: 4,

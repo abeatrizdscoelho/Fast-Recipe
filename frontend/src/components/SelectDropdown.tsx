@@ -1,8 +1,8 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '@/src/theme/color'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 type Option = string | { key: string; label: string }
 
@@ -18,6 +18,7 @@ type Props = {
 }
 
 export function SelectDropdown({ value, placeholder, options, open, onToggle, onSelect, error, maxHeight = 180 }: Props) {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const resolvedPlaceholder = placeholder || t('components.selectDropdown.placeholder')
 
@@ -26,42 +27,55 @@ export function SelectDropdown({ value, placeholder, options, open, onToggle, on
 
     const selectedLabel = options.map(normalize).find(o => o.key === value)?.label ?? value
 
+    const dynStyles = StyleSheet.create({
+        select: { backgroundColor: theme.surface, borderColor: theme.border },
+        selectText: { color: theme.textPrimary },
+        dropdown: { backgroundColor: theme.card, borderColor: theme.border },
+        dropdownItem: { borderBottomColor: theme.divider },
+        dropdownItemActive: { backgroundColor: theme.surfaceSecondary },
+        dropdownTextActive: { color: theme.primary },
+    })
+
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                style={[styles.select, error ? styles.selectError : null]}
+                style={[styles.select, dynStyles.select, error ? styles.selectError : null]}
                 onPress={onToggle}
             >
-                <Text style={[styles.selectText, !value && styles.placeholder]}>
+                <Text style={[styles.selectText, dynStyles.selectText, !value && styles.placeholder]}>
                     {value ? selectedLabel : resolvedPlaceholder}
                 </Text>
-                <Ionicons 
-                    name={open ? 'chevron-up' : 'chevron-down'} 
-                    size={16} 
-                    color="#aaa" 
-                    />
+                <Ionicons
+                    name={open ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={theme.textMuted}
+                />
             </TouchableOpacity>
 
             {open && (
                 <View style={styles.dropdownWrapper}>
-                    <View style={styles.dropdown}>
+                    <View style={[styles.dropdown, dynStyles.dropdown]}>
                         <ScrollView nestedScrollEnabled style={{ maxHeight }}>
                             {options.map(opt => {
-                                const { key, label } = normalize(opt)  
+                                const { key, label } = normalize(opt)
                                 return (
                                     <TouchableOpacity
                                         key={key}
                                         style={[
                                             styles.dropdownItem,
-                                            value === key && styles.dropdownItemActive, 
+                                            dynStyles.dropdownItem,
+                                            value === key && styles.dropdownItemActive,
+                                            value === key && dynStyles.dropdownItemActive,
                                         ]}
-                                        onPress={() => onSelect(key)}  
+                                        onPress={() => onSelect(key)}
                                     >
                                         <Text style={[
                                             styles.dropdownText,
-                                            value === key && styles.dropdownTextActive,  
+                                            dynStyles.selectText,
+                                            value === key && styles.dropdownTextActive,
+                                            value === key && dynStyles.dropdownTextActive,
                                         ]}>
-                                            {label}  
+                                            {label}
                                         </Text>
                                     </TouchableOpacity>
                                 )
@@ -90,7 +104,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fafafa',
     },
     selectError: {
-        borderColor: colors.error ?? '#e05c5c',
+        borderColor: '#DC2626',
     },
     selectText: {
         fontSize: 14,
@@ -132,7 +146,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     dropdownTextActive: {
-        color: colors.primary,
+        color: '#7A0000',
         fontWeight: 'bold',
     },
 })

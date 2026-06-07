@@ -6,6 +6,7 @@ import { colors } from '@/src/theme/color'
 import { router } from 'expo-router'
 import { DotsMenu } from '@/src/components/DotsMenu'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface FilledSlotProps {
     entry: MealPlanEntry
@@ -14,22 +15,30 @@ interface FilledSlotProps {
 }
 
 export function FilledSlot({ entry, onRemove, onReplace }: FilledSlotProps) {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const photo = entry.recipe.photos?.[0]
 
+    const dynStyles = StyleSheet.create({
+        cardShadow: { backgroundColor: theme.card, borderColor: theme.divider },
+        card: { backgroundColor: theme.card },
+        recipeImage: { backgroundColor: theme.surfaceSecondary },
+        recipeTitle: { color: theme.primary },
+    })
+
     return (
         <View style={styles.filledSlot}>
-            <View style={styles.cardShadow}>
+            <View style={[styles.cardShadow, dynStyles.cardShadow]}>
                 <TouchableOpacity
-                    style={styles.card}
+                    style={[styles.card, dynStyles.card]}
                     onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: entry.recipe.id } })}
                     activeOpacity={0.9}
                 >
                     {photo ? (
                         <Image source={{ uri: photo }} style={styles.recipeImage} />
                     ) : (
-                        <View style={[styles.recipeImage, styles.noPhoto]}>
-                            <Ionicons name="restaurant-outline" size={24} color="#ccc" />
+                        <View style={[styles.recipeImage, styles.noPhoto, dynStyles.recipeImage]}>
+                            <Ionicons name="restaurant-outline" size={24} color={theme.grayLight} />
                         </View>
                     )}
 
@@ -39,7 +48,7 @@ export function FilledSlot({ entry, onRemove, onReplace }: FilledSlotProps) {
                     </View>
 
                     <View style={styles.cardFooter}>
-                        <Text style={styles.recipeTitle} numberOfLines={2}>{entry.recipe.title}</Text>
+                        <Text style={[styles.recipeTitle, dynStyles.recipeTitle]} numberOfLines={2}>{entry.recipe.title}</Text>
                         <DotsMenu
                             options={[
                                 { label: t('recipeSlot.replace'), icon: 'repeat-outline', onPress: () => onReplace(entry.id) },
@@ -59,10 +68,17 @@ interface EmptySlotProps {
 
 export function EmptySlot({ onPress }: EmptySlotProps) {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
+
+    const dynStyles = StyleSheet.create({
+        emptySlot: { borderColor: isDark ? 'rgba(255,255,255,0.25)' : theme.border },
+        emptyText: { color: theme.textMuted },
+    })
+
     return (
-        <TouchableOpacity style={styles.emptySlot} onPress={onPress} activeOpacity={0.7}>
-            <Ionicons name="add-circle-outline" size={26} color="#bbb" />
-            <Text style={styles.emptyText}>{t('recipeSlot.add')}</Text>
+        <TouchableOpacity style={[styles.emptySlot, dynStyles.emptySlot]} onPress={onPress} activeOpacity={0.7}>
+            <Ionicons name="add-circle-outline" size={26} color={theme.textMuted} />
+            <Text style={[styles.emptyText, dynStyles.emptyText]}>{t('recipeSlot.add')}</Text>
         </TouchableOpacity>
     )
 }
@@ -75,21 +91,17 @@ const styles = StyleSheet.create({
     cardShadow: {
         marginTop: 8,
         marginRight: 8,
-        backgroundColor: colors.white,
         borderRadius: 12,
         elevation: 4,
         borderWidth: 1,
-        borderColor: '#F3F3F3',
     },
     card: {
         borderRadius: 12,
         overflow: 'hidden',
-        backgroundColor: colors.white,
     },
     recipeImage: {
         width: '100%',
         height: 85,
-        backgroundColor: '#f0f0f0',
     },
     noPhoto: {
         alignItems: 'center',
@@ -123,7 +135,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 12,
         fontWeight: '600',
-        color: colors.primary,
         lineHeight: 16,
         paddingRight: 4,
     },
@@ -134,7 +145,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1.5,
         borderStyle: 'dashed',
-        borderColor: '#d0d0d0',
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 10,
@@ -142,7 +152,6 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 11,
-        color: '#bbb',
         textAlign: 'center',
         lineHeight: 15,
     },

@@ -8,6 +8,7 @@ import { CATEGORY_ICONS } from '../../shoppingList/components/CategorySection'
 import { pluralizeUnit } from '@/src/utils/pluralizeUnitUtil'
 import { formatExpiry, isExpired, isExpiringSoon } from '@/src/utils/expiryUtil'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface Props {
     item: PantryItem
@@ -17,25 +18,36 @@ interface Props {
 
 export function PantryItemCard({ item, onEdit, onDelete }: Props) {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const icon = CATEGORY_ICONS[item.category] ?? 'basket-outline'
     const expiring = isExpiringSoon(item.expiresAt)
     const expired = isExpired(item.expiresAt)
 
+    const dynStyles = StyleSheet.create({
+        card: { backgroundColor: theme.card },
+        cardExpired: { backgroundColor: isDark ? theme.surfaceSecondary : '#fafafa' },
+        iconBox: { backgroundColor: isDark ? theme.iconBox : '#FFF0EC' },
+        iconBoxExpired: { backgroundColor: isDark ? theme.surfaceSecondary : '#f0f0f0' },
+        name: { color: theme.textPrimary },
+        qty: { color: theme.textMuted },
+        expiryText: { color: isDark ? 'rgba(255,255,255,0.3)' : '#bbb' },
+    })
+
     return (
-        <View style={[styles.card, expired && styles.cardExpired]}>
-            <View style={[styles.iconBox, expired && styles.iconBoxExpired]}>
+        <View style={[styles.card, dynStyles.card, expired && dynStyles.cardExpired]}>
+            <View style={[styles.iconBox, dynStyles.iconBox, expired && dynStyles.iconBoxExpired]}>
                 <Ionicons
                     name={icon}
                     size={22}
-                    color={expired ? '#aaa' : colors.primary}
+                    color={expired ? theme.textMuted : theme.primary}
                 />
             </View>
 
             <View style={styles.info}>
-                <Text style={[styles.name, expired && styles.nameExpired]} numberOfLines={1}>
+                <Text style={[styles.name, dynStyles.name, expired && styles.nameExpired]} numberOfLines={1}>
                     {item.name}
                 </Text>
-                <Text style={styles.qty}>
+                <Text style={[styles.qty, dynStyles.qty]}>
                     {item.quantity} {pluralizeUnit(item.quantity, item.unit)}
                 </Text>
                 {item.expiresAt && (
@@ -43,10 +55,11 @@ export function PantryItemCard({ item, onEdit, onDelete }: Props) {
                         <Ionicons
                             name="time-outline"
                             size={11}
-                            color={expired ? '#e05c5c' : expiring ? '#f39c12' : '#bbb'}
+                            color={expired ? '#e05c5c' : expiring ? '#f39c12' : theme.textMuted}
                         />
                         <Text style={[
                             styles.expiryText,
+                            dynStyles.expiryText,
                             expired && styles.expiryExpired,
                             expiring && !expired && styles.expirySoon,
                         ]}>
@@ -80,7 +93,6 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
         borderRadius: 14,
         padding: 12,
         marginBottom: 8,
@@ -92,18 +104,13 @@ const styles = StyleSheet.create({
     },
     cardExpired: {
         opacity: 0.7,
-        backgroundColor: '#fafafa',
     },
     iconBox: {
         width: 44,
         height: 44,
         borderRadius: 12,
-        backgroundColor: '#FFF0EC',
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    iconBoxExpired: {
-        backgroundColor: '#f0f0f0',
     },
     info: {
         flex: 1,
@@ -112,7 +119,6 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#333',
     },
     nameExpired: {
         color: '#aaa',
@@ -120,7 +126,6 @@ const styles = StyleSheet.create({
     },
     qty: {
         fontSize: 12,
-        color: '#999',
     },
     expiryRow: {
         flexDirection: 'row',
@@ -130,7 +135,6 @@ const styles = StyleSheet.create({
     },
     expiryText: {
         fontSize: 11,
-        color: '#bbb',
     },
     expiryExpired: {
         color: '#e05c5c',

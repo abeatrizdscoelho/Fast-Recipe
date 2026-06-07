@@ -1,13 +1,16 @@
 import React from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet,
-    Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import FieldError from '../../components/FieldError';
 import { useForgotPassword } from '../../hooks/auth/useForgotPassword';
-import { colors } from '../../theme/color';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function ForgotPasswordScreen() {
+  const { theme } = useTheme()
   const { t } = useTranslation()
   const {
     email, setEmail, confirmEmail, setConfirmEmail,
@@ -15,8 +18,18 @@ export default function ForgotPasswordScreen() {
     handleForgotPassword, navigation
   } = useForgotPassword()
 
+  const dynStyles = StyleSheet.create({
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    title: { color: theme.textPrimary },
+    successText: { color: theme.textPrimary },
+    input: { borderBottomColor: theme.primary, color: theme.textPrimary },
+    button: { backgroundColor: theme.primary },
+    backText: { color: theme.textPrimary },
+  })
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, dynStyles.container]}>
       <KeyboardAwareScrollView
         enableOnAndroid
         enableAutomaticScroll
@@ -33,12 +46,12 @@ export default function ForgotPasswordScreen() {
           />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>{t('forgotPassword.title')}</Text>
+        <View style={[styles.card, dynStyles.card]}>
+          <Text style={[styles.title, dynStyles.title]}>{t('forgotPassword.title')}</Text>
           <Text style={styles.subtitle}>{t('forgotPassword.subtitle')}</Text>
 
           {success ? (
-            <Text style={styles.successText}>
+            <Text style={[styles.successText, dynStyles.successText]}>
               {t('forgotPassword.successMessage')}
             </Text>
           ) : (
@@ -50,7 +63,8 @@ export default function ForgotPasswordScreen() {
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  style={[styles.input, errors.email ? styles.inputError : null]}
+                  style={[styles.input, dynStyles.input, errors.email ? styles.inputError : null]}
+                  placeholderTextColor={theme.textMuted}
                 />
                 <FieldError message={errors.email} />
               </View>
@@ -62,7 +76,8 @@ export default function ForgotPasswordScreen() {
                   onChangeText={setConfirmEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  style={[styles.input, errors.confirmEmail ? styles.inputError : null]}
+                  style={[styles.input, dynStyles.input, errors.confirmEmail ? styles.inputError : null]}
+                  placeholderTextColor={theme.textMuted}
                 />
                 <FieldError message={errors.confirmEmail} />
               </View>
@@ -70,7 +85,7 @@ export default function ForgotPasswordScreen() {
               {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
               <TouchableOpacity
-                style={[styles.button, loading && styles.buttonDisabled]}
+                style={[styles.button, dynStyles.button, loading && styles.buttonDisabled]}
                 onPress={handleForgotPassword}
                 disabled={loading}>
                 <Text style={styles.buttonText}>
@@ -81,7 +96,7 @@ export default function ForgotPasswordScreen() {
           )}
 
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backWrapper}>
-            <Text style={styles.backText}>{t('forgotPassword.backToLogin')}</Text>
+            <Text style={[styles.backText, dynStyles.backText]}>{t('forgotPassword.backToLogin')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -91,9 +106,9 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: colors.primary 
+  container: {
+    flex: 1,
+    backgroundColor: '#7A0000',
   },
   scrollContent: {
     flexGrow: 1,
@@ -106,13 +121,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { 
-    width: 200, 
-    height: 200 
+  logo: {
+    width: 200,
+    height: 200,
   },
   card: {
     width: '100%',
-    backgroundColor: colors.white,
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     paddingHorizontal: 32,
     paddingTop: 36,
@@ -129,63 +144,63 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { 
-    color: colors.primary, 
-    fontSize: 22, 
-    fontWeight: 'bold', 
-    marginBottom: 6 
+  title: {
+    color: '#7A0000',
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 6,
   },
-  subtitle: { 
-    color: colors.gray, 
-    fontSize: 13, 
-    marginBottom: 32 
+  subtitle: {
+    color: '#9CA3AF',
+    fontSize: 13,
+    marginBottom: 32,
   },
   successText: {
-    color: colors.primary,
+    color: '#7A0000',
     fontSize: 15,
     textAlign: 'center',
     marginVertical: 32,
   },
-  inputGroup: { 
-    marginBottom: 24 
+  inputGroup: {
+    marginBottom: 24,
   },
-  label: { 
-    color: colors.gray, 
-    marginBottom: 4, 
-    fontSize: 14 
+  label: {
+    color: '#9CA3AF',
+    marginBottom: 4,
+    fontSize: 14,
   },
   input: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
+    borderBottomColor: '#7A0000',
     paddingBottom: 8,
     fontSize: 16,
-    color: colors.black,
+    color: '#000000',
   },
-  inputError: { 
-    borderBottomColor: colors.error 
+  inputError: {
+    borderBottomColor: '#DC2626',
   },
   button: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000',
     borderRadius: 50,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 16,
   },
-  buttonDisabled: { 
-    opacity: 0.7 
+  buttonDisabled: {
+    opacity: 0.7,
   },
-  buttonText: { 
-    color: colors.white, 
-    fontWeight: 'bold', 
-    letterSpacing: 2, 
-    fontSize: 15 
+  buttonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    letterSpacing: 2,
+    fontSize: 15,
   },
-  backWrapper: { 
-    alignItems: 'center' 
+  backWrapper: {
+    alignItems: 'center',
   },
-  backText: { 
-    color: colors.primary, 
-    fontSize: 13 
+  backText: {
+    color: '#7A0000',
+    fontSize: 13,
   },
 })

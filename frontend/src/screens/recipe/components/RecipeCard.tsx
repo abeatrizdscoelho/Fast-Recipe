@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { colors } from '@/src/theme/color';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 type Props = {
   id: string
@@ -28,7 +28,7 @@ export function RecipeCard({
   id, title, time, difficulty, description, photos,
   favorite, author, isOwner, onFavorite, onEdit, onDelete,
 }: Props) {
-
+  const { theme } = useTheme()
   const { t } = useTranslation()
   const authorInitials = author?.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
 
@@ -38,6 +38,15 @@ export function RecipeCard({
       day: '2-digit', month: '2-digit', year: 'numeric',
     })
   }
+
+  const dynStyles = StyleSheet.create({
+    recipeCard: { backgroundColor: theme.card },
+    recipeImagePlaceholder: { backgroundColor: theme.surfaceSecondary },
+    recipeTitle: { color: theme.textPrimary },
+    recipeMetaText: { color: theme.textPrimary },
+    favoriteText: { color: theme.textPrimary },
+    seeMoreBtn: { backgroundColor: theme.primary },
+  })
 
   return (
     <View style={styles.wrapper}>
@@ -62,11 +71,11 @@ export function RecipeCard({
         </View>
       )}
 
-      <View style={styles.recipeCard}>
+      <View style={[styles.recipeCard, dynStyles.recipeCard]}>
         {photos ? (
           <Image source={{ uri: photos }} style={styles.recipeImage} />
         ) : (
-          <View style={[styles.recipeImage, styles.recipeImagePlaceholder]}>
+          <View style={[styles.recipeImage, styles.recipeImagePlaceholder, dynStyles.recipeImagePlaceholder]}>
             <Ionicons name="image-outline" size={32} color="rgba(0,0,0,0.2)" />
           </View>
         )}
@@ -74,13 +83,13 @@ export function RecipeCard({
         <View style={styles.recipeInfo}>
 
           <View style={styles.recipeTitleRow}>
-            <Text style={[styles.recipeTitle, { flex: 1 }]} numberOfLines={2}>
+            <Text style={[styles.recipeTitle, dynStyles.recipeTitle, { flex: 1 }]} numberOfLines={2}>
               {title}
             </Text>
             {isOwner && (
               <View style={styles.recipeOwnerActions}>
                 <TouchableOpacity onPress={() => onEdit?.(id)}>
-                  <Ionicons name="pencil-outline" size={15} color={colors.primary} />
+                  <Ionicons name="pencil-outline" size={15} color={theme.primary} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => onDelete?.(id)}>
                   <Ionicons name="trash-outline" size={15} color="#e05c5c" />
@@ -90,12 +99,12 @@ export function RecipeCard({
           </View>
 
           <View style={styles.recipeMeta}>
-            <Ionicons name="time-outline" size={13} color={colors.primary} />
-            <Text style={styles.recipeMetaText}>{time}min</Text>
+            <Ionicons name="time-outline" size={13} color={theme.primary} />
+            <Text style={[styles.recipeMetaText, dynStyles.recipeMetaText]}>{time}min</Text>
             {difficulty && (
               <>
                 <Text style={styles.recipeDot}>|</Text>
-                <Text style={styles.recipeMetaText}>{t(`difficulties.${difficulty}`, difficulty)}</Text>
+                <Text style={[styles.recipeMetaText, dynStyles.recipeMetaText]}>{t(`difficulties.${difficulty}`, difficulty)}</Text>
               </>
             )}
           </View>
@@ -107,9 +116,9 @@ export function RecipeCard({
             <Ionicons
               name={favorite ? 'heart' : 'heart-outline'}
               size={14}
-              color={favorite ? '#e05c5c' : colors.primary}
+              color={favorite ? '#e05c5c' : theme.primary}
             />
-            <Text style={[styles.favoriteText, favorite && { color: '#e05c5c' }]}>
+            <Text style={[styles.favoriteText, dynStyles.favoriteText, favorite && { color: '#e05c5c' }]}>
               {favorite ? t('recipeCard.favorited') : t('recipeCard.favorite')}
             </Text>
           </TouchableOpacity>
@@ -121,7 +130,7 @@ export function RecipeCard({
           )}
 
           <TouchableOpacity
-            style={styles.seeMoreBtn}
+            style={[styles.seeMoreBtn, dynStyles.seeMoreBtn]}
             onPress={() => router.push({ pathname: '/recipe/[id]', params: { id } })}
           >
             <Text style={styles.seeMoreText}>{t('recipeCard.seeMore')}</Text>
@@ -139,7 +148,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     gap: 8,
   },
-
   authorRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -154,7 +162,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   authorInitials: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -164,17 +172,16 @@ const styles = StyleSheet.create({
   },
   authorNameBold: {
     fontWeight: 'bold',
-    color: colors.white,
+    color: '#FFFFFF',
   },
   authorDate: {
     fontSize: 11,
     color: 'rgba(255,255,255,0.5)',
     marginTop: 1,
   },
-
   recipeCard: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -205,7 +212,7 @@ const styles = StyleSheet.create({
   recipeTitle: {
     fontSize: 13,
     fontWeight: 'bold',
-    color: colors.primary,
+    color: '#7A0000',
     lineHeight: 18,
   },
   recipeOwnerActions: {
@@ -220,7 +227,7 @@ const styles = StyleSheet.create({
   },
   recipeMetaText: {
     fontSize: 11,
-    color: colors.primary,
+    color: '#7A0000',
   },
   recipeDot: {
     color: '#ccc',
@@ -233,7 +240,7 @@ const styles = StyleSheet.create({
   },
   favoriteText: {
     fontSize: 11,
-    color: colors.primary,
+    color: '#7A0000',
   },
   recipeDescription: {
     fontSize: 11,
@@ -242,14 +249,14 @@ const styles = StyleSheet.create({
   },
   seeMoreBtn: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000',
     borderRadius: 50,
     marginTop: 5,
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
   seeMoreText: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: 'bold',
   },

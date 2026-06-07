@@ -4,16 +4,23 @@ import React, { useCallback } from 'react'
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { BottomNav } from '../../components/BottomNav'
 import { Header } from '../../components/Header'
-import { colors } from '../../theme/color'
 import { useRecentRecipes } from '../../hooks/recipe/useRecentRecipes'
 import { RecipeCard } from '../recipe/components/RecipeCard'
 import { useAuth } from '../../context/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export default function ProfileHistoryScreen() {
     const { user } = useAuth()
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const { recipes, fetching, loadRecipes, handleClear } = useRecentRecipes()
+
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        sectionTitle: { color: theme.cream },
+        clearText: { color: theme.cream },
+    })
 
     useFocusEffect(
         useCallback(() => {
@@ -22,7 +29,7 @@ export default function ProfileHistoryScreen() {
     )
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <FlatList
@@ -32,11 +39,11 @@ export default function ProfileHistoryScreen() {
                 contentContainerStyle={styles.listContent}
                 ListHeaderComponent={
                     <View style={styles.headerRow}>
-                        <Text style={styles.sectionTitle}>{t('profileHistory.title')}</Text>
+                        <Text style={[styles.sectionTitle, dynStyles.sectionTitle]}>{t('profileHistory.title')}</Text>
                         {recipes.length > 0 && (
                             <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-                                <Ionicons name="trash-outline" size={16} color={colors.cream} />
-                                <Text style={styles.clearText}>{t('profileHistory.clear')}</Text>
+                                <Ionicons name="trash-outline" size={16} color={theme.cream} />
+                                <Text style={[styles.clearText, dynStyles.clearText]}>{t('profileHistory.clear')}</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -44,12 +51,14 @@ export default function ProfileHistoryScreen() {
                 ListEmptyComponent={
                     fetching ? (
                         <View style={styles.empty}>
-                            <ActivityIndicator size="large" color="rgba(255,255,255,0.4)" />
+                            <ActivityIndicator size="large" color={isDark ? 'rgba(255,255,255,0.4)' : 'rgba(122,0,0,0.3)'} />
                         </View>
                     ) : (
                         <View style={styles.empty}>
-                            <Ionicons name="time-outline" size={48} color="rgba(255,255,255,0.2)" />
-                            <Text style={styles.emptyText}>{t('profileHistory.empty')}</Text>
+                            <Ionicons name="time-outline" size={48} color={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(122,0,0,0.15)'} />
+                            <Text style={styles.emptyText}>
+                                {t('profileHistory.empty')}
+                            </Text>
                         </View>
                     )
                 }
@@ -78,7 +87,7 @@ export default function ProfileHistoryScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.primary,
+        backgroundColor: '#7A0000',
     },
     listContent: {
         paddingBottom: 16,
@@ -92,7 +101,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     sectionTitle: {
-        color: colors.cream,
+        color: '#DDBC9B',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -107,7 +116,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.2)',
     },
     clearText: {
-        color: colors.cream,
+        color: '#DDBC9B',
         fontSize: 13,
     },
     empty: {

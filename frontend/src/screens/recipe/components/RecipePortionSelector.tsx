@@ -1,8 +1,8 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { colors } from '@/src/theme/color'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 interface Props {
     portions: number
@@ -12,13 +12,21 @@ interface Props {
 }
 
 export function PortionSelector({ portions, originalPortions, onIncrement, onDecrement }: Props) {
+    const { theme } = useTheme()
     const { t } = useTranslation()
     const isOriginal = portions === originalPortions
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.surface, borderColor: theme.border },
+        label: { color: theme.textPrimary },
+        btn: { backgroundColor: theme.card, borderColor: theme.border },
+        value: { color: theme.textPrimary },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <View style={styles.left}>
-                <Text style={styles.label}>{t('recipePortionSelector.label')}</Text>
+                <Text style={[styles.label, dynStyles.label]}>{t('recipePortionSelector.label')}</Text>
                 {isOriginal && (
                     <Text style={styles.question}>{t('recipePortionSelector.question')}</Text>
                 )}
@@ -31,22 +39,22 @@ export function PortionSelector({ portions, originalPortions, onIncrement, onDec
 
             <View style={styles.controls}>
                 <TouchableOpacity
-                    style={[styles.btn, portions <= 1 && styles.btnDisabled]}
+                    style={[styles.btn, dynStyles.btn, portions <= 1 && styles.btnDisabled]}
                     onPress={onDecrement}
                     disabled={portions <= 1}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                    <Ionicons name="remove" size={16} color={portions <= 1 ? '#ccc' : colors.primary} />
+                    <Ionicons name="remove" size={16} color={portions <= 1 ? '#ccc' : theme.primary} />
                 </TouchableOpacity>
 
-                <Text style={styles.value}>{portions}</Text>
+                <Text style={[styles.value, dynStyles.value]}>{portions}</Text>
 
                 <TouchableOpacity
-                    style={styles.btn}
+                    style={[styles.btn, dynStyles.btn]}
                     onPress={onIncrement}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
-                    <Ionicons name="add" size={16} color={colors.primary} />
+                    <Ionicons name="add" size={16} color={theme.primary} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -58,7 +66,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: colors.surface,
+        backgroundColor: '#faf8f6',
         borderRadius: 12,
         paddingHorizontal: 14,
         paddingVertical: 10,
@@ -71,7 +79,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: '600',
-        color: colors.primary,
+        color: '#7A0000',
     },
     question: {
         fontSize: 11,
@@ -90,7 +98,7 @@ const styles = StyleSheet.create({
         width: 32,
         height: 32,
         borderRadius: 8,
-        backgroundColor: colors.white,
+        backgroundColor: '#FFFFFF',
         borderWidth: 1,
         borderColor: '#ede8e4',
         alignItems: 'center',
@@ -103,7 +111,7 @@ const styles = StyleSheet.create({
     value: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: colors.primary,
+        color: '#7A0000',
         minWidth: 28,
         textAlign: 'center',
     },

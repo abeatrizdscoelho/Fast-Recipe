@@ -10,9 +10,11 @@ import { Header } from '@/src/components/Header'
 import { BottomNav } from '@/src/components/BottomNav'
 import { MEAL_TYPES } from '@/src/types/mealPlan'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/src/context/ThemeContext'
 
 export default function MealPlanScreen() {
     const { t } = useTranslation()
+    const { theme, isDark } = useTheme()
     const {
         loading, refreshing, onRefresh,
         selectedDay, setSelectedDay,
@@ -26,20 +28,33 @@ export default function MealPlanScreen() {
         dayLabel, dayIsEmpty, weekDates,
     } = useMealPlan()
 
+    const dynStyles = StyleSheet.create({
+        container: { backgroundColor: theme.background },
+        headerTitle: { color: theme.white },
+        headerSub: { color: 'rgba(255,255,255,0.75)' },
+        pickerWrapper: { backgroundColor: theme.background },
+        scroll: { backgroundColor: isDark ? theme.surface : '#f5f5f5' },
+        loadingWrapper: { backgroundColor: isDark ? theme.surface : '#f5f5f5' },
+        dayTitle: { color: theme.textMuted },
+        emptyBanner: { backgroundColor: theme.card },
+        emptyText: { color: theme.textPrimary },
+        emptySubText: { color: theme.textMuted },
+    })
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynStyles.container]}>
             <Header />
 
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
                     <View>
-                        <Text style={styles.headerTitle}>{t('mealPlan.screenTitle')}</Text>
-                        <Text style={styles.headerSub}>{t('mealPlan.screenSubtitle')}</Text>
+                        <Text style={[styles.headerTitle, dynStyles.headerTitle]}>{t('mealPlan.screenTitle')}</Text>
+                        <Text style={[styles.headerSub, dynStyles.headerSub]}>{t('mealPlan.screenSubtitle')}</Text>
                     </View>
                 </View>
             </View>
 
-            <View style={styles.pickerWrapper}>
+            <View style={[styles.pickerWrapper, dynStyles.pickerWrapper]}>
                 <WeekDayPicker
                     weekDates={weekDates}
                     selectedDay={selectedDay}
@@ -50,23 +65,23 @@ export default function MealPlanScreen() {
             </View>
 
             {loading ? (
-                <View style={styles.loadingWrapper}>
-                    <ActivityIndicator size="large" color={colors.primary} />
+                <View style={[styles.loadingWrapper, dynStyles.loadingWrapper]}>
+                    <ActivityIndicator size="large" color={theme.primary} />
                 </View>
             ) : (
                 <ScrollView
-                    style={styles.scroll}
+                    style={[styles.scroll, dynStyles.scroll]}
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
                 >
-                    <Text style={styles.dayTitle}>{dayLabel}</Text>
+                    <Text style={[styles.dayTitle, dynStyles.dayTitle]}>{dayLabel}</Text>
 
                     {dayIsEmpty && (
-                        <View style={styles.emptyBanner}>
-                            <Ionicons name="restaurant-outline" size={36} color={colors.primary} style={{ opacity: 0.5 }} />
-                            <Text style={styles.emptyText}>{t('mealPlan.emptyDay')}</Text>
-                            <Text style={styles.emptySubText}>{t('mealPlan.emptyDaySub')}</Text>
+                        <View style={[styles.emptyBanner, dynStyles.emptyBanner]}>
+                            <Ionicons name="restaurant-outline" size={36} color={theme.primary} style={{ opacity: 0.5 }} />
+                            <Text style={[styles.emptyText, dynStyles.emptyText]}>{t('mealPlan.emptyDay')}</Text>
+                            <Text style={[styles.emptySubText, dynStyles.emptySubText]}>{t('mealPlan.emptyDaySub')}</Text>
                         </View>
                     )}
 
@@ -93,8 +108,8 @@ export default function MealPlanScreen() {
                 onSearchChange={setRecipeSearch}
                 onSelect={handleSelectRecipe}
                 onClose={() => setRecipeModalVisible(false)}
-                filters={recipeFilters}         
-                onApplyFilters={handleRecipeFilter} 
+                filters={recipeFilters}
+                onApplyFilters={handleRecipeFilter}
             />
 
             <BottomNav />
@@ -103,81 +118,66 @@ export default function MealPlanScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        backgroundColor: colors.primary 
+    container: {
+        flex: 1,
     },
-
     header: {
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20, 
-        paddingTop: 8, 
+        paddingHorizontal: 20,
+        paddingTop: 8,
         paddingBottom: 16,
     },
-    headerLeft: { 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        gap: 12 
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12
     },
-    headerTitle: { 
-        fontSize: 22, 
-        fontWeight: 'bold', 
-        color: colors.white 
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
     },
-    headerSub: { 
-        fontSize: 12, 
-        color: 'rgba(255,255,255,0.75)', 
-        marginTop: 2 
+    headerSub: {
+        fontSize: 12,
+        marginTop: 2
     },
-
-    pickerWrapper: { 
-        backgroundColor: colors.primary, 
-        paddingBottom: 8 
+    pickerWrapper: {
+        paddingBottom: 8
     },
-
-    scroll: { 
-        flex: 1, 
-        backgroundColor: '#f5f5f5', 
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius: 20 
+    scroll: {
+        flex: 1,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20
     },
-    scrollContent: { 
-        padding: 16, 
-        paddingTop: 20 
+    scrollContent: {
+        padding: 16,
+        paddingTop: 20
     },
-
-    loadingWrapper: { 
-        flex: 1, 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        backgroundColor: '#f5f5f5' 
+    loadingWrapper: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    dayTitle: { 
-        fontSize: 13, 
+    dayTitle: {
+        fontSize: 13,
         fontWeight: '700',
-        color: '#999', 
-        letterSpacing: 0.5, 
-        marginBottom: 14 
+        letterSpacing: 0.5,
+        marginBottom: 14
     },
-
     emptyBanner: {
-        alignItems: 'center', 
-        backgroundColor: colors.white,
-        borderRadius: 16, 
-        padding: 28, 
-        marginBottom: 16, 
+        alignItems: 'center',
+        borderRadius: 16,
+        padding: 28,
+        marginBottom: 16,
         gap: 4,
     },
-    emptyText: { 
-        fontSize: 14, 
-        fontWeight: '600', 
-        color: '#555', 
-        marginTop: 8 
+    emptyText: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginTop: 8
     },
-    emptySubText: { 
-        fontSize: 13, 
-        color: '#aaa' 
+    emptySubText: {
+        fontSize: 13,
     },
 })

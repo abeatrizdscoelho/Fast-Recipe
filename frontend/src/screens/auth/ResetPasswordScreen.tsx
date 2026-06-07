@@ -1,15 +1,19 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Platform, SafeAreaView, StyleSheet,
-  Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Image, Platform, SafeAreaView, StyleSheet,
+  Text, TextInput, TouchableOpacity, View
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useResetPassword } from '../../hooks/auth/useResetPassword';
 import EyeIcon from '../../components/icons/EyeIcon';
 import FieldError from '../../components/FieldError';
 import { colors } from '../../theme/color';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function ResetPasswordScreen() {
+  const { theme } = useTheme()
   const { t } = useTranslation()
   const {
     password, setPassword, confirmPassword, setConfirmPassword,
@@ -17,8 +21,21 @@ export default function ResetPasswordScreen() {
     loading, errors, apiError, success, handleResetPassword
   } = useResetPassword()
 
+  const dynStyles = StyleSheet.create({
+    container: { backgroundColor: theme.background },
+    card: { backgroundColor: theme.card },
+    title: { color: theme.primary },
+    subtitle: { color: theme.textMuted },
+    successText: { color: theme.primary },
+    label: { color: theme.textMuted },
+    inputNoBorder: { color: theme.textPrimary },
+    passwordRow: { borderBottomColor: theme.primary },
+    button: { backgroundColor: theme.primary },
+    backText: { color: theme.primary },
+  })
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, dynStyles.container]}>
       <KeyboardAwareScrollView
         enableOnAndroid
         enableAutomaticScroll
@@ -35,15 +52,15 @@ export default function ResetPasswordScreen() {
           />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>{t('resetPassword.title')}</Text>
-          <Text style={styles.subtitle}>{t('resetPassword.subtitle')}</Text>
+        <View style={[styles.card, dynStyles.card]}>
+          <Text style={[styles.title, dynStyles.title]}>{t('resetPassword.title')}</Text>
+          <Text style={[styles.subtitle, dynStyles.subtitle]}>{t('resetPassword.subtitle')}</Text>
 
           {success ? (
             <>
-              <Text style={styles.successText}>{t('resetPassword.successMessage')}</Text>
+              <Text style={[styles.successText, dynStyles.successText]}>{t('resetPassword.successMessage')}</Text>
               <TouchableOpacity
-                style={styles.button}
+                style={[styles.button, dynStyles.button]}
                 onPress={() => router.replace('/(auth)/login')}>
                 <Text style={styles.buttonText}>{t('resetPassword.goToLoginBtn')}</Text>
               </TouchableOpacity>
@@ -51,13 +68,14 @@ export default function ResetPasswordScreen() {
           ) : (
             <>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('resetPassword.labelNewPassword')}</Text>
-                <View style={[styles.passwordRow, errors.password ? styles.passwordRowError : null]}>
+                <Text style={[styles.label, dynStyles.label]}>{t('resetPassword.labelNewPassword')}</Text>
+                <View style={[styles.passwordRow, dynStyles.passwordRow, errors.password ? styles.passwordRowError : null]}>
                   <TextInput
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
-                    style={[styles.inputNoBorder, styles.flex]}
+                    placeholderTextColor={theme.textMuted}
+                    style={[styles.inputNoBorder, dynStyles.inputNoBorder, styles.flex]}
                   />
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                     <EyeIcon visible={showPassword} />
@@ -67,13 +85,14 @@ export default function ResetPasswordScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>{t('resetPassword.labelConfirmPassword')}</Text>
-                <View style={[styles.passwordRow, errors.confirmPassword ? styles.passwordRowError : null]}>
+                <Text style={[styles.label, dynStyles.label]}>{t('resetPassword.labelConfirmPassword')}</Text>
+                <View style={[styles.passwordRow, dynStyles.passwordRow, errors.confirmPassword ? styles.passwordRowError : null]}>
                   <TextInput
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showConfirmPassword}
-                    style={[styles.inputNoBorder, styles.flex]}
+                    placeholderTextColor={theme.textMuted}
+                    style={[styles.inputNoBorder, dynStyles.inputNoBorder, styles.flex]}
                   />
                   <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                     <EyeIcon visible={showConfirmPassword} />
@@ -85,7 +104,7 @@ export default function ResetPasswordScreen() {
               {apiError ? <FieldError message={apiError} centered={true} /> : null}
 
               <TouchableOpacity
-                style={[styles.button, loading && styles.buttonDisabled]}
+                style={[styles.button, dynStyles.button, loading && styles.buttonDisabled]}
                 onPress={handleResetPassword}
                 disabled={loading}>
                 <Text style={styles.buttonText}>
@@ -96,7 +115,7 @@ export default function ResetPasswordScreen() {
               <TouchableOpacity
                 onPress={() => router.replace('/(auth)/login')}
                 style={styles.backWrapper}>
-                <Text style={styles.backText}>{t('resetPassword.backToLogin')}</Text>
+                <Text style={[styles.backText, dynStyles.backText]}>{t('resetPassword.backToLogin')}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -109,9 +128,9 @@ export default function ResetPasswordScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  container: { 
-    flex: 1, 
-    backgroundColor: colors.primary 
+  container: {
+    flex: 1,
+    backgroundColor: colors.primary,
   },
   scrollContent: {
     flexGrow: 1,
@@ -124,9 +143,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: { 
-    width: 200, 
-    height: 200 
+  logo: {
+    width: 200,
+    height: 200
   },
   card: {
     width: '100%',
@@ -147,55 +166,48 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  title: { 
-    color: colors.primary, 
-    fontSize: 22, 
-    fontWeight: 'bold', 
-    marginBottom: 6 
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 6
   },
-  subtitle: { 
-    color: colors.gray, 
-    fontSize: 13, 
-    marginBottom: 32 
+  subtitle: {
+    fontSize: 13,
+    marginBottom: 32
   },
   successText: {
-    color: colors.primary,
     fontSize: 15,
     textAlign: 'center',
     marginVertical: 32,
   },
-  inputGroup: { 
-    marginBottom: 24 
+  inputGroup: {
+    marginBottom: 24
   },
-  label: { 
-    color: colors.gray, 
-    marginBottom: 4, 
-    fontSize: 14 
+  label: {
+    marginBottom: 4,
+    fontSize: 14
   },
   inputNoBorder: {
     paddingBottom: 8,
     fontSize: 16,
-    color: colors.black,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
   },
-  passwordRowError: { 
-    borderBottomColor: colors.error 
+  passwordRowError: {
+    borderBottomColor: colors.error
   },
   button: {
-    backgroundColor: colors.primary,
     borderRadius: 50,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 16,
   },
-  buttonDisabled: { 
-    opacity: 0.7 
+  buttonDisabled: {
+    opacity: 0.7
   },
   buttonText: {
     color: colors.white,
@@ -203,11 +215,10 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     fontSize: 15,
   },
-  backWrapper: { 
-    alignItems: 'center' 
+  backWrapper: {
+    alignItems: 'center'
   },
-  backText: { 
-    color: colors.primary, 
-    fontSize: 13 
+  backText: {
+    fontSize: 13
   },
 })

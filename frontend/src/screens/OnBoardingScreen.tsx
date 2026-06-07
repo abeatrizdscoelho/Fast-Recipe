@@ -1,34 +1,25 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet,
-  Dimensions, ScrollView, Image } from 'react-native';
+import {
+  View, Text, TouchableOpacity, StyleSheet,
+  Dimensions, ScrollView, Image
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { colors } from '../theme/color';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/src/context/ThemeContext';
 
 const { height } = Dimensions.get('window')
 
 const features = [
-  {
-    id: '1',
-    key: 'explore',
-    icon: require('../assets/images/icon-explore.png'),
-  },
-  {
-    id: '2',
-    key: 'create',
-    icon: require('../assets/images/icon-idea.png'),
-  },
-  {
-    id: '3',
-    key: 'save',
-    icon: require('../assets/images/icon-bookmark.png'),
-  },
+  { id: '1', key: 'explore', icon: require('../assets/images/icon-explore.png') },
+  { id: '2', key: 'create', icon: require('../assets/images/icon-idea.png') },
+  { id: '3', key: 'save', icon: require('../assets/images/icon-bookmark.png') },
 ]
 
 export default function OnboardingScreen() {
   const { user } = useAuth()
+  const { theme } = useTheme()
   const { t } = useTranslation()
 
   async function handleStart() {
@@ -37,17 +28,12 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
-          {/* <Image
-            source={require('../assets/images/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          /> */}
           <Text style={styles.welcomeText}>{t('onboarding.welcome')}</Text>
           <Text style={styles.logoText}>Fast Recipe!</Text>
         </View>
@@ -57,7 +43,7 @@ export default function OnboardingScreen() {
             <View key={feature.id} style={styles.featureItem}>
               <Image
                 source={feature.icon}
-                style={styles.iconImage}
+                style={[styles.iconImage, { tintColor: theme.cream }]}
                 resizeMode="contain"
               />
               <Text style={styles.featureTitle}>
@@ -73,8 +59,8 @@ export default function OnboardingScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.button} onPress={handleStart}>
-          <Text style={styles.buttonText}>{t('onboarding.startAction')}</Text>
+        <TouchableOpacity style={[styles.button, { backgroundColor: theme.cream }]} onPress={handleStart}>
+          <Text style={[styles.buttonText, { color: theme.primary }]}>{t('onboarding.startAction')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -84,7 +70,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: '#7A0000'
   },
   scrollContent: {
     flexGrow: 1,
@@ -95,68 +81,68 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 40
   },
   logo: {
     width: 90,
     height: 90,
-    marginBottom: 12,
+    marginBottom: 12
   },
   welcomeText: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
-    opacity: 0.85,
+    opacity: 0.85
   },
   logoText: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   featuresContainer: {
     width: '100%',
-    gap: 32,
+    gap: 32
   },
   featureItem: {
     alignItems: 'center',
-    gap: 10,
+    gap: 10
   },
   iconImage: {
     width: 85,
     height: 85,
-    tintColor: colors.cream,
+    tintColor: '#DDBC9B'
   },
   featureTitle: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'center'
   },
   featureDescription: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: 'bold',
     opacity: 0.8,
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   footer: {
     paddingHorizontal: 32,
     paddingBottom: height * 0.06,
     paddingTop: 16,
-    width: '100%',
+    width: '100%'
   },
   button: {
-    backgroundColor: colors.cream,
+    backgroundColor: '#DDBC9B',
     borderRadius: 50,
     paddingVertical: 16,
     alignItems: 'center',
-    width: '100%',
+    width: '100%'
   },
   buttonText: {
-    color: colors.primary,
+    color: '#7A0000',
     fontSize: 16,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 1
   },
 })

@@ -2,12 +2,14 @@ import React from 'react';
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export function Header() {
-  const { logout } = useAuth();
+  const { logout } = useAuth()
+  const { theme } = useTheme()
 
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { backgroundColor: theme.background }]}>
       <Image
         source={require('../assets/images/logo2.png')}
         style={styles.logo}

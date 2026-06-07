@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { fonts } from '../theme/typography';
 import { colors } from '../theme/color';
 
 export default function FieldError({ message, centered = false }: { message?: string; centered?: boolean }) {
@@ -14,7 +13,7 @@ const styles = StyleSheet.create({
   error: {
     color: colors.error,
     fontSize: 12,
-    fontFamily: fonts.regular,
+    fontWeight: 400,
     marginTop: 4,
   },
   centered: {
