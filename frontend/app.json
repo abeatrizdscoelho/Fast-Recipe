@@ -18,6 +18,7 @@
       "bundleIdentifier": "com.abeatrizdscoelho.fastrecipe"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.abeatrizdscoelho.fastrecipe",
@@ -43,7 +44,8 @@
       ],
       "expo-localization",
       "@react-native-firebase/app",
-      "@react-native-firebase/crashlytics"
+      "@react-native-firebase/crashlytics",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
