@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { api } from './api';
 import i18next from 'i18next'
+import crashlytics from '@react-native-firebase/crashlytics'
 
 export const userService = {
   async getProfile() {
@@ -8,7 +9,10 @@ export const userService = {
       const response = await api.get('/profile')
       return response.data
     } catch (err) {
+      crashlytics().log('Erro ao buscar perfil do usuário')
+
       if (axios.isAxiosError(err)) {
+        crashlytics().recordError(err)
         throw new Error(err.response?.data?.error ?? i18next.t('userService.fetchError'))
       }
       throw new Error(i18next.t('common.unexpectedError'))
@@ -39,7 +43,10 @@ export const userService = {
       })
       return response.data
     } catch (err) {
+      crashlytics().log('Erro ao atualizar perfil do usuário')
+
       if (axios.isAxiosError(err)) {
+        crashlytics().recordError(err)
         throw new Error(err.response?.data?.error ?? i18next.t('userService.updateError'))
       }
       throw new Error(i18next.t('common.unexpectedError'))

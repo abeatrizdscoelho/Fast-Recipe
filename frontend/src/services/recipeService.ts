@@ -3,11 +3,12 @@ import { api } from './api'
 import { RecipeFormData, Recipe, FeedResponse, FeedRecipe } from '../types/recipe'
 import { ActiveFilters } from '../components/FilterModal'
 import i18next from 'i18next'
+import crashlytics from '@react-native-firebase/crashlytics' 
 
 interface ReactNativeFile {
-  uri: string
-  name: string
-  type: string
+    uri: string
+    name: string
+    type: string
 }
 
 export const recipeService = {
@@ -42,7 +43,10 @@ export const recipeService = {
             })
             return response.data
         } catch (err) {
+            crashlytics().log('Erro ao tentar criar nova receita')
+
             if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
                 throw new Error(err.response?.data?.error ?? i18next.t('recipeService.createError'))
             }
             throw new Error(i18next.t('common.unexpectedError'))
@@ -54,7 +58,10 @@ export const recipeService = {
             const response = await api.get('/recipes/me')
             return response.data
         } catch (err) {
+            crashlytics().log('Erro ao buscar minhas receitas')
+
             if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
                 throw new Error(err.response?.data?.error ?? i18next.t('recipeService.fetchError'))
             }
             throw new Error(i18next.t('common.unexpectedError'))
@@ -77,7 +84,12 @@ export const recipeService = {
             })
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('recipeService.feedError'))
+            crashlytics().log('Erro ao buscar feed de receitas')
+
+            if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
+                throw new Error(err.response?.data?.error ?? i18next.t('recipeService.feedError'))
+            }
             throw new Error(i18next.t('common.unexpectedError'))
         }
     },
@@ -87,7 +99,10 @@ export const recipeService = {
             const response = await api.get(`/recipes/${id}`)
             return response.data
         } catch (err) {
+            crashlytics().log(`Erro ao buscar detalhes da receita ID: ${id}`)
+
             if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
                 throw new Error(err.response?.data?.error ?? i18next.t('recipeService.notFoundError'))
             }
             throw new Error(i18next.t('common.unexpectedError'))
@@ -125,7 +140,10 @@ export const recipeService = {
             })
             return response.data
         } catch (err) {
+            crashlytics().log(`Erro ao atualizar receita ID: ${id}`)
+
             if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
                 throw new Error(err.response?.data?.error ?? i18next.t('recipeService.updateError'))
             }
             throw new Error(i18next.t('common.unexpectedError'))
@@ -136,7 +154,10 @@ export const recipeService = {
         try {
             await api.delete(`/recipes/${id}`)
         } catch (err) {
+            crashlytics().log(`Erro ao deletar receita ID: ${id}`)
+
             if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
                 throw new Error(err.response?.data?.error ?? i18next.t('recipeService.deleteError'))
             }
             throw new Error(i18next.t('common.unexpectedError'))

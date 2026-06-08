@@ -9,6 +9,7 @@ import {
     ShoppingListItem,
 } from '../types/shoppingList'
 import i18next from 'i18next'
+import crashlytics from '@react-native-firebase/crashlytics'
 
 export const shoppingListService = {
     async getList(weekStart?: string): Promise<ShoppingListResponse> {
@@ -18,7 +19,12 @@ export const shoppingListService = {
             })
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.fetchError'))
+            crashlytics().log('Erro ao buscar lista de compras')
+
+            if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
+                throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.fetchError'))
+            }
             throw new Error(i18next.t('common.unexpectedError'))
         }
     },
@@ -28,7 +34,12 @@ export const shoppingListService = {
             const response = await api.patch('/shopping-list/bought', payload)
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.toggleError'))
+            crashlytics().log(`Erro ao alternar status do item. Payload: ${JSON.stringify(payload)}`)
+
+            if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
+                throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.toggleError'))
+            }
             throw new Error(i18next.t('common.unexpectedError'))
         }
     },
@@ -38,7 +49,12 @@ export const shoppingListService = {
             const response = await api.post('/shopping-list/items', payload)
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.addError'))
+            crashlytics().log('Erro ao adicionar item na lista de compras')
+
+            if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
+                throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.addError'))
+            }
             throw new Error(i18next.t('common.unexpectedError'))
         }
     },
@@ -48,7 +64,12 @@ export const shoppingListService = {
             const response = await api.patch('/shopping-list/items', payload)
             return response.data
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.updateError'))
+            crashlytics().log('Erro ao atualizar item na lista de compras')
+
+            if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
+                throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.updateError'))
+            }
             throw new Error(i18next.t('common.unexpectedError'))
         }
     },
@@ -57,7 +78,12 @@ export const shoppingListService = {
         try {
             await api.delete('/shopping-list/items', { data: payload })
         } catch (err) {
-            if (axios.isAxiosError(err)) throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.deleteError'))
+            crashlytics().log('Erro ao deletar item da lista de compras')
+
+            if (axios.isAxiosError(err)) {
+                crashlytics().recordError(err)
+                throw new Error(err.response?.data?.error ?? i18next.t('shoppingListService.deleteError'))
+            }
             throw new Error(i18next.t('common.unexpectedError'))
         }
     },
